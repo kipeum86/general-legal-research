@@ -48,13 +48,15 @@ Persist these session fields:
 - Skip Steps 2 and 4–5.
 - Run Steps 1 → 3 → 6 → 7 only.
 - State: `[Quick Mode: single-issue lookup]` at the start of the response.
-- If the answer cannot be confirmed from 1–2 sources, fall back to full 7-step mode.
+- If the answer cannot be confirmed from 1–2 sources, fall back to full 8-step mode.
 
-## 5) Workflow Orchestration (7 Steps)
+## 5) Workflow Orchestration (8 Steps)
 
 At every step start, print progress:
 
-`[Step X/7 — <Step Name>]`
+`[Step X/8 — <Step Name>]`
+
+Step 3.5 uses: `[Step 3.5/8 — Factual Claim Spot-Check]`
 
 Update `output/checkpoint.json` at the END of **every** step (not only Step 3).
 
@@ -81,6 +83,18 @@ Fallback order: tavily -> brave -> fetch from curated URLs in `references/legal-
 
 **For Korean law:** Always attempt law.go.kr first before using search tools.
 **For EU law:** Always attempt eur-lex.europa.eu first.
+
+### Step 3.5: Factual Claim Spot-Check
+
+Read `.claude/skills/fact-checker/SKILL.md` and follow it.
+
+**Purpose:** Intercept hallucinations before they enter analysis. Extracts discrete verifiable claims (statute numbers, case citations, dates, thresholds) from Step 3 output, spot-checks them against primary sources within a token budget, and produces `output/claim-registry.json`.
+
+**Skip when:** Quick Mode is active, OR single-jurisdiction KR-only with all sources directly confirmed from law.go.kr or equivalent primary portal.
+
+**Contradicted anchors:** Correct immediately before proceeding. If the correction is material to the legal conclusion, trigger a partial Step 3 loop-back for the affected jurisdiction only (max 1 loop).
+
+Output: `output/claim-registry.json` with `Verified` / `Unverified` / `Contradicted` status per anchor, plus inline summary.
 
 ### Step 4: Source Reliability Scoring
 
@@ -197,10 +211,11 @@ Tag placement: always inline at the specific finding. Do NOT aggregate tags only
 - Step 1: clarification questions (max 5), then default assumptions.
 - Step 2: one retry with broader scope.
 - Step 3: max 3 retries with different query strategy.
+- Step 3.5: budget exhausted → mark remaining HIGH-priority anchors `[Unverified]`, proceed. Contradicted anchor → correct and partial loop-back to Step 3 (affected jurisdiction only, max 1 loop). Source unreachable → one alternative URL attempt, then `Unverified`.
 - Step 4: one retry.
 - Step 5: re-enter Step 3 when evidence is insufficient.
 - Step 6: one remediation pass.
-- Step 7: two remediation rounds max.
+- Step 7: two remediation rounds max. Block delivery if any `Contradicted` anchor remains uncorrected in final output.
 
 All unresolved findings must remain explicit and traceable.
 
@@ -208,6 +223,7 @@ All unresolved findings must remain explicit and traceable.
 
 The following externally sourced skills are installed under `.claude/skills/` and may be invoked when relevant:
 
+- `fact-checker` ← Step 3.5 (built-in workflow step, always dispatched per trigger conditions)
 - `legal-opinion-formatter`
 - `legal-research`
 - `legal-research-summary`
