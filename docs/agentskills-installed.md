@@ -40,5 +40,5 @@ python "C:/Users/kplee/.codex/skills/.system/skill-installer/scripts/install-ski
   skills/legal/judgment-summary `
   skills/legal/case-briefs `
   skills/legal/cyber-law-compliance-summary `
-  --dest "game-legal-research/.claude/skills"
+  --dest "general-legal-research/.claude/skills"
 ```

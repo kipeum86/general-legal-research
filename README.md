@@ -2,11 +2,13 @@
 
 Evidence-based international legal research workflow, powered by Claude Code.
 
+> **[How to Use](docs/how-to-use.md)** · **[Disclaimer](docs/disclaimer.md)** · **[MCP Setup Guide](docs/mcp-setup-guide.md)**
+
 ## Overview
 
 `General Legal Research Agent` is a Claude Code agent scaffold that performs structured, source-grounded legal research across any practice area and jurisdiction. It runs entirely within your local Claude Code session — no external backend required.
 
-The agent persona is **김재식 (5th-year Associate at 법무법인 진주)**, specializing in domestic and international statute/regulation research (국내외 법률/법령 조사).
+The agent persona is **Kim Jaesik (김재식)**, a 5th-year Associate at **Law Firm Pearl (법무법인 진주)**, specializing in domestic and international statute/regulation research (국내외 법률/법령 조사).
 
 This project is **not** designed to provide legal advice.
 
@@ -150,11 +152,15 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 ├── scripts/
 │   ├── install-agentskills-set.ps1
 │   ├── render_professional_legal_opinion_docx.py
-│   └── generate_lootbox_8jurisdictions_opinion_docx.py
+│   └── render_acp_comparison_docx.py
+├── references/
+│   └── korean-law-reference.md        ← Korean law research guide (법원체계, 판례, 규제기관, 용어)
 ├── output/
 │   ├── glossary/glossary-global.json
 │   └── reports/                       ← generated output files (gitignored)
 └── docs/
+    ├── how-to-use.md
+    ├── disclaimer.md
     ├── mcp-setup-guide.md
     └── agentskills-installed.md
 ```

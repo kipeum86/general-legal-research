@@ -10,7 +10,7 @@
 
 ## Format Examples
 
-- `[P1] Ministry of Culture, Sports and Tourism, "Game Industry Promotion Act," Article 32, amended 2025-01-15, https://... (accessed 2026-03-05)`
+- `[P1] National Assembly, "Personal Information Protection Act (개인정보 보호법)," Article 28-2, amended 2025-03-14, https://www.law.go.kr/... (accessed 2026-03-05)`
 - `[C1] Supreme Court of X, Case 2025-AB-101, 2025-11-09, para. 44, https://... (accessed 2026-03-05)`
 
 ## Special Tags
