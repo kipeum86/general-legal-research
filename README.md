@@ -1,163 +1,205 @@
-# Game Legal Research Agent
+# General Legal Research Agent
 
-Evidence-based international legal research workflow for the game industry.
+Evidence-based international legal research workflow, powered by Claude Code.
 
 ## Overview
 
-`Game Legal Research Agent` is an implementation scaffold for a legal research assistant specialized in game-related regulation across jurisdictions.
+`General Legal Research Agent` is a Claude Code agent scaffold that performs structured, source-grounded legal research across any practice area and jurisdiction. It runs entirely within your local Claude Code session — no external backend required.
 
-This project is designed for:
-
-- In-house legal counsel and business/legal operations in game companies
-- Cross-jurisdiction legal/regulatory comparison
-- Source-grounded internal decision support
+The agent persona is **김재식 (5th-year Associate at 법무법인 진주)**, specializing in domestic and international statute/regulation research (국내외 법률/법령 조사).
 
 This project is **not** designed to provide legal advice.
 
-## Current Repository Status
-
-This repository now includes an **operational local MVP scaffold** based on the design spec.
-
-Included now:
-
-- `game-legal-research-agent-design.md`: integrated design document
-- `CLAUDE.md`: main orchestrator instructions
-- `.claude/skills/*`: modular skill set (Step 1-7)
-- `.claude/skills/*` (external): selected AgentSkills legal modules for specialist tasks
-- `.claude/agents/deep-researcher/AGENT.md`: optional sub-agent definition
-- `output/*`: checkpoint and intermediate artifact templates
-- `scripts/install-agentskills-set.ps1`: helper script to install selected external legal skills
-- `.env.example`: environment variable template for optional MCP integrations
-- `docs/mcp-setup-guide.md`: beginner setup guide for MCP integration
-- `docs/agentskills-installed.md`: installed AgentSkills set + install command
-- `LICENSE`: MIT license
-
 ## Core Design Principles
 
-- No legal advice: research and analysis support only
-- Anti-hallucination: no legal claim without verifiable source
-- Source hierarchy enforced:
-  - Primary: statute/regulation/case law/agency original documents
-  - Secondary: academic or practitioner materials
-  - Excluded as basis: low-trust summaries/blog/wiki-style sources
-- Pinpoint citations required: article/section/page/paragraph
-- Uncertainty transparency: unresolved findings must be tagged and explained
+- **No hallucination**: no legal claim without a verifiable, pinpoint-cited source
+- **Source hierarchy**: primary sources (statutes, cases, agency documents) over secondary; low-trust blogs/wikis excluded as sole basis
+- **Uncertainty transparency**: all unresolved findings tagged `[Unverified]` or `[Unresolved Conflict]`
+- **Jurisdiction-first**: official legal portals fetched directly (law.go.kr, eur-lex.europa.eu, congress.gov, etc.)
 
-## End-to-End Workflow (7 Steps)
+## Workflow
 
-1. Query Interpretation & Parameter Resolution
-2. Jurisdiction Mapping & Research Plan
-3. Source Collection (web research)
-4. Source Reliability Scoring (A-D)
-5. Analysis & Issue Structuring
-6. Output Generation (Mode A/B/C/D + file format)
-7. Quality-Gate Self-Verification
+### Standard: 7 Steps
 
-Checkpointing is part of the design (`output/checkpoint.json`) to support resume after interruptions.
+| Step | Name | Output |
+|------|------|--------|
+| 1 | Query Interpretation & Parameter Resolution | Structured parameters + assumptions |
+| 2 | Jurisdiction Mapping & Research Plan | Jurisdiction profile, domain checklist, search plan |
+| 3 | Source Collection | Raw sources with metadata |
+| 4 | Source Reliability Scoring (A–D) | Graded source list with rationale |
+| 5 | Analysis & Issue Structuring | Issue tree, conflict report, glossary updates |
+| 6 | Output Generation (Mode A/B/C/D) | Inline preview → file on confirmation |
+| 7 | Quality-Gate Self-Verification | Pass/fail with remediation |
+
+### Quick Mode: 4 Steps (Steps 1 → 3 → 6 → 7)
+
+For simple, single-jurisdiction statute lookups where Steps 2, 4, and 5 would add overhead without meaningful benefit.
+
+Session state is checkpointed at the end of every step (`output/checkpoint.json`). Interrupted sessions can be resumed.
 
 ## Output Modes
 
-- Mode A: Executive Brief
-- Mode B: Comparative Matrix
-- Mode C: Enforcement & Case Law
-- Mode D: Black-letter & Commentary (long-form, file output default)
+| Mode | Type | Default format |
+|------|------|----------------|
+| A | Executive Brief | `.md` |
+| B | Comparative Matrix | `.md` |
+| C | Enforcement & Case Law | `.md` |
+| D | Black-letter & Commentary (long-form) | `.docx` ← default |
 
-Supported output formats (design target):
+Supported file formats: `.md`, `.docx`, `.pdf`, `.pptx`, `.html`, `.txt`
 
-- `.md`, `.pdf`, `.docx`, `.pptx`, `.html`, `.txt`
-
-## Source Reliability & Citation Model
-
-Reliability grade:
-
-- A: official primary source
-- B: high-quality secondary source
-- C: medium reliability (bias note required)
-- D: low reliability (not allowed as sole basis)
-
-Citation codes:
-
-- `[P#]`: legislation/regulation
-- `[T#]`: treaty/convention
-- `[C#]`: case law/decision
-- `[A#]`: administrative document
-- `[S#]`: academic/practitioner source
-
-Special tags:
-
-- `[Industry Self-Regulatory Body]`
-- `[Unverified]`
-- `[Unresolved Conflict]`
+For legal opinion deliverables (`법률 의견서`, `legal opinion`, `opinion letter`), the `legal-opinion-formatter` skill generates a python-docx A4 document in law-firm style.
 
 ## Architecture
 
-Single main agent + one optional sub-agent:
+```
+Main agent (CLAUDE.md orchestrator)
+  └── Skills: 8 core + 14 specialist (read inline per step)
+  └── Sub-agent: deep-researcher (activated when ≥3 jurisdictions, >8 sources, or >~20,000 words)
+```
 
-- Main agent: orchestrates the full workflow
-- Sub-agent (`deep-researcher`): activated for multi-jurisdiction/high-volume source analysis
+### Core Skills (`steps 1–7`)
 
-Core skill modules:
+| Skill | Step |
+|-------|------|
+| `query-interpreter` | 1 |
+| `jurisdiction-mapper` | 2 |
+| `web-researcher` | 3 |
+| `source-scorer` | 4 |
+| `conflict-detector` + `glossary-manager` | 5 |
+| `output-generator` | 6 |
+| `quality-checker` | 7 |
 
-- `query-interpreter`
-- `jurisdiction-mapper`
-- `web-researcher`
-- `source-scorer`
-- `conflict-detector`
-- `glossary-manager`
-- `output-generator`
-- `quality-checker`
+### Specialist Skills (routed by topic)
 
-Specialist external legal skills are also installed under `.claude/skills/` (e.g., legal research, regulatory/compliance, privacy, antitrust, IP, memo/case summary templates).
+| Skill | Trigger topic |
+|-------|---------------|
+| `legal-opinion-formatter` | 법률 의견서, opinion letter, formal opinion |
+| `legal-research` | Research methodology, authority validation |
+| `legal-research-summary` + `client-memo` | Research digest, memo output |
+| `regulatory-summary` + `compliance-summaries` | Market entry, regulator obligations |
+| `gambling-law-summary` | Gambling, loot boxes, gaming licensing |
+| `privacy-law-updates` + `cyber-law-compliance-summary` | Data / privacy |
+| `antitrust-investigation-summary` | Antitrust / competition |
+| `ip-infringement-analysis` | IP enforcement, dispute risk |
+| `terms-of-service` + `api-acceptable-use-policy` | Platform/user policy terms |
+| `judgment-summary` + `case-briefs` | Case-law synthesis |
+
+## Source Reliability & Citation Model
+
+**Reliability grades:**
+
+| Grade | Description |
+|-------|-------------|
+| A | Official primary source (statute, case, agency document, regulatory body) |
+| B | High-quality secondary (peer-reviewed, major practitioner publication; unofficial translations max B) |
+| C | Medium reliability — bias note required |
+| D | Low reliability — not allowed as sole basis for any conclusion |
+
+**Citation codes:** `[P#]` legislation/regulation · `[T#]` treaty · `[C#]` case law · `[A#]` administrative · `[S#]` secondary
+
+**Special tags:** `[Industry Self-Regulatory Body]` · `[Unverified]` · `[Unresolved Conflict]`
+
+## Jurisdiction Coverage
+
+Official legal portals pre-approved for direct fetch (17+ jurisdictions):
+
+| Region | Portal |
+|--------|--------|
+| Korea | law.go.kr, supremecourt.go.kr |
+| EU | eur-lex.europa.eu |
+| US | congress.gov, ecfr.gov, federalregister.gov |
+| UK | legislation.gov.uk |
+| Germany | gesetze-im-internet.de |
+| Japan | laws.e-gov.go.jp, moj.go.jp |
+| France | legifrance.gouv.fr |
+| Spain | boe.es |
+| Italy | gazzettaufficiale.it |
+| China | flk.npc.gov.cn |
+| Singapore | sso.agc.gov.sg |
+| Australia | legislation.gov.au |
+| Canada | laws-lois.justice.gc.ca |
+| Brazil | planalto.gov.br |
+
+Additional practitioner/commentary sources are listed in `.claude/skills/web-researcher/references/legal-source-urls.md`.
 
 ## Repository Structure
 
-```text
+```
 /project-root
-├── .env.example
-├── CLAUDE.md
+├── CLAUDE.md                          ← main orchestrator (start here)
+├── .gitignore
+├── .env.example                       ← MCP API key template
 ├── .claude/
-│   ├── skills/
-│   └── agents/
+│   ├── settings.local.json            ← WebFetch domain allowlist
+│   ├── agents/
+│   │   └── deep-researcher/AGENT.md
+│   └── skills/
+│       ├── query-interpreter/
+│       ├── jurisdiction-mapper/
+│       ├── web-researcher/
+│       ├── source-scorer/
+│       ├── conflict-detector/
+│       ├── glossary-manager/
+│       ├── output-generator/
+│       ├── quality-checker/
+│       ├── legal-opinion-formatter/   ← includes python-docx generator
+│       └── [10 specialist skills]/
 ├── scripts/
+│   ├── install-agentskills-set.ps1
+│   ├── render_professional_legal_opinion_docx.py
+│   └── generate_lootbox_8jurisdictions_opinion_docx.py
 ├── output/
-│   ├── reports/
-│   └── glossary/
+│   ├── glossary/glossary-global.json
+│   └── reports/                       ← generated output files (gitignored)
 └── docs/
+    ├── mcp-setup-guide.md
+    └── agentskills-installed.md
 ```
 
-## Scope (Regulatory Domains)
+## How to Use
 
-1. Gambling & chance mechanics (loot box/gacha)
-2. Consumer protection & advertising
-3. Minors & online safety
-4. Privacy & data
-5. Platform/app store policies
-6. IP & UGC
-7. Esports & tournaments
-8. Virtual assets & digital items
-9. Competition/antitrust
-10. Labor/freelancer (game-industry-specific context only)
+### Requirements
 
-## How to Use This Repository
+- [Claude Code](https://claude.ai/code) CLI installed and authenticated
+- Python 3 + `python-docx` (for DOCX output): `pip install python-docx`
+- Optional: MCP search provider API keys (see `.env.example` and `docs/mcp-setup-guide.md`)
 
-1. Read `CLAUDE.md` (runtime orchestration rules).
-2. Start Codex in this directory and issue your research task in natural language.
-3. The agent executes the 7-step workflow and uses `.claude/skills/*` as dispatch targets.
-4. Use `output/checkpoint.json` to resume interrupted sessions.
-5. Keep `game-legal-research-agent-design.md` as the authoritative design reference.
+### Running a research task
+
+1. Open this directory in Claude Code.
+2. Issue your research question in natural language — Korean or English.
+3. The agent runs the full 7-step workflow (or Quick Mode for simple lookups) and produces the deliverable.
+4. For interrupted sessions, resume from `output/checkpoint.json` at session start.
+
+**Example prompts:**
+
+```
+개인정보보호법 제28조의2에 따른 가명정보 처리 요건을 EU GDPR 가명처리 규정과 비교 분석해줘.
+```
+
+```
+Summarize US federal AI liability frameworks currently in effect or under active rulemaking.
+```
+
+```
+브라질 LGPD 적용 범위와 위반 시 과징금 체계를 법률 의견서 형식으로 작성해줘.
+```
 
 ### Local-Only vs MCP-Connected
 
-- Local-only mode works without external API keys by using the installed local skills.
-- MCP-connected mode is optional and documented in `docs/mcp-setup-guide.md`.
+| Mode | What works | What doesn't |
+|------|-----------|--------------|
+| Local-only | Direct URL fetch from whitelisted legal portals, skill dispatch, output generation | Keyword search (tavily/brave) |
+| MCP-connected | Full workflow including search | Requires API keys in `.env` |
 
-## Development Roadmap (Next)
+## Development Roadmap
 
-1. Replace MCP script stubs with production connectors per provider environment.
-2. Add repeatable integration tests for the 7-step workflow.
-3. Add robust format export backends for PDF/DOCX/PPTX.
-4. Add CI checks for linting, schema validation, and artifact consistency.
-5. Expand jurisdiction-specific legal source references and conflict-resolution heuristics.
+1. Add repeatable integration tests for the 7-step workflow
+2. Expand conflict-resolution heuristics for more jurisdiction pairs
+3. Add production MCP connectors (replace script stubs)
+4. Add CI schema validation for checkpoint and glossary JSON artifacts
+5. Expand `legal-source-urls.md` for additional jurisdictions (India, Netherlands, Mexico, etc.)
 
 ## Disclaimer
 
@@ -167,4 +209,3 @@ For legal decisions, consult qualified counsel in the relevant jurisdiction.
 ## License
 
 MIT. See `LICENSE`.
-
