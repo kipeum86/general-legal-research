@@ -31,8 +31,14 @@ Every output must include:
 2. Conclusion summary
 3. Issue tree
 4. Detailed analysis
-5. Annotated bibliography
-6. Verification guide
+5. Counter-analysis (per conclusion, per `references/counter-analysis-checklist.md`)
+6. Practical implications (client-actionable takeaways)
+7. Annotated bibliography
+8. Verification guide
+
+## Mode-Specific References
+
+- **Mode B (Comparative Matrix):** Also read `references/comparative-framework.md` for standardized comparison axes and divergence commentary rules.
 
 ## Templates
 

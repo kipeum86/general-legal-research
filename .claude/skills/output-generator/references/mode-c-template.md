@@ -20,6 +20,14 @@
 - Practical implication:
 - Pinpoint:
 
+## Counter-Analysis
+Per enforcement trend, at least 1 dissenting or minority view. See `references/counter-analysis-checklist.md`.
+
+## Practical Implications
+- What the enforcement landscape means for the client
+- Compliance risk areas and recommended actions
+- Monitoring points for future developments
+
 ## Annotated Bibliography
 - Primary:
 - Secondary:

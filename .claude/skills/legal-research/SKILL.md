@@ -85,7 +85,7 @@ Last Updated:
 **Key changes from the original:**
 
 - **Description**: Rewritten in third-person active voice with clear trigger guidance; removed `tags` field (not part of the spec — only `name` and `description` are required frontmatter).
-- **Workflow**: Converted the 7-step process into a copyable checklist pattern (per best practices for multi-step workflows).
+- **Workflow**: Converted the 8-step process into a copyable checklist pattern (per best practices for multi-step workflows).
 - **Removed redundancy**: Dropped the "Common sources" table (Claude already knows about Westlaw/LexisNexis/Google Scholar) and the empty research trail log template (zero-value empty table).
 - **Consolidated structure**: Merged the "Update protocol" into its own focused section; moved guidelines into a "Pitfalls" section for scannability.
 - **Reduced from 94 to 68 lines** while preserving all domain-accurate legal content.

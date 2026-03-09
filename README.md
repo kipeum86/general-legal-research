@@ -57,7 +57,7 @@ For legal opinion deliverables (`법률 의견서`, `legal opinion`, `opinion le
 
 ```
 Main agent (CLAUDE.md orchestrator)
-  └── Skills: 8 core + 14 specialist (read inline per step)
+  └── Skills: 8 core + 15 specialist (read inline per step)
   └── Sub-agent: deep-researcher (activated when ≥3 jurisdictions, >8 sources, or >~20,000 words)
 ```
 
@@ -148,7 +148,7 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 │       ├── output-generator/
 │       ├── quality-checker/
 │       ├── legal-opinion-formatter/   ← includes python-docx generator
-│       └── [10 specialist skills]/
+│       └── [15 specialist skills]/
 ├── scripts/
 │   ├── install-agentskills-set.ps1
 │   ├── render_professional_legal_opinion_docx.py
@@ -203,7 +203,7 @@ Summarize US federal AI liability frameworks currently in effect or under active
 
 ## Development Roadmap
 
-1. Add repeatable integration tests for the 7-step workflow
+1. Add repeatable integration tests for the 8-step workflow
 2. Expand conflict-resolution heuristics for more jurisdiction pairs
 3. Add production MCP connectors (replace script stubs)
 4. Add CI schema validation for checkpoint and glossary JSON artifacts
