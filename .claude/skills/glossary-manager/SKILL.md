@@ -5,7 +5,7 @@ description: Maintain jurisdiction-aware legal glossary entries with translation
 
 # Glossary Manager
 
-Use this skill in Step 5 and Step 6 when terminology appears.
+Use this skill in Step 6 and Step 7 when terminology appears.
 
 ## Input
 

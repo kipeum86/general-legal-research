@@ -5,11 +5,11 @@ description: Generate mode-specific legal research deliverables, enforce citatio
 
 # Output Generator
 
-Use this skill at Step 6.
+Use this skill at Step 7.
 
 ## Inputs
 
-- Analysis result (Step 5)
+- Analysis result (Step 6)
 - Selected **mode** (A/B/C/D or auto) — controls structure and depth
 - Selected **format** (`.md`/`.docx`/`.pdf`/`.html` etc.) — controls file type
 - Output language

@@ -5,7 +5,7 @@ description: Format legal research output into a law-firm-grade formal opinion s
 
 # Legal Opinion Formatter
 
-Use this skill during Step 6 (Output Generation) when the user asks for:
+Use this skill during Step 7 (Output Generation) when the user asks for:
 - "legal opinion"
 - "formal opinion"
 - "law-firm style"
@@ -13,7 +13,7 @@ Use this skill during Step 6 (Output Generation) when the user asks for:
 
 ## Inputs
 
-- Step 5 analysis result
+- Step 6 analysis result
 - User language and output format
 - Jurisdiction scope and as-of date
 

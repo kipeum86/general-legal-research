@@ -5,7 +5,7 @@ description: Detect legal-source conflicts across definitions, scope, obligation
 
 # Conflict Detector
 
-Use this skill during Step 5 when conflicts appear.
+Use this skill during Step 6 when conflicts appear.
 
 ## Conflict Types
 

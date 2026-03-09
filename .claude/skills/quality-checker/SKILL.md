@@ -5,7 +5,7 @@ description: Run the 12-item legal research quality gate and decide pass/fail wi
 
 # Quality Checker
 
-Use this skill at Step 7 before delivery.
+Use this skill at Step 8 before delivery.
 
 ## 12-Item Checklist
 

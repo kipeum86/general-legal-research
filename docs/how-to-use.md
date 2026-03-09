@@ -25,11 +25,11 @@
    | 1 | Parses your query into structured parameters |
    | 2 | Maps relevant jurisdictions and builds a research plan |
    | 3 | Collects sources via web research (MCP or direct portal fetch) |
-   | 3.5 | Spot-checks factual claims to intercept hallucinations |
-   | 4 | Grades each source for reliability (A–D) |
-   | 5 | Analyzes issues, detects conflicts, updates glossary |
-   | 6 | Generates your deliverable (with inline preview) |
-   | 7 | Final quality gate — up to two remediation rounds |
+   | 4 | Spot-checks factual claims to intercept hallucinations |
+   | 5 | Grades each source for reliability (A–D) |
+   | 6 | Analyzes issues, detects conflicts, updates glossary |
+   | 7 | Generates your deliverable (with inline preview) |
+   | 8 | Final quality gate — up to two remediation rounds |
 
 5. Choose your preferred output format when prompted (`.md`, `.pdf`, `.docx`, `.pptx`, `.html`, `.txt`).
 
@@ -47,7 +47,7 @@ Mode D is the default, reflecting the agent's specialization in statute/regulati
 ## Quick Mode
 
 For simple, single-jurisdiction factual lookups, the agent automatically applies Quick Mode:
-- Runs Steps 1 → 3 → 6 → 7 only (skips Steps 2, 3.5, 4, 5).
+- Runs Steps 1 → 3 → 7 → 8 only (skips Steps 2, 4, 5, 6).
 - Stated at the start of the response as `[Quick Mode: single-issue lookup]`.
 - Falls back to the full 8-step workflow if the answer cannot be confirmed from 1–2 sources.
 

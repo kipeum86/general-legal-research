@@ -45,8 +45,8 @@ Persist these session fields:
 ## 4) Quick Mode
 
 **If the query is clearly simple** (single-jurisdiction, single factual lookup, no synthesis required), apply Quick Mode:
-- Skip Steps 2 and 4–5.
-- Run Steps 1 → 3 → 6 → 7 only.
+- Skip Steps 2 and 5–6.
+- Run Steps 1 → 3 → 7 → 8 only.
 - State: `[Quick Mode: single-issue lookup]` at the start of the response.
 - If the answer cannot be confirmed from 1–2 sources, fall back to full 8-step mode.
 
@@ -55,8 +55,6 @@ Persist these session fields:
 At every step start, print progress:
 
 `[Step X/8 — <Step Name>]`
-
-Step 3.5 uses: `[Step 3.5/8 — Factual Claim Spot-Check]`
 
 Update `output/checkpoint.json` at the END of **every** step (not only Step 3).
 
@@ -96,7 +94,7 @@ Fallback order: tavily -> brave -> fetch from curated URLs in `references/legal-
 - `[Repealed — YYYY-MM-DD]` — statute or provision no longer in effect. Do not cite as current law.
 For Korean law, check law.go.kr "연혁" tab. For EU law, check EUR-Lex procedural status. For other jurisdictions, check the official portal's amendment/status indicators.
 
-### Step 3.5: Factual Claim Spot-Check
+### Step 4: Factual Claim Spot-Check
 
 Read `.claude/skills/fact-checker/SKILL.md` and follow it.
 
@@ -108,7 +106,7 @@ Read `.claude/skills/fact-checker/SKILL.md` and follow it.
 
 Output: `output/claim-registry.json` with `Verified` / `Unverified` / `Contradicted` status per anchor, plus inline summary.
 
-### Step 4: Source Reliability Scoring
+### Step 5: Source Reliability Scoring
 
 Read `.claude/skills/source-scorer/SKILL.md` and follow it.
 
@@ -119,7 +117,7 @@ Source grading notes:
 - Translated statutes (unofficial translation) = Grade B maximum; note original-language source.
 - **Korean sources:** Apply the Korean-specific grading refinements in `references/korean-law-reference.md` § 6 and `.claude/skills/source-scorer/references/scoring-rubric.md`.
 
-### Step 5: Analysis & Issue Structuring
+### Step 6: Analysis & Issue Structuring
 
 Read `.claude/skills/conflict-detector/SKILL.md` and `.claude/skills/glossary-manager/SKILL.md` and follow them.
 
@@ -135,7 +133,7 @@ Output:
 
 When tagging unresolved findings, use `[Unverified]` or `[Unresolved Conflict]` **inline** at the specific finding, not only in a summary section.
 
-### Step 6: Output Generation
+### Step 7: Output Generation
 
 Read `.claude/skills/output-generator/SKILL.md` and follow it.
 
@@ -148,14 +146,14 @@ Rules:
 - If user requests a legal opinion deliverable (`법률 의견서`, `opinion letter`, `legal opinion`, `formal opinion`, `opinion memo`), you MUST read BOTH:
   1. `.claude/skills/legal-opinion-formatter/SKILL.md` (routing overview)
   2. `.claude/skills/legal-opinion-formatter/legal-opinion-formatter-SKILL.md` (full python-docx implementation guide)
-  Apply both in Step 6.
+  Apply both in Step 7.
 - First query in session: ask preferred file format.
 - Later queries: confirm previous format (`same as before?`).
 - Render inline preview before file save.
 - Save only after explicit user confirmation.
 - Default page size for DOCX: **A4** (210mm × 297mm). Korean law firm standard — do not use US Letter unless user requests it.
 
-### Step 7: Quality Gate
+### Step 8: Quality Gate
 
 Read `.claude/skills/quality-checker/SKILL.md` and follow it.
 
@@ -237,11 +235,11 @@ Tag placement: always inline at the specific finding. Do NOT aggregate tags only
 - Step 1: clarification questions (max 5), then default assumptions.
 - Step 2: one retry with broader scope.
 - Step 3: max 3 retries with different query strategy.
-- Step 3.5: budget exhausted → mark remaining HIGH-priority anchors `[Unverified]`, proceed. Contradicted anchor → correct and partial loop-back to Step 3 (affected jurisdiction only, max 1 loop). Source unreachable → one alternative URL attempt, then `Unverified`.
-- Step 4: one retry.
-- Step 5: re-enter Step 3 when evidence is insufficient.
-- Step 6: one remediation pass.
-- Step 7: two remediation rounds max. Block delivery if any `Contradicted` anchor remains uncorrected in final output.
+- Step 4: budget exhausted → mark remaining HIGH-priority anchors `[Unverified]`, proceed. Contradicted anchor → correct and partial loop-back to Step 3 (affected jurisdiction only, max 1 loop). Source unreachable → one alternative URL attempt, then `Unverified`.
+- Step 5: one retry.
+- Step 6: re-enter Step 3 when evidence is insufficient.
+- Step 7: one remediation pass.
+- Step 8: two remediation rounds max. Block delivery if any `Contradicted` anchor remains uncorrected in final output.
 
 All unresolved findings must remain explicit and traceable.
 
@@ -249,7 +247,7 @@ All unresolved findings must remain explicit and traceable.
 
 The following externally sourced skills are installed under `.claude/skills/` and may be invoked when relevant:
 
-- `fact-checker` ← Step 3.5 (built-in workflow step, always dispatched per trigger conditions)
+- `fact-checker` ← Step 4 (built-in workflow step, always dispatched per trigger conditions)
 - `legal-opinion-formatter`
 - `legal-research`
 - `legal-research-summary`
@@ -267,7 +265,7 @@ The following externally sourced skills are installed under `.claude/skills/` an
 - `cyber-law-compliance-summary`
 
 Routing rules:
-- If user requests a legal opinion deliverable (`법률 의견서`, `opinion letter`, `legal opinion`, `formal opinion`, `opinion memo`), always invoke `legal-opinion-formatter` (both `SKILL.md` and `legal-opinion-formatter-SKILL.md`) during Step 6.
+- If user requests a legal opinion deliverable (`법률 의견서`, `opinion letter`, `legal opinion`, `formal opinion`, `opinion memo`), always invoke `legal-opinion-formatter` (both `SKILL.md` and `legal-opinion-formatter-SKILL.md`) during Step 7.
 - If query is broad legal research methodology or authority validation, read `legal-research`.
 - If output is research digest/memo, read `legal-research-summary` and `client-memo`. Note: `legal-research-summary` is US-centric — adapt its framework when working outside the US.
 - If topic is market-entry or regulator obligations, read `regulatory-summary` and `compliance-summaries`.

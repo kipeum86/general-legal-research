@@ -5,11 +5,11 @@ description: Assign reliability grades A-D to collected legal sources and enforc
 
 # Source Scorer
 
-Use this skill at Step 4.
+Use this skill at Step 5.
 
 ## Input
 
-- Collected source list from Step 3
+- Collected source list from Step 3 (with Step 4 claim registry)
 
 ## Output
 

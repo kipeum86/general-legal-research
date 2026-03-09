@@ -5,10 +5,10 @@ description: >
   spot-check them against primary sources within a token budget, and produce
   a structured Claim Registry (output/claim-registry.json) with
   Verified / Unverified / Contradicted status per anchor.
-  Run as Step 3.5 — after source collection, before reliability scoring.
+  Run as Step 4 — after source collection, before reliability scoring.
 ---
 
-# Fact-Checker (Step 3.5)
+# Fact-Checker (Step 4)
 
 ## Purpose
 
@@ -124,7 +124,7 @@ Write `output/claim-registry.json`:
 ```json
 {
   "generated_at": "YYYY-MM-DD",
-  "step": "3.5",
+  "step": "4",
   "jurisdictions_covered": ["EU", "US", "KR"],
   "budget_used": { "EU": 3, "US": 2, "KR": 1 },
   "summary": {
@@ -172,7 +172,7 @@ Write `output/claim-registry.json`:
 After writing the registry, print to conversation:
 
 ```
-[Step 3.5 — Fact-Check Complete]
+[Step 4 — Fact-Check Complete]
 Anchors checked: 12 | Verified: 9 | Unverified: 2 | Contradicted: 1
 Registry: output/claim-registry.json
 
@@ -186,21 +186,21 @@ Unverified (2): A007 (US — CCPA §1798.100 text unconfirmed), A011 (JP — Act
 
 If `contradicted_count > 0`:
 
-1. **Correct immediately** in working notes before proceeding to Step 4
+1. **Correct immediately** in working notes before proceeding to Step 5
 2. **Materiality check**:
    - If correction changes the legal conclusion → trigger **partial Step 3 loop-back** (affected jurisdiction only, max 1 loop)
    - If correction is minor (typo in case number, article number off-by-one) → fix inline, continue
 3. **Document the correction** in the registry `note` field
-4. Step 7 Quality Gate will verify that no `Contradicted` anchor remains uncorrected in final output
+4. Step 8 Quality Gate will verify that no `Contradicted` anchor remains uncorrected in final output
 
 ---
 
-## Downstream Usage (Steps 4–7)
+## Downstream Usage (Steps 5–8)
 
-- **Step 4** (Reliability Scoring): use registry status to inform source grading. A source with Contradicted anchors cannot be Grade A.
-- **Step 5** (Analysis): tag analysis claims with registry IDs where applicable (e.g., `[A001: Verified]`). Promote `Unverified` anchors to `[Unverified]` inline tags.
-- **Step 6** (Output): do not expose registry IDs in client-facing output; translate to `[Unverified]` tags only.
-- **Step 7** (Quality Gate): confirm `contradicted_count == 0` in final output. If any Contradicted anchor is still uncorrected → block delivery.
+- **Step 5** (Reliability Scoring): use registry status to inform source grading. A source with Contradicted anchors cannot be Grade A.
+- **Step 6** (Analysis): tag analysis claims with registry IDs where applicable (e.g., `[A001: Verified]`). Promote `Unverified` anchors to `[Unverified]` inline tags.
+- **Step 7** (Output): do not expose registry IDs in client-facing output; translate to `[Unverified]` tags only.
+- **Step 8** (Quality Gate): confirm `contradicted_count == 0` in final output. If any Contradicted anchor is still uncorrected → block delivery.
 
 ---
 
@@ -208,8 +208,8 @@ If `contradicted_count > 0`:
 
 | Condition | Response |
 |---|---|
-| Budget exhausted, HIGH-priority anchors still unverified | Mark remaining as `Unverified`, proceed, flag in Step 7 |
+| Budget exhausted, HIGH-priority anchors still unverified | Mark remaining as `Unverified`, proceed, flag in Step 8 |
 | Source unreachable | Try one alternative URL; if still unreachable → `Unverified` |
 | Search returns no primary source result | Mark `Unverified`, do not guess |
-| No anchors found in Step 3 output | Pass-through with empty registry; proceed to Step 4 |
-| Step 3 output entirely from confirmed primary fetches | Mark all as pre-Verified; registry populated, Step 4 proceeds |
+| No anchors found in Step 3 output | Pass-through with empty registry; proceed to Step 5 |
+| Step 3 output entirely from confirmed primary fetches | Mark all as pre-Verified; registry populated, Step 5 proceeds |
