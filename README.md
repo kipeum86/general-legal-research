@@ -19,13 +19,14 @@ This project is **not** designed to provide legal advice.
 
 ## Workflow
 
-### Standard: 7 Steps
+### Standard: 8 Steps
 
 | Step | Name | Output |
 |------|------|--------|
 | 1 | Query Interpretation & Parameter Resolution | Structured parameters + assumptions |
 | 2 | Jurisdiction Mapping & Research Plan | Jurisdiction profile, domain checklist, search plan |
 | 3 | Source Collection | Raw sources with metadata |
+| 3.5 | Factual Claim Spot-Check | `output/claim-registry.json` — Verified / Unverified / Contradicted per anchor |
 | 4 | Source Reliability Scoring (A–D) | Graded source list with rationale |
 | 5 | Analysis & Issue Structuring | Issue tree, conflict report, glossary updates |
 | 6 | Output Generation (Mode A/B/C/D) | Inline preview → file on confirmation |
@@ -33,7 +34,7 @@ This project is **not** designed to provide legal advice.
 
 ### Quick Mode: 4 Steps (Steps 1 → 3 → 6 → 7)
 
-For simple, single-jurisdiction statute lookups where Steps 2, 4, and 5 would add overhead without meaningful benefit.
+For simple, single-jurisdiction statute lookups where Steps 2, 3.5, 4, and 5 would add overhead without meaningful benefit.
 
 Session state is checkpointed at the end of every step (`output/checkpoint.json`). Interrupted sessions can be resumed.
 
@@ -65,6 +66,7 @@ Main agent (CLAUDE.md orchestrator)
 | `query-interpreter` | 1 |
 | `jurisdiction-mapper` | 2 |
 | `web-researcher` | 3 |
+| `fact-checker` | 3.5 |
 | `source-scorer` | 4 |
 | `conflict-detector` + `glossary-manager` | 5 |
 | `output-generator` | 6 |
@@ -169,7 +171,7 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 
 1. Open this directory in Claude Code.
 2. Issue your research question in natural language — Korean or English.
-3. The agent runs the full 7-step workflow (or Quick Mode for simple lookups) and produces the deliverable.
+3. The agent runs the full 8-step workflow (or Quick Mode for simple lookups) and produces the deliverable.
 4. For interrupted sessions, resume from `output/checkpoint.json` at session start.
 
 **Example prompts:**
