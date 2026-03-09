@@ -1,0 +1,16 @@
+# Design document (internal blueprint)
+general-legal-research-agent-design.md
+
+# Generated report artifacts
+output/reports/
+
+# Session state & intermediate artifacts
+output/checkpoint.json
+output/research-plan.json
+output/research-result.json
+output/analysis-result.json
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.py[cod]

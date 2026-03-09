@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:law.go.kr)",
+      "WebFetch(domain:www.law.go.kr)",
+      "WebFetch(domain:eur-lex.europa.eu)",
+      "WebFetch(domain:www.congress.gov)",
+      "WebFetch(domain:www.ecfr.gov)",
+      "WebFetch(domain:www.federalregister.gov)",
+      "WebFetch(domain:www.legislation.gov.uk)",
+      "WebFetch(domain:www.gesetze-im-internet.de)",
+      "WebFetch(domain:laws.e-gov.go.jp)",
+      "WebFetch(domain:www.legifrance.gouv.fr)",
+      "WebFetch(domain:www.boe.es)",
+      "WebFetch(domain:www.gazzettaufficiale.it)",
+      "WebFetch(domain:www.planalto.gov.br)",
+      "WebFetch(domain:www.legislation.gov.au)",
+      "WebFetch(domain:laws-lois.justice.gc.ca)",
+      "WebFetch(domain:www.moj.go.jp)",
+      "WebFetch(domain:flk.npc.gov.cn)",
+      "WebFetch(domain:sso.agc.gov.sg)",
+      "WebFetch(domain:www.supremecourt.go.kr)",
+      "WebFetch(domain:casenote.kr)",
+      "WebFetch(domain:www.insideprivacy.com)",
+      "WebFetch(domain:www.lickslegal.com)",
+      "WebFetch(domain:www.machadomeyer.com.br)",
+      "WebFetch(domain:blog.galalaw.com)",
+      "WebFetch(domain:www.montaury.com.br)",
+      "WebFetch(domain:fpf.org)",
+      "WebFetch(domain:www.mondaq.com)",
+      "WebFetch(domain:www.globalpolicywatch.com)",
+      "WebFetch(domain:www.kasznarleonardos.com)",
+      "WebFetch(domain:www.compliancehub.wiki)",
+      "WebFetch(domain:captaincompliance.com)",
+      "Bash(python3:*)",
+      "Bash(where git)",
+      "Bash(where gh)",
+      "Bash(powershell -Command \"Get-Command gh -ErrorAction SilentlyContinue\")"
+    ]
+  }
+}
