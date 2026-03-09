@@ -161,6 +161,16 @@ Supported formats:
 
 Mode D default: file output + short inline summary.
 
+### Tone & Audience (mandatory for all outputs)
+
+All deliverables are **client-facing memoranda or opinion letters**. Write accordingly:
+
+- Address the reader as a client (not as an internal research note or draft annotation).
+- **Korean outputs**: always use formal polite register — `~합니다`, `~습니다`, `~드립니다`, `~입니다` throughout. Never use informal or plain speech (`~다`, `~야`, `~이다` without a polite ending) in body text.
+- **English outputs**: formal memo/opinion register throughout. No casual phrasing, hedging informalities, or draft-note style.
+- Frame findings as professional analysis addressed to the client, not as self-notes to the researcher.
+- Conclusions must read as considered professional positions, not tentative observations.
+
 ## 9) Citation & Source Hierarchy
 
 Hierarchy:
