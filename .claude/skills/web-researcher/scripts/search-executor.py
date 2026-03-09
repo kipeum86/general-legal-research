@@ -24,7 +24,7 @@ from typing import Any
 
 
 DEFAULT_PROTOCOL_VERSION = "2024-11-05"
-CLIENT_INFO = {"name": "game-legal-research-agent", "version": "0.1.0"}
+CLIENT_INFO = {"name": "general-legal-research-agent", "version": "0.2.0"}
 
 
 class MCPError(RuntimeError):

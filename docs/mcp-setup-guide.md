@@ -89,8 +89,8 @@ $env:BRAVE_API_KEY = "YOUR_BRAVE_KEY"
 ### 4) Test the script
 
 ```powershell
-cd "C:\Users\kplee\Desktop\VS Code\Legal Research Agent (심진주 변호사)\game-legal-research"
-.\.claude\skills\web-researcher\scripts\search-executor.ps1 -Query "EU loot box regulation official text"
+cd "C:\path\to\general-legal-research"
+.\.claude\skills\web-researcher\scripts\search-executor.ps1 -Query "GDPR data processing requirements official text"
 ```
 
 Expected:

@@ -2,9 +2,17 @@
 
 ## South Korea
 - Korean Law Information Center (국가법령정보센터 / KLIS): https://www.law.go.kr/
-- Supreme Court Case Search (대법원 판례검색): https://www.supremecourt.go.kr/
+- Supreme Court Case Search (대법원 종합법률정보): https://glaw.scourt.go.kr/
+- Supreme Court main (대법원): https://www.supremecourt.go.kr/
 - Constitutional Court (헌법재판소): https://www.ccourt.go.kr/
 - Korea Legislation Research Institute (한국법제연구원): https://www.klri.re.kr/
+- English Legislation (한국법제연구원 영문법령): https://elaw.klri.re.kr/
+- Ministry of Government Legislation (법제처): https://www.moleg.go.kr/
+- National Assembly Legislation Info (국회 의안정보): https://likms.assembly.go.kr/
+- Personal Information Protection Commission (개인정보보호위원회): https://www.pipc.go.kr/
+- Fair Trade Commission (공정거래위원회): https://www.ftc.go.kr/
+- Financial Services Commission (금융위원회): https://www.fsc.go.kr/
+- Financial Supervisory Service (금융감독원): https://www.fss.or.kr/
 
 ## European Union
 - EUR-Lex (Official Journal & legislation): https://eur-lex.europa.eu/
