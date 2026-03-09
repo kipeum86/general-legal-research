@@ -36,7 +36,25 @@
       "Bash(python3:*)",
       "Bash(where git)",
       "Bash(where gh)",
-      "Bash(powershell -Command \"Get-Command gh -ErrorAction SilentlyContinue\")"
+      "Bash(powershell -Command \"Get-Command gh -ErrorAction SilentlyContinue\")",
+      "Bash(gh release:*)",
+      "Bash(powershell -Command \"Get-Command gh -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source\")",
+      "WebFetch(domain:www.kimchang.com)",
+      "WebFetch(domain:www.globalcompliancenews.com)",
+      "WebFetch(domain:www.lawtimes.co.kr)",
+      "WebFetch(domain:www.law.cornell.edu)",
+      "WebFetch(domain:supreme.justia.com)",
+      "WebFetch(domain:resourcehub.bakermckenzie.com)",
+      "WebFetch(domain:www.dlapiperintelligence.com)",
+      "WebFetch(domain:www.lexology.com)",
+      "WebFetch(domain:www.koreadaily.com)",
+      "WebFetch(domain:www.korea.kr)",
+      "WebFetch(domain:www.sisajournal.com)",
+      "WebFetch(domain:www.seoul.co.kr)",
+      "WebFetch(domain:www.k-lawconsulting.com)",
+      "WebFetch(domain:www.etoday.co.kr)",
+      "WebFetch(domain:www.legaltimes.co.kr)",
+      "Bash(python:*)"
     ]
   }
 }
