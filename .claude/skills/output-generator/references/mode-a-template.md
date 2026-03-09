@@ -9,10 +9,17 @@
 ## Key Conclusions (5-10)
 1. Finding... [P1]
 
+## Counter-Analysis & Risk Assessment
+Per key conclusion, at least 1 counter-argument (brief). See `references/counter-analysis-checklist.md`.
+
 ## Risk / Priority Ranking
 - High:
 - Medium:
 - Low:
+
+## Practical Implications
+- What the findings mean for the client's decision
+- Recommended next steps
 
 ## Immediate Action Checklist
 - [ ] Action item

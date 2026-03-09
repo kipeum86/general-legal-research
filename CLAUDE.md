@@ -89,6 +89,13 @@ Fallback order: tavily -> brave -> fetch from curated URLs in `references/legal-
 **For Korean law:** Always attempt law.go.kr first before using search tools. Read `references/korean-law-reference.md` § 9 for the full Korean source collection sequence (본문 → 하위법령 → 연혁/부칙 → 판례 → 영문).
 **For EU law:** Always attempt eur-lex.europa.eu first.
 
+**Temporal status tagging (mandatory):** When collecting sources, check each statute/regulation for temporal status and apply the appropriate inline tag:
+- `[Recently Amended — YYYY-MM-DD]` — statute amended within the last 12 months. Include brief note on what changed.
+- `[Pending Amendment]` — amendment bill pending in legislature or regulatory guidance under consultation. Cite the bill/consultation reference.
+- `[Not Yet In Force — effective YYYY-MM-DD]` — statute enacted but not yet effective. Note which provisions are affected.
+- `[Repealed — YYYY-MM-DD]` — statute or provision no longer in effect. Do not cite as current law.
+For Korean law, check law.go.kr "연혁" tab. For EU law, check EUR-Lex procedural status. For other jurisdictions, check the official portal's amendment/status indicators.
+
 ### Step 3.5: Factual Claim Spot-Check
 
 Read `.claude/skills/fact-checker/SKILL.md` and follow it.
@@ -110,7 +117,7 @@ Output: graded source list (A-D) with one-line rationale.
 Source grading notes:
 - Government-adjacent regulatory bodies (e.g., EDPB, FSC, FTC) = Grade A.
 - Translated statutes (unofficial translation) = Grade B maximum; note original-language source.
-- **Korean sources:** Apply the Korean-specific grading refinements in `references/korean-law-reference.md` § 6 and `source-scorer/references/scoring-rubric.md`.
+- **Korean sources:** Apply the Korean-specific grading refinements in `references/korean-law-reference.md` § 6 and `.claude/skills/source-scorer/references/scoring-rubric.md`.
 
 ### Step 5: Analysis & Issue Structuring
 
@@ -118,9 +125,11 @@ Read `.claude/skills/conflict-detector/SKILL.md` and `.claude/skills/glossary-ma
 
 **Korean law included:** Also read `references/korean-law-reference.md` § 7 (충돌 유형) for Korean-specific conflict patterns, and § 8 (핵심 용어) to seed glossary entries and avoid mistranslation. Always check 부칙 (supplementary provisions) per § 2 before concluding on effective dates or transitional rules.
 
+**Counter-analysis requirement:** For every key conclusion, identify at least one counter-argument, alternative interpretation, or risk scenario. Use the framework in `references/counter-analysis-checklist.md`. This is mandatory — a conclusion without counter-analysis is incomplete.
+
 Output:
 - Issue tree
-- Per-issue analysis
+- Per-issue analysis with counter-arguments
 - Conflict report(s), if any
 - Glossary updates
 
@@ -207,10 +216,19 @@ Citation codes:
 - `[A#]` administrative document
 - `[S#]` secondary source
 
+**Numbering order:** Within each citation type, assign numbers by source reliability grade (A → D), not by order of appearance. Grade A sources get the lowest numbers (e.g., `[P1]` = highest-grade legislation source). This ensures readers encounter the most authoritative sources first in the bibliography. Within the same grade, use order of appearance.
+
 Special tags:
 - `[Industry Self-Regulatory Body]`
 - `[Unverified]`
 - `[Unresolved Conflict]`
+- `[Material Risk]`
+
+Temporal status tags (apply inline when relevant):
+- `[Recently Amended — YYYY-MM-DD]`
+- `[Pending Amendment]`
+- `[Not Yet In Force — effective YYYY-MM-DD]`
+- `[Repealed — YYYY-MM-DD]`
 
 Tag placement: always inline at the specific finding. Do NOT aggregate tags only in a summary or footnote section.
 
