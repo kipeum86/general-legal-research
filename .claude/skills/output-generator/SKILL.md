@@ -16,6 +16,14 @@ Use this skill at Step 6.
 
 **Mode and format are independent.** Confirm each separately. Mode D + `.docx` is the default for Kim Jaesik's statute-research work.
 
+## Tone & Audience
+
+Every output is a **client-facing memorandum or opinion letter**:
+
+- **Korean**: formal polite register throughout — `~합니다`, `~습니다`, `~드립니다`, `~입니다`. Body text must not use informal or plain-speech endings.
+- **English**: formal memo/opinion register. No casual phrasing or draft-note style.
+- Address the reader as a client. Frame findings as professional analysis, not researcher notes.
+
 ## Mandatory Sections
 
 Every output must include:

@@ -44,6 +44,8 @@ Use US Letter only when the user explicitly requests it or the matter is US-dome
 3. Separate "fact", "rule", "analysis", and "recommendation".
 4. Mark uncertainty explicitly (`[Unverified]`, `[Unresolved Conflict]` when needed).
 5. Keep citation identifiers consistent with project codes (`[P#]`, `[C#]`, `[A#]`, `[S#]`, `[T#]`).
+6. **Korean outputs**: formal polite register (`~합니다`, `~습니다`, `~드립니다`, `~입니다`) throughout all body text, headings, and recommendation items. Plain-speech endings are not permitted.
+7. **English outputs**: formal opinion-letter register. Address the reader as a client throughout.
 
 ## Sample Assets
 
