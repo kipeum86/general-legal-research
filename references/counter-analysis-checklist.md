@@ -1,6 +1,6 @@
 # Counter-Analysis Checklist
 
-Every key conclusion in Step 5 must be tested against at least one of the following counter-analysis dimensions before proceeding to Step 6.
+Every key conclusion in Step 6 must be tested against at least one of the following counter-analysis dimensions before proceeding to Step 7.
 
 ## Mandatory Check: Per-Conclusion Counter-Analysis
 

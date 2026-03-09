@@ -63,7 +63,13 @@
       "WebFetch(domain:www.k-lawconsulting.com)",
       "WebFetch(domain:www.etoday.co.kr)",
       "WebFetch(domain:www.legaltimes.co.kr)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "WebFetch(domain:iclg.com)",
+      "WebFetch(domain:www.mohw.go.kr)",
+      "WebFetch(domain:www.monews.co.kr)",
+      "WebFetch(domain:www.kpanews.co.kr)",
+      "WebFetch(domain:m.ceoscoredaily.com)",
+      "Bash(pip list:*)"
     ]
   }
 }

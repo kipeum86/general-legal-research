@@ -28,15 +28,15 @@ This project is **not** designed to provide legal advice.
 | 1 | Query Interpretation & Parameter Resolution | Structured parameters + assumptions |
 | 2 | Jurisdiction Mapping & Research Plan | Jurisdiction profile, domain checklist, search plan |
 | 3 | Source Collection | Raw sources with metadata |
-| 3.5 | Factual Claim Spot-Check | `output/claim-registry.json` — Verified / Unverified / Contradicted per anchor |
-| 4 | Source Reliability Scoring (A–D) | Graded source list with rationale |
-| 5 | Analysis & Issue Structuring | Issue tree, conflict report, glossary updates |
-| 6 | Output Generation (Mode A/B/C/D) | Inline preview → file on confirmation |
-| 7 | Quality-Gate Self-Verification | Pass/fail with remediation |
+| 4 | Factual Claim Spot-Check | `output/claim-registry.json` — Verified / Unverified / Contradicted per anchor |
+| 5 | Source Reliability Scoring (A–D) | Graded source list with rationale |
+| 6 | Analysis & Issue Structuring | Issue tree, conflict report, glossary updates |
+| 7 | Output Generation (Mode A/B/C/D) | Inline preview → file on confirmation |
+| 8 | Quality-Gate Self-Verification | Pass/fail with remediation |
 
-### Quick Mode: 4 Steps (Steps 1 → 3 → 6 → 7)
+### Quick Mode: 4 Steps (Steps 1 → 3 → 7 → 8)
 
-For simple, single-jurisdiction statute lookups where Steps 2, 3.5, 4, and 5 would add overhead without meaningful benefit.
+For simple, single-jurisdiction statute lookups where Steps 2, 4, 5, and 6 would add overhead without meaningful benefit.
 
 Session state is checkpointed at the end of every step (`output/checkpoint.json`). Interrupted sessions can be resumed.
 
@@ -61,18 +61,18 @@ Main agent (CLAUDE.md orchestrator)
   └── Sub-agent: deep-researcher (activated when ≥3 jurisdictions, >8 sources, or >~20,000 words)
 ```
 
-### Core Skills (`steps 1–7`)
+### Core Skills (`steps 1–8`)
 
 | Skill | Step |
 |-------|------|
 | `query-interpreter` | 1 |
 | `jurisdiction-mapper` | 2 |
 | `web-researcher` | 3 |
-| `fact-checker` | 3.5 |
-| `source-scorer` | 4 |
-| `conflict-detector` + `glossary-manager` | 5 |
-| `output-generator` | 6 |
-| `quality-checker` | 7 |
+| `fact-checker` | 4 |
+| `source-scorer` | 5 |
+| `conflict-detector` + `glossary-manager` | 6 |
+| `output-generator` | 7 |
+| `quality-checker` | 8 |
 
 ### Specialist Skills (routed by topic)
 

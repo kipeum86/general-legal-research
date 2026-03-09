@@ -19,7 +19,7 @@ This project is powered by a large language model (Claude). LLMs can and do prod
 - **Misclassify source hierarchy** — treat non-binding guidance, blog commentary, or secondary summaries as if they were primary legal authority
 - **Invent citations** — generate plausible-looking but entirely fictitious case names, docket numbers, statute references, or article titles
 
-The agent includes built-in safeguards (Step 3.5 fact-checking, source grading, quality gates, conflict detection, `[Unverified]` tagging), but **these safeguards reduce — not eliminate — the risk of error**. A qualified human must always review and verify every output before any reliance or action. The agent assists; the human decides.
+The agent includes built-in safeguards (Step 4 fact-checking, source grading, quality gates, conflict detection, `[Unverified]` tagging), but **these safeguards reduce — not eliminate — the risk of error**. A qualified human must always review and verify every output before any reliance or action. The agent assists; the human decides.
 
 ## Data Handling
 
