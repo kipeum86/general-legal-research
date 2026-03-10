@@ -1,0 +1,41 @@
+{
+  "_template": "EU 개인정보보호",
+  "_description": "GDPR, ePrivacy, EU-US 데이터 이전, 감독당국 대응.",
+  "version": "1.0",
+  "persona": {
+    "title": "Associate",
+    "firm": "[Firm Name]",
+    "bar_admissions": ["EU"],
+    "specialization": "EU Data Protection & Privacy"
+  },
+  "practice": {
+    "primary_area": "regulatory",
+    "sub_areas": ["data_privacy", "cybersecurity", "digital_markets", "AI_regulation"],
+    "industry_sectors": ["technology", "adtech", "healthcare", "financial_services", "retail"],
+    "typical_matters": [
+      "GDPR_compliance_assessment",
+      "data_transfer_mechanisms",
+      "DPA_drafting",
+      "supervisory_authority_response",
+      "DPIA",
+      "privacy_by_design",
+      "AI_Act_compliance"
+    ]
+  },
+  "jurisdictions": {
+    "primary": ["EU"],
+    "secondary": ["UK", "US", "KR"]
+  },
+  "research_defaults": {
+    "mode": "D",
+    "output_format": "docx",
+    "output_language": "en",
+    "quick_mode_threshold": "single-EU-regulation"
+  },
+  "kb": {
+    "index_path": "knowledge/_index.md"
+  },
+  "library": {
+    "index_path": "library/_index.md"
+  }
+}

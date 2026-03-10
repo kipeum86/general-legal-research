@@ -1,0 +1,40 @@
+{
+  "_template": "한국 스타트업·VC·IT",
+  "_description": "창업, VC 투자, IT·데이터 법무 전반.",
+  "version": "1.0",
+  "persona": {
+    "title": "Associate",
+    "firm": "[사무소명]",
+    "bar_admissions": ["KR"],
+    "specialization": "스타트업·VC·IT 법무"
+  },
+  "practice": {
+    "primary_area": "corporate",
+    "sub_areas": ["startup_law", "VC_financing", "data_privacy", "employment"],
+    "industry_sectors": ["fintech", "SaaS", "gaming", "AI", "e-commerce"],
+    "typical_matters": [
+      "term_sheet_review",
+      "SHA_investment_agreement",
+      "founders_agreement",
+      "stock_options_ESOP",
+      "data_processing_agreement",
+      "service_terms"
+    ]
+  },
+  "jurisdictions": {
+    "primary": ["KR"],
+    "secondary": ["US", "SG"]
+  },
+  "research_defaults": {
+    "mode": "D",
+    "output_format": "docx",
+    "output_language": "ko",
+    "quick_mode_threshold": "single-KR-statute"
+  },
+  "kb": {
+    "index_path": "knowledge/_index.md"
+  },
+  "library": {
+    "index_path": "library/_index.md"
+  }
+}

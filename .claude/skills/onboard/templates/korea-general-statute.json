@@ -1,0 +1,33 @@
+{
+  "_template": "한국 법령 일반",
+  "_description": "국내 법령·규정 리서치 전반. 현재 CLAUDE.md 기본값과 동일.",
+  "version": "1.0",
+  "persona": {
+    "title": "Associate",
+    "firm": "[사무소명]",
+    "bar_admissions": ["KR"],
+    "specialization": "국내외 법률·법령 조사"
+  },
+  "practice": {
+    "primary_area": "regulatory",
+    "sub_areas": ["statute_research", "administrative_law"],
+    "industry_sectors": [],
+    "typical_matters": ["statute_review", "regulatory_compliance", "legislative_analysis"]
+  },
+  "jurisdictions": {
+    "primary": ["KR"],
+    "secondary": []
+  },
+  "research_defaults": {
+    "mode": "D",
+    "output_format": "docx",
+    "output_language": "ko",
+    "quick_mode_threshold": "single-KR-statute"
+  },
+  "kb": {
+    "index_path": "knowledge/_index.md"
+  },
+  "library": {
+    "index_path": "library/_index.md"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "_template": "한국 고용·노동",
+  "_description": "근로기준법, 노사관계, 고용 규제 전반.",
+  "version": "1.0",
+  "persona": {
+    "title": "Associate",
+    "firm": "[사무소명]",
+    "bar_admissions": ["KR"],
+    "specialization": "고용·노동법"
+  },
+  "practice": {
+    "primary_area": "employment",
+    "sub_areas": ["labor_standards", "industrial_relations", "workplace_safety", "discrimination"],
+    "industry_sectors": ["manufacturing", "retail", "finance", "healthcare", "IT"],
+    "typical_matters": [
+      "unfair_dismissal",
+      "collective_bargaining",
+      "wage_hour_compliance",
+      "workplace_harassment",
+      "employment_contract_review",
+      "redundancy_restructuring"
+    ]
+  },
+  "jurisdictions": {
+    "primary": ["KR"],
+    "secondary": []
+  },
+  "research_defaults": {
+    "mode": "D",
+    "output_format": "docx",
+    "output_language": "ko",
+    "quick_mode_threshold": "single-KR-statute"
+  },
+  "kb": {
+    "index_path": "knowledge/_index.md"
+  },
+  "library": {
+    "index_path": "library/_index.md"
+  }
+}

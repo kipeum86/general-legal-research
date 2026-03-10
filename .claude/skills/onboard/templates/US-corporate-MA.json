@@ -1,0 +1,40 @@
+{
+  "_template": "미국 기업·M&A",
+  "_description": "미국 델라웨어 법인, M&A 딜 구조, 증권 규제.",
+  "version": "1.0",
+  "persona": {
+    "title": "Associate",
+    "firm": "[Firm Name]",
+    "bar_admissions": ["US-DE", "US-NY"],
+    "specialization": "US Corporate & M&A"
+  },
+  "practice": {
+    "primary_area": "corporate",
+    "sub_areas": ["MA_transactions", "corporate_governance", "securities", "PE_VC"],
+    "industry_sectors": ["technology", "healthcare", "financial_services", "energy", "consumer"],
+    "typical_matters": [
+      "merger_agreement_review",
+      "due_diligence",
+      "board_fiduciary_duties",
+      "securities_compliance",
+      "shareholder_agreements",
+      "acquisition_structuring"
+    ]
+  },
+  "jurisdictions": {
+    "primary": ["US"],
+    "secondary": ["KR", "EU", "UK"]
+  },
+  "research_defaults": {
+    "mode": "D",
+    "output_format": "docx",
+    "output_language": "en",
+    "quick_mode_threshold": "single-US-statute"
+  },
+  "kb": {
+    "index_path": "knowledge/_index.md"
+  },
+  "library": {
+    "index_path": "library/_index.md"
+  }
+}
