@@ -170,6 +170,26 @@ Rules:
   Apply both in Step 7.
 - First query in session: ask preferred file format.
 - Later queries: confirm previous format (`same as before?`).
+- **8-Section pre-save checklist (MANDATORY before writing any DOCX script):**
+  Before finalizing the script, explicitly confirm all 8 sections from output-generator SKILL.md are present:
+  - [ ] 1. Scope & as-of date
+  - [ ] 2. Conclusion summary
+  - [ ] 3. Issue tree (standalone section — NOT embedded inside the analysis body)
+  - [ ] 4. Detailed analysis
+  - [ ] 5. Counter-analysis
+  - [ ] 6. Practical implications
+  - [ ] 7. Annotated bibliography
+  - [ ] 8. Verification guide
+  If any section is missing, add it before writing the script. Do not skip this check.
+- **Korean DOCX generation rules (MANDATORY for any KO `.docx` script):**
+  1. Use the **Write tool** to write the Python file. Never use Bash shell or heredoc for Korean content — Windows cp949 terminal encoding corrupts Korean UTF-8 strings.
+  2. Embed all Korean-language content directly as **Python UTF-8 string literals** in the source file.
+  3. Apply dual-font pattern from `scripts/render_acp_comparison_docx.py` (the reference template):
+     - `FONT_BODY = "Times New Roman"` (Latin runs)
+     - `FONT_BODY_KO = "맑은 고딕"` (CJK runs — set via `w:eastAsia` in every run's rPr element)
+     - In `_set_run_font()`: always call `rf.set(qn("w:eastAsia"), FONT_BODY_KO)` explicitly.
+  4. Also set `eastAsia` on the document Normal style paragraph format.
+  5. Never assume python-docx will auto-detect CJK fonts — always set `w:eastAsia` explicitly.
 - Render inline preview before file save.
 - Save only after explicit user confirmation.
 - Default page size for DOCX: **A4** (210mm × 297mm). Korean law firm standard — do not use US Letter unless user requests it.
@@ -195,6 +215,13 @@ Use `.claude/agents/deep-researcher/AGENT.md` when any condition is true:
 - 3+ jurisdictions, or
 - Mode B/D with estimated > 8 sources, or
 - total source text estimated > ~20,000 words.
+
+**Communication pattern (MANDATORY):** Before launching deep-researcher, tell the user why:
+> "이 조사는 N개 관할을 포함합니다 — 병렬 서브에이전트를 사용하면 순차 조사보다 빠릅니다. 진행할까요? [Y/N]"
+> (English: "This query covers N jurisdictions — parallel sub-agent research is faster than sequential WebSearch. Proceed? [Y/N]")
+
+If user declines, fall back to sequential WebSearch/WebFetch and state the speed trade-off explicitly.
+Do NOT silently launch or silently fall back without user acknowledgment.
 
 Handoff:
 - write plan to `output/research-plan.json`
