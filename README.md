@@ -1,12 +1,26 @@
+**Language:** [**English**](README.md) | [한국어](docs/ko/README.md)
+
 # General Legal Research Agent
 
 Evidence-based international legal research workflow, powered by Claude Code.
 
-> **[How to Use](docs/how-to-use.md)** · **[Disclaimer](docs/disclaimer.md)** · **[MCP Setup Guide](docs/mcp-setup-guide.md)**
+> **[How to Use](docs/en/how-to-use.md)** | **[Disclaimer](docs/en/disclaimer.md)** | **[MCP Setup Guide](docs/en/mcp-setup-guide.md)**
+
+---
+
+<div align="center">
+
+**Language / 언어**
+
+[**English**](README.md) | [한국어](docs/ko/README.md)
+
+</div>
+
+---
 
 ## Overview
 
-`General Legal Research Agent` is a Claude Code agent scaffold that performs structured, source-grounded legal research across any practice area and jurisdiction. It runs entirely within your local Claude Code session — no external backend required.
+`General Legal Research Agent` is a Claude Code agent scaffold that performs structured, source-grounded legal research across any practice area and jurisdiction. It runs entirely within your local Claude Code session with no external backend required.
 
 The agent is configurable per user. On first launch, a brief setup wizard collects your name, firm, practice area, and jurisdiction preferences, then saves them locally as `user-config.json`. Every subsequent session loads this config automatically, personalizing the agent's persona, jurisdiction defaults, and output language without any manual steps.
 
@@ -15,43 +29,44 @@ This project is **not** designed to provide legal advice.
 ## Core Design Principles
 
 - **No hallucination**: no legal claim without a verifiable, pinpoint-cited source
-- **Source hierarchy**: primary sources (statutes, cases, agency documents) over secondary; low-trust blogs/wikis excluded as sole basis
-- **Uncertainty transparency**: all unresolved findings tagged `[Unverified]` or `[Unresolved Conflict]`
-- **Jurisdiction-first**: official legal portals fetched directly (law.go.kr, eur-lex.europa.eu, congress.gov, etc.)
+- **Source hierarchy**: primary sources (statutes, cases, agency documents) over secondary; low-trust blogs and wikis are excluded as the sole basis for any conclusion
+- **Uncertainty transparency**: all unresolved findings are tagged `[Unverified]` or `[Unresolved Conflict]`
+- **Jurisdiction-first**: official legal portals are fetched directly (`law.go.kr`, `eur-lex.europa.eu`, `congress.gov`, and others)
 
 ## Workflow
 
-### Standard: 9 Steps (Step 0 + Steps 1–8)
+### Standard: 9 Steps (Step 0 + Steps 1-7)
 
 | Step | Name | Output |
 |------|------|--------|
-| 0 | User Config Loading | Loads `user-config.json`; auto-triggers `/onboard` setup if missing |
-| 1 | Query Interpretation & Parameter Resolution | Structured parameters + assumptions |
+| 0 | User Config Loading | Loads `user-config.json`; auto-triggers `/onboard` if missing |
+| 1 | Query Interpretation & Parameter Resolution | Structured parameters and assumptions |
 | 2 | Jurisdiction Mapping & Research Plan | Jurisdiction profile, domain checklist, search plan |
 | 3 | Source Collection | Raw sources with metadata |
-| 3.5 | Factual Claim Spot-Check | `output/claim-registry.json` — Verified / Unverified / Contradicted per anchor |
-| 4 | Source Reliability Scoring (A–D) | Graded source list with rationale |
+| 3.5 | Factual Claim Spot-Check | `output/claim-registry.json` with Verified / Unverified / Contradicted per anchor |
+| 4 | Source Reliability Scoring (A-D) | Graded source list with rationale |
 | 5 | Analysis & Issue Structuring | Issue tree, conflict report, glossary updates |
-| 6 | Output Generation (Mode A/B/C/D) | Inline preview → file on confirmation |
-| 7 | Quality-Gate Self-Verification | Pass/fail with remediation |
+| 6 | Output Generation (Mode A/B/C/D) | Inline preview, then file generation on confirmation |
+| 7 | Quality-Gate Self-Verification | Pass/fail plus remediation instructions |
 
-### Quick Mode: 4 Steps (Steps 1 → 3 → 6 → 7)
+### Quick Mode: 4 Steps (Steps 1 -> 3 -> 6 -> 7)
 
-For simple, single-jurisdiction statute lookups where Steps 2, 3.5, 4, and 5 would add overhead without meaningful benefit.
+Quick Mode is used for simple, single-jurisdiction statute lookups where Steps 2, 3.5, 4, and 5 would add overhead without meaningful value.
 
-Session state is checkpointed at the end of every step (`output/checkpoint.json`). Interrupted sessions can be resumed.
+Session state is checkpointed at the end of every step in `output/checkpoint.json`. Interrupted sessions can be resumed.
 
 ## Personal Configuration
 
-The agent is designed for single-user, local installation. Each user configures the agent once for their own practice — similar to how you would set up a custom GPT or Claude Project.
+The agent is designed for single-user local installation. Configure it once for your own practice, much like setting up a custom GPT or Claude Project.
 
 ### How it works
 
-**First session (automatic):** If `user-config.json` does not exist, Step 0 triggers the setup wizard automatically before any research begins. No need to run `/onboard` manually.
+**First session (automatic):** If `user-config.json` does not exist, Step 0 triggers the setup wizard automatically before research begins. No need to run `/onboard` manually.
 
 **Setup options:**
-- **[1] Starter template** — pick one of 6 presets and start immediately
-- **[2] Custom interview** — answer 7 questions to configure every field
+
+- **[1] Starter template**: pick one of 6 presets and start immediately
+- **[2] Custom interview**: answer 7 questions to configure every field
 
 **Starter templates:**
 
@@ -64,7 +79,7 @@ The agent is designed for single-user, local installation. Each user configures 
 | 5 | US Corporate & M&A | US | English |
 | 6 | EU Privacy & GDPR | EU (+ UK, US, KR) | English |
 
-**Reconfiguration:** Run `/onboard` at any time to update your settings. The wizard shows your current config and asks for confirmation before overwriting.
+**Reconfiguration:** Run `/onboard` at any time to update your settings. The wizard shows your current config and asks for confirmation before overwriting it.
 
 ### Local-only files (gitignored)
 
@@ -73,8 +88,8 @@ All user-specific data stays on your machine and is never committed to git:
 | Path | Who manages it | Purpose |
 |------|----------------|---------|
 | `user-config.json` | Auto-generated by `/onboard` | Persona, jurisdiction defaults, output preferences |
-| `knowledge/` | Agent (auto-generated after research) | Cached research results, statute digests, verified source snapshots |
-| `library/` | Attorney (manual uploads) | Your own legal opinions, case law, papers, regulations — referenced as Grade A sources in Step 3 |
+| `knowledge/` | Agent-generated after research | Cached research results, statute digests, verified source snapshots |
+| `library/` | Attorney-managed manual uploads | Your own legal opinions, case law, papers, and regulations; treated as Grade A sources in Step 3 |
 
 ### `user-config.json` schema
 
@@ -112,27 +127,27 @@ All user-specific data stays on your machine and is never committed to git:
 
 Place your own reference materials here. The agent indexes `library/_index.md` at Step 0 and treats any file listed there as a Grade A source during Step 3 source collection.
 
-```
+```text
 library/
-├── _index.md          ← maintain this index manually
-├── opinions/          ← legal opinions (internal + external)
-├── cases/             ← case law PDFs
-├── papers/            ← articles, law review pieces
-├── regulations/       ← regulatory guidelines, agency manuals
-└── misc/
+|-- _index.md          # maintain this index manually
+|-- opinions/          # legal opinions (internal + external)
+|-- cases/             # case law PDFs
+|-- papers/            # articles, law review pieces
+|-- regulations/       # regulatory guidelines, agency manuals
+`-- misc/
 ```
 
 ### `knowledge/` directory
 
 Agent-generated. After each research session, the agent stores verified findings, statute excerpts, and source metadata here for reuse in future sessions.
 
-```
+```text
 knowledge/
-├── _index.md          ← maintained by the agent
-├── statutes/
-├── cases/
-├── templates/
-└── precedents/
+|-- _index.md          # maintained by the agent
+|-- statutes/
+|-- cases/
+|-- templates/
+`-- precedents/
 ```
 
 ## Output Modes
@@ -142,21 +157,22 @@ knowledge/
 | A | Executive Brief | `.md` |
 | B | Comparative Matrix | `.md` |
 | C | Enforcement & Case Law | `.md` |
-| D | Black-letter & Commentary (long-form) | `.docx` ← default |
+| D | Black-letter & Commentary (long-form) | `.docx` (default) |
 
-Supported file formats: `.md`, `.docx`, `.pdf`, `.pptx`, `.html`, `.txt`
+Supported output formats: `.md`, `.docx`, `.pdf`, `.pptx`, `.html`, `.txt`
 
-For legal opinion deliverables (`legal opinion`, `opinion letter`, `formal opinion memo`), the `legal-opinion-formatter` skill generates a python-docx A4 document in law-firm style.
+For legal opinion deliverables (`legal opinion`, `opinion letter`, `formal opinion memo`), the `legal-opinion-formatter` skill generates an A4 law-firm-style document with `python-docx`.
 
 ## Architecture
 
-```
+```text
 Main agent (CLAUDE.md orchestrator)
-  └── Skills: 8 core + 15 specialist (read inline per step)
-  └── Sub-agent: deep-researcher (activated when ≥3 jurisdictions, >8 sources, or >~20,000 words)
+  |-- Skills: 8 core + 15 specialist (read inline per step)
+  `-- Sub-agent: deep-researcher
+      (activated when >=3 jurisdictions, >8 sources, or >~20,000 words)
 ```
 
-### Core Skills (Steps 0–7)
+### Core Skills (Steps 0-7)
 
 | Skill | Step |
 |-------|------|
@@ -175,15 +191,15 @@ Main agent (CLAUDE.md orchestrator)
 | Skill | Trigger topic |
 |-------|---------------|
 | `legal-opinion-formatter` | legal opinion, opinion letter, formal opinion |
-| `legal-research` | Research methodology, authority validation |
-| `legal-research-summary` + `client-memo` | Research digest, memo output |
-| `regulatory-summary` + `compliance-summaries` | Market entry, regulator obligations |
-| `gambling-law-summary` | Gambling, loot boxes, gaming licensing |
-| `privacy-law-updates` + `cyber-law-compliance-summary` | Data / privacy |
-| `antitrust-investigation-summary` | Antitrust / competition |
+| `legal-research` | research methodology, authority validation |
+| `legal-research-summary` + `client-memo` | research digest, memo output |
+| `regulatory-summary` + `compliance-summaries` | market entry, regulator obligations |
+| `gambling-law-summary` | gambling, loot boxes, gaming licensing |
+| `privacy-law-updates` + `cyber-law-compliance-summary` | data / privacy |
+| `antitrust-investigation-summary` | antitrust / competition |
 | `ip-infringement-analysis` | IP enforcement, dispute risk |
-| `terms-of-service` + `api-acceptable-use-policy` | Platform/user policy terms |
-| `judgment-summary` + `case-briefs` | Case-law synthesis |
+| `terms-of-service` + `api-acceptable-use-policy` | platform / user policy terms |
+| `judgment-summary` + `case-briefs` | case-law synthesis |
 
 ## Source Reliability & Citation Model
 
@@ -191,14 +207,14 @@ Main agent (CLAUDE.md orchestrator)
 
 | Grade | Description |
 |-------|-------------|
-| A | Official primary source (statute, case, agency document, regulatory body); also attorney-uploaded `library/` materials |
-| B | High-quality secondary (peer-reviewed, major practitioner publication; unofficial translations max B) |
-| C | Medium reliability — bias note required |
-| D | Low reliability — not allowed as sole basis for any conclusion |
+| A | Official primary source (statute, case, agency document, regulatory body), plus attorney-uploaded `library/` materials |
+| B | High-quality secondary source (peer-reviewed work, major practitioner publication; unofficial translations are capped at B) |
+| C | Medium reliability; bias note required |
+| D | Low reliability; not allowed as the sole basis for any conclusion |
 
-**Citation codes:** `[P#]` legislation/regulation · `[T#]` treaty · `[C#]` case law · `[A#]` administrative · `[S#]` secondary
+**Citation codes:** `[P#]` legislation / regulation | `[T#]` treaty | `[C#]` case law | `[A#]` administrative | `[S#]` secondary
 
-**Special tags:** `[Industry Self-Regulatory Body]` · `[Unverified]` · `[Unresolved Conflict]`
+**Special tags:** `[Industry Self-Regulatory Body]` | `[Unverified]` | `[Unresolved Conflict]`
 
 ## Jurisdiction Coverage
 
@@ -225,55 +241,64 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 
 ## Repository Structure
 
-```
+```text
 /project-root
-├── CLAUDE.md                          ← main orchestrator (start here)
-├── user-config.json                   ← gitignored; auto-generated by /onboard
-├── .gitignore
-├── .env.example                       ← MCP API key template
-├── .claude/
-│   ├── settings.local.json            ← WebFetch domain allowlist
-│   ├── agents/
-│   │   └── deep-researcher/AGENT.md
-│   └── skills/
-│       ├── onboard/                   ← /onboard skill + 6 starter templates
-│       ├── query-interpreter/
-│       ├── jurisdiction-mapper/
-│       ├── web-researcher/
-│       ├── source-scorer/
-│       ├── conflict-detector/
-│       ├── glossary-manager/
-│       ├── output-generator/
-│       ├── quality-checker/
-│       ├── legal-opinion-formatter/   ← includes python-docx generator
-│       └── [15 specialist skills]/
-├── knowledge/                         ← gitignored; agent-generated KB
-│   ├── _index.md
-│   ├── statutes/
-│   ├── cases/
-│   ├── templates/
-│   └── precedents/
-├── library/                           ← gitignored; attorney-curated materials (Grade A)
-│   ├── _index.md
-│   ├── opinions/
-│   ├── cases/
-│   ├── papers/
-│   ├── regulations/
-│   └── misc/
-├── scripts/
-│   ├── install-agentskills-set.ps1
-│   ├── render_professional_legal_opinion_docx.py
-│   └── render_acp_comparison_docx.py
-├── references/
-│   └── korean-law-reference.md        ← Korean law research guide
-├── output/
-│   ├── glossary/glossary-global.json
-│   └── reports/                       ← generated output files (gitignored)
-└── docs/
-    ├── how-to-use.md
-    ├── disclaimer.md
-    ├── mcp-setup-guide.md
-    └── agentskills-installed.md
+|-- CLAUDE.md                          # main orchestrator (start here)
+|-- user-config.json                   # gitignored; auto-generated by /onboard
+|-- .gitignore
+|-- .env.example                       # MCP API key template
+|-- .claude/
+|   |-- settings.local.json            # WebFetch domain allowlist
+|   |-- agents/
+|   |   `-- deep-researcher/AGENT.md
+|   `-- skills/
+|       |-- onboard/                   # /onboard skill + 6 starter templates
+|       |-- query-interpreter/
+|       |-- jurisdiction-mapper/
+|       |-- web-researcher/
+|       |-- source-scorer/
+|       |-- conflict-detector/
+|       |-- glossary-manager/
+|       |-- output-generator/
+|       |-- quality-checker/
+|       |-- legal-opinion-formatter/   # includes python-docx generator
+|       `-- [15 specialist skills]/
+|-- knowledge/                         # gitignored; agent-generated KB
+|   |-- _index.md
+|   |-- statutes/
+|   |-- cases/
+|   |-- templates/
+|   `-- precedents/
+|-- library/                           # gitignored; attorney-curated materials (Grade A)
+|   |-- _index.md
+|   |-- opinions/
+|   |-- cases/
+|   |-- papers/
+|   |-- regulations/
+|   `-- misc/
+|-- scripts/
+|   |-- install-agentskills-set.ps1
+|   |-- render_professional_legal_opinion_docx.py
+|   `-- render_acp_comparison_docx.py
+|-- references/
+|   `-- korean-law-reference.md        # Korean law research guide
+|-- output/
+|   |-- glossary/glossary-global.json
+|   `-- reports/                       # generated output files (gitignored)
+`-- docs/
+    |-- en/
+    |   |-- README.md                  # compatibility bridge to root README
+    |   |-- how-to-use.md
+    |   |-- disclaimer.md
+    |   `-- mcp-setup-guide.md
+    |-- ko/
+    |   |-- README.md
+    |   |-- how-to-use.md
+    |   |-- disclaimer.md
+    |   `-- mcp-setup-guide.md
+    |-- how-to-use.md                  # compatibility bridge
+    |-- disclaimer.md                  # compatibility bridge
+    `-- mcp-setup-guide.md             # compatibility bridge
 ```
 
 ## How to Use
@@ -281,36 +306,36 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 ### Requirements
 
 - [Claude Code](https://claude.ai/code) CLI installed and authenticated
-- Python 3 + `python-docx` (for DOCX output): `pip install python-docx`
-- Optional: MCP search provider API keys (see `.env.example` and `docs/mcp-setup-guide.md`)
+- Python 3 + `python-docx` for DOCX output: `pip install python-docx`
+- Optional MCP search provider API keys; see `.env.example` and `docs/en/mcp-setup-guide.md`
 
 ### Running a research task
 
 1. Clone this repo and open the directory in Claude Code.
-2. **First session only:** the agent automatically runs the onboard setup wizard — pick a starter template or answer 7 short questions. This takes about 2 minutes and creates `user-config.json` locally.
-3. Issue your research question in natural language — Korean or English.
-4. The agent runs the full 9-step workflow (or Quick Mode for simple lookups) and produces the deliverable.
-5. For interrupted sessions, resume from `output/checkpoint.json` at session start.
+2. **First session only:** the agent automatically runs the onboard setup wizard. Pick a starter template or answer 7 short questions. This usually takes about 2 minutes and creates `user-config.json` locally.
+3. Ask your research question in natural language, in Korean or English.
+4. The agent runs the full 9-step workflow, or Quick Mode for simple lookups, and produces the deliverable.
+5. Interrupted sessions can be resumed from `output/checkpoint.json` at the next session start.
 
-To reconfigure your profile at any time, run `/onboard`.
+Run `/onboard` at any time if you want to reconfigure your profile.
 
 **Example prompts:**
 
-```
+```text
 Compare pseudonymization requirements under Korea's Personal Information Protection Act
-with GDPR Article 4(5) — identify compliance gaps for a joint KR-EU data controller.
+with GDPR Article 4(5) and identify compliance gaps for a joint KR-EU data controller.
 ```
 
-```
+```text
 Summarize US federal AI liability frameworks currently in effect or under active rulemaking.
 ```
 
-```
+```text
 Analyze board approval requirements for a Delaware corporation acquiring a Korean subsidiary
 via share purchase. Flag any CFIUS or FKFTC notification thresholds.
 ```
 
-```
+```text
 Draft a formal opinion letter on whether our SaaS platform's data localization architecture
 satisfies Brazil LGPD Article 33 cross-border transfer requirements.
 ```
@@ -318,18 +343,18 @@ satisfies Brazil LGPD Article 33 cross-border transfer requirements.
 ### Local-Only vs MCP-Connected
 
 | Mode | What works | What doesn't |
-|------|-----------|--------------|
-| Local-only | Direct URL fetch from whitelisted legal portals, skill dispatch, output generation | Keyword search (tavily/brave) |
+|------|------------|--------------|
+| Local-only | Direct URL fetch from whitelisted legal portals, skill dispatch, output generation | Keyword search (`tavily` / `brave`) |
 | MCP-connected | Full workflow including search | Requires API keys in `.env` |
 
 ## Development Roadmap
 
 1. Add repeatable integration tests for the 9-step workflow
 2. Expand conflict-resolution heuristics for more jurisdiction pairs
-3. Add production MCP connectors (replace script stubs)
+3. Add production MCP connectors to replace current script stubs
 4. Add CI schema validation for checkpoint and glossary JSON artifacts
-5. Expand `legal-source-urls.md` for additional jurisdictions (India, Netherlands, Mexico, etc.)
-6. Implement `/kb add`, `/kb search`, `/kb status` commands for `knowledge/` management
+5. Expand `legal-source-urls.md` for additional jurisdictions such as India, the Netherlands, and Mexico
+6. Implement `/kb add`, `/kb search`, and `/kb status` for `knowledge/` management
 7. Auto-update `knowledge/_index.md` after Step 7 completes
 
 ## Disclaimer
