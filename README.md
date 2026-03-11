@@ -6,18 +6,6 @@ Evidence-based international legal research workflow, powered by Claude Code.
 
 > **[How to Use](docs/en/how-to-use.md)** | **[Disclaimer](docs/en/disclaimer.md)** | **[MCP Setup Guide](docs/en/mcp-setup-guide.md)**
 
----
-
-<div align="center">
-
-**Language / 언어**
-
-[**English**](README.md) | [한국어](docs/ko/README.md)
-
-</div>
-
----
-
 ## Overview
 
 `General Legal Research Agent` is a Claude Code agent scaffold that performs structured, source-grounded legal research across any practice area and jurisdiction. It runs entirely within your local Claude Code session with no external backend required.
