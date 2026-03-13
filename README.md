@@ -14,6 +14,13 @@ The agent is configurable per user. On first launch, a brief setup wizard collec
 
 This project is **not** designed to provide legal advice.
 
+## Example Outputs
+
+| Example | Description |
+|---------|-------------|
+| [Korean output](https://docs.google.com/document/d/1KBaSeJXEXWDNKoxS2yt0kE6XXjuw5JWw/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) | 딥페이크 규제 5개국 비교 분석 (KR, EU, US, JP, UK) |
+| [English output](https://docs.google.com/document/d/1HTXCMYERDhHlm40_zSqMrIWATJPTBPOW/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) | Deepfake regulation across five jurisdictions (KR, EU, US, JP, UK) |
+
 ## Core Design Principles
 
 - **No hallucination**: no legal claim without a verifiable, pinpoint-cited source
