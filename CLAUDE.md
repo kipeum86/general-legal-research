@@ -119,13 +119,15 @@ For Korean law, check law.go.kr "연혁" tab. For EU law, check EUR-Lex procedur
 
 Read `.claude/skills/fact-checker/SKILL.md` and follow it.
 
-**Purpose:** Intercept hallucinations before they enter analysis. Extracts discrete verifiable claims (statute numbers, case citations, dates, thresholds) from Step 3 output, spot-checks them against primary sources within a token budget, and produces `output/claim-registry.json`.
+**Purpose:** Intercept hallucinations **and source laundering** before they enter analysis. Extracts discrete verifiable claims (statute numbers, case citations, dates, thresholds) from Step 3 output, spot-checks them against primary sources within a token budget, detects cases where secondary sources are cited as primary authority, and produces `output/claim-registry.json`.
 
 **Skip when:** Quick Mode is active, OR single-jurisdiction KR-only with all sources directly confirmed from law.go.kr or equivalent primary portal.
 
 **Contradicted anchors:** Correct immediately before proceeding. If the correction is material to the legal conclusion, trigger a partial Step 3 loop-back for the affected jurisdiction only (max 1 loop).
 
-Output: `output/claim-registry.json` with `Verified` / `Unverified` / `Contradicted` status per anchor, plus inline summary.
+**Source laundering detection (Phase 3.5):** After anchor verification, scan all secondary/mixed sources for laundering patterns: (1) interpretation presented as fact without primary fetch, (2) phantom citations to unfetched primary sources, (3) paraphrasing primary sources without pinpoint citation. Any conclusion relying solely on a laundering-flagged source must be resolved (fetch primary, re-attribute to secondary, or mark `[Unverified]`) before proceeding to Step 5.
+
+Output: `output/claim-registry.json` with `Verified` / `Unverified` / `Contradicted` status per anchor, source laundering flags, plus inline summary.
 
 ### Step 5: Source Reliability Scoring
 
@@ -170,7 +172,7 @@ Rules:
   Apply both in Step 7.
 - First query in session: ask preferred file format.
 - Later queries: confirm previous format (`same as before?`).
-- **8-Section pre-save checklist (MANDATORY before writing any DOCX script):**
+- **Pre-save checklist (MANDATORY before writing any DOCX script):**
   Before finalizing the script, explicitly confirm all 8 sections from output-generator SKILL.md are present:
   - [ ] 1. Scope & as-of date
   - [ ] 2. Conclusion summary
@@ -181,6 +183,15 @@ Rules:
   - [ ] 7. Annotated bibliography
   - [ ] 8. Verification guide
   If any section is missing, add it before writing the script. Do not skip this check.
+
+  **Citation integrity pre-flight (MANDATORY — run after the 8-section check, before Step 8):**
+  - [ ] 9. Every key conclusion cites at least one directly-fetched primary source (not only secondary commentary)
+  - [ ] 10. All secondary source citations use transparent attribution ("According to [Source]'s analysis...")
+  - [ ] 11. No primary source is cited that was not actually fetched in Step 3
+  - [ ] 12. Verification guide separates primary and secondary sources
+  - [ ] 13. No unresolved `laundering_risk: true` flags from Step 4/5
+  - [ ] 14. No secondary source is presented as if it were the law itself
+  If any citation integrity check fails, remediate before proceeding to Step 8.
 - **Korean DOCX generation rules (MANDATORY for any KO `.docx` script):**
   1. Use the **Write tool** to write the Python file. Never use Bash shell or heredoc for Korean content — Windows cp949 terminal encoding corrupts Korean UTF-8 strings.
   2. Embed all Korean-language content directly as **Python UTF-8 string literals** in the source file.
@@ -198,10 +209,13 @@ Rules:
 
 Read `.claude/skills/quality-checker/SKILL.md` and follow it.
 
+**13-item checklist** includes source laundering detection (item #13). A conclusion that cites a secondary source as if it were primary authority is a quality gate failure.
+
 If failed:
 1. Round 1: re-enter Step 3 only for failing items.
 2. Round 2: patch failing items only.
 3. If still failing, deliver with `[Unverified]`.
+4. **Block delivery** if any `Contradicted` anchor remains uncorrected, or if any conclusion relies on a `laundering_risk: true` source without resolution.
 
 ## 6) Skill Dispatch Mechanism
 
@@ -284,11 +298,11 @@ Tag placement: always inline at the specific finding. Do NOT aggregate tags only
 - Step 1: clarification questions (max 5), then default assumptions.
 - Step 2: one retry with broader scope.
 - Step 3: max 3 retries with different query strategy.
-- Step 4: budget exhausted → mark remaining HIGH-priority anchors `[Unverified]`, proceed. Contradicted anchor → correct and partial loop-back to Step 3 (affected jurisdiction only, max 1 loop). Source unreachable → one alternative URL attempt, then `Unverified`.
+- Step 4: budget exhausted → mark remaining HIGH-priority anchors `[Unverified]`, proceed. Contradicted anchor → correct and partial loop-back to Step 3 (affected jurisdiction only, max 1 loop). Source unreachable → one alternative URL attempt, then `Unverified`. Source laundering detected → fetch primary source if budget permits; otherwise re-attribute to secondary source transparently or mark `[Unverified]`.
 - Step 5: one retry.
 - Step 6: re-enter Step 3 when evidence is insufficient.
 - Step 7: one remediation pass.
-- Step 8: two remediation rounds max. Block delivery if any `Contradicted` anchor remains uncorrected in final output.
+- Step 8: two remediation rounds max. Block delivery if any `Contradicted` anchor remains uncorrected in final output, or if any conclusion relies on a `laundering_risk: true` source without resolution.
 
 All unresolved findings must remain explicit and traceable.
 

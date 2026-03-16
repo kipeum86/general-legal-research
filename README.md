@@ -25,6 +25,7 @@ This project is **not** designed to provide legal advice.
 
 - **No hallucination**: no legal claim without a verifiable, pinpoint-cited source
 - **Source hierarchy**: primary sources (statutes, cases, agency documents) over secondary; low-trust blogs and wikis are excluded as the sole basis for any conclusion
+- **Citation integrity**: every key conclusion must trace back to a directly-fetched primary source; secondary sources are never presented as primary authority (source laundering prevention)
 - **Uncertainty transparency**: all unresolved findings are tagged `[Unverified]` or `[Unresolved Conflict]`
 - **Jurisdiction-first**: official legal portals are fetched directly (`law.go.kr`, `eur-lex.europa.eu`, `congress.gov`, and others)
 
@@ -38,7 +39,7 @@ This project is **not** designed to provide legal advice.
 | 1 | Query Interpretation & Parameter Resolution | Structured parameters and assumptions |
 | 2 | Jurisdiction Mapping & Research Plan | Jurisdiction profile, domain checklist, search plan |
 | 3 | Source Collection | Raw sources with metadata |
-| 3.5 | Factual Claim Spot-Check | `output/claim-registry.json` with Verified / Unverified / Contradicted per anchor |
+| 3.5 | Factual Claim Spot-Check & Source Laundering Detection | `output/claim-registry.json` with Verified / Unverified / Contradicted per anchor, plus source laundering flags |
 | 4 | Source Reliability Scoring (A-D) | Graded source list with rationale |
 | 5 | Analysis & Issue Structuring | Issue tree, conflict report, glossary updates |
 | 6 | Output Generation (Mode A/B/C/D) | Inline preview, then file generation on confirmation |
@@ -206,6 +207,8 @@ Main agent (CLAUDE.md orchestrator)
 | B | High-quality secondary source (peer-reviewed work, major practitioner publication; unofficial translations are capped at B) |
 | C | Medium reliability; bias note required |
 | D | Low reliability; not allowed as the sole basis for any conclusion |
+
+**Source authority classification:** Every source is independently classified as `primary` (official original text), `secondary` (interpretation/commentary), or `mixed` (both). Key conclusions require at least one directly-fetched `primary` source at Grade A or B. Secondary sources flagged with `laundering_risk` cannot be cited as primary authority.
 
 **Citation codes:** `[P#]` legislation / regulation | `[T#]` treaty | `[C#]` case law | `[A#]` administrative | `[S#]` secondary
 

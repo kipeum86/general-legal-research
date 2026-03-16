@@ -54,6 +54,41 @@ If output intent matches legal opinion deliverables (`법률 의견서`, `opinio
 
 This is a mandatory routing rule for opinion-letter style outputs.
 
+## Citation Integrity Rules (Mandatory)
+
+These rules enforce source transparency in all outputs. Violation of any rule triggers Step 8 quality gate failure.
+
+### Rule 1: Conclusions require primary-source citation
+
+Every key conclusion must cite at least one **directly-fetched primary source** (statute text, court decision, regulation original). A secondary source (law-firm memo, commentary, blog) may supplement but never substitute for the primary source.
+
+| Allowed | Not Allowed |
+|---|---|
+| "개인정보 보호법 제17조 제1항에 따르면..." `[P1]` | "한 로펌의 분석에 따르면 개인정보 보호법은..." `[S2]` (as sole support) |
+| "GDPR Art. 17(1) provides that..." `[P1]` | "According to industry guidance, the GDPR requires..." `[S3]` (as sole support) |
+
+### Rule 2: Secondary sources must be transparently attributed
+
+When citing a secondary source, the text must clearly identify it as interpretation/commentary, not present it as the law itself:
+
+| Transparent (correct) | Laundered (forbidden) |
+|---|---|
+| "According to [Firm]'s analysis of Art. 17..." `[S2]` | "Art. 17 requires..." (citing `[S2]` which is a firm newsletter) |
+| "[연구원] 보고서에 의하면..." `[S3]` | "법률에 따르면..." (citing `[S3]` which is a research report) |
+
+### Rule 3: No phantom primary citations
+
+If a primary source was not directly fetched in Step 3, it cannot be cited as if it were. Either:
+- Fetch it (preferred), or
+- Cite the secondary source that references it, with transparent attribution, or
+- Mark the claim `[Unverified]`
+
+### Rule 4: Verification guide separates primary and secondary
+
+The Verification Guide section must clearly separate sources by authority:
+- **Primary sources** (directly verified): list with direct URLs and pinpoint references
+- **Secondary sources** (for context): list with transparent attribution of their interpretive nature
+
 ## Format & Save Rules
 
 1. First query in session: ask preferred file format.

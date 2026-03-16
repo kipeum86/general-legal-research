@@ -30,6 +30,26 @@ Low-trust summaries:
 
 Never use D as sole support for conclusions.
 
+## Source Authority Classification
+
+Independent of grade, classify every source as `primary`, `secondary`, or `mixed`:
+
+| Authority | Criteria | Can support key conclusions alone? |
+|---|---|---|
+| `primary` | Original text issued by the authoritative body (legislature, court, regulator) | Yes (if Grade A or B) |
+| `secondary` | Interpretation, commentary, or analysis by third parties | No — must be paired with a primary source |
+| `mixed` | Contains both original text and editorial content | Only the primary-text portions may serve as primary authority |
+
+### Source Laundering Indicators
+
+Flag `laundering_risk: true` when a secondary source:
+- Paraphrases a statute/regulation without citing the specific article or section number
+- Claims "the law requires X" without linking to the actual provision
+- Summarizes a court decision without providing the case citation or specific holding
+- Presents regulatory requirements as general knowledge without attribution
+
+When flagged, the source **cannot** be cited as primary authority. Either fetch the underlying primary source or cite the secondary source transparently.
+
 ## Korean Source Refinements
 
 When grading Korean sources, apply these jurisdiction-specific rules in addition to the general rubric above:
@@ -46,3 +66,11 @@ When grading Korean sources, apply these jurisdiction-specific rules in addition
 - 법률 블로그·커뮤니티 → Grade D
 
 See `references/korean-law-reference.md` § 6 for full details.
+
+### Korean Source Authority
+
+- law.go.kr 법령 전문, 대법원/헌재 판례 원문, 법제처 유권해석 → `primary`
+- 규제기관 가이드라인, 보도자료, 국회 입법자료 → `primary` (Grade B)
+- 한국법제연구원 보고서 → `secondary` (Grade B)
+- 로펌 뉴스레터 → `secondary` (Grade C) — 원문 법령 핀포인트 없이 패러프레이즈 시 `laundering_risk: true`
+- 법률 블로그/커뮤니티 → `secondary` (Grade D)
