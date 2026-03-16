@@ -27,6 +27,10 @@ Use this skill at Step 3.
 - `snippet`
 - `full_text` (if fetched)
 - `collection_round`
+- `source_authority` — classify at collection time:
+  - `primary` — official statute text, court decision, regulator original publication, treaty text
+  - `secondary` — law-firm memo, academic article, news report, commentary, practitioner guide
+  - `mixed` — contains both original text excerpts and editorial analysis (e.g., annotated code)
 
 ## Collection Strategy
 

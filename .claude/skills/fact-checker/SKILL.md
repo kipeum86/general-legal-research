@@ -117,6 +117,66 @@ Sort anchors for verification in this order:
 
 ---
 
+## Phase 3.5 — Source Laundering Detection
+
+**Purpose:** Detect cases where secondary sources are being used as if they were primary authority, or where primary source content has been laundered through secondary interpretations without direct verification.
+
+### Detection Patterns
+
+Scan all sources collected in Step 3 for these three patterns:
+
+| Pattern | ID | Description | Action |
+|---|---|---|---|
+| **Interpretation presented as fact** | `interpretation_unverified` | A secondary source's interpretation of a statute/regulation is stated as the law itself, without the primary source having been directly fetched and confirmed | Flag; fetch primary source to verify |
+| **Phantom citation** | `phantom_citation` | A source cites a specific article/section number but the cited primary source was never actually fetched or confirmed in Step 3 | Flag; fetch the cited primary source |
+| **Source laundering** | `laundering_risk` | A secondary source paraphrases primary source content without pinpoint citation, and the analysis relies on this paraphrase as if it were the original text | Flag; either fetch primary or re-attribute to secondary |
+
+### Procedure
+
+1. For each source in Step 3 output where `source_authority == "secondary"` or `source_authority == "mixed"`:
+   - Check if any conclusion or factual claim in the working notes relies on this source **as if it were primary authority**
+   - Check if the source paraphrases a primary source without providing a pinpoint citation (specific article, section, paragraph)
+   - Check if the corresponding primary source was actually fetched and confirmed in Step 3
+
+2. For each detected pattern:
+   - Record in the claim registry with pattern ID
+   - If budget permits: fetch the underlying primary source to resolve
+   - If budget exhausted: flag as `[Unverified — primary source not directly confirmed]`
+
+3. **Blocking rule:** A conclusion that relies solely on a `laundering_risk` source without any directly-fetched primary source backing is **not permitted** to proceed to Step 5. Either:
+   - Fetch the primary source (preferred), or
+   - Re-attribute the claim transparently to the secondary source (e.g., "According to [Source]'s analysis..."), or
+   - Mark the conclusion as `[Unverified]`
+
+### Output (appended to claim registry)
+
+```json
+{
+  "source_laundering_check": {
+    "sources_scanned": 8,
+    "flags": [
+      {
+        "source_code": "[S2]",
+        "pattern": "laundering_risk",
+        "description": "Law firm newsletter paraphrases GDPR Art. 17 requirements without pinpoint; primary text not fetched",
+        "resolution": "Fetched GDPR Art. 17 directly from EUR-Lex; confirmed substance",
+        "resolved": true
+      },
+      {
+        "source_code": "[S4]",
+        "pattern": "interpretation_unverified",
+        "description": "Blog post claims '개인정보 보호법 제39조의3' requires X; article not directly verified",
+        "resolution": "Marked [Unverified] — budget exhausted",
+        "resolved": false
+      }
+    ],
+    "summary": "2 flags detected, 1 resolved, 1 marked Unverified"
+  }
+}
+```
+
+---
+
 ## Phase 4 — Claim Registry Output
 
 Write `output/claim-registry.json`:
@@ -174,10 +234,12 @@ After writing the registry, print to conversation:
 ```
 [Step 4 — Fact-Check Complete]
 Anchors checked: 12 | Verified: 9 | Unverified: 2 | Contradicted: 1
+Source laundering flags: 2 (1 resolved, 1 unresolved)
 Registry: output/claim-registry.json
 
 ⚠ Contradicted (1): A003 — Schrems II case number corrected (C-312/18 → C-311/18)
 Unverified (2): A007 (US — CCPA §1798.100 text unconfirmed), A011 (JP — Act No. 57 date unconfirmed)
+⚠ Laundering (1 unresolved): [S4] — 개인정보 보호법 제39조의3 interpretation from blog, primary not fetched
 ```
 
 ---

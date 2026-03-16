@@ -1,15 +1,28 @@
 ---
 name: quality-checker
-description: Run the 12-item legal research quality gate and decide pass/fail with remediation steps.
+description: Run the 13-item legal research quality gate and decide pass/fail with remediation steps.
 ---
 
 # Quality Checker
 
 Use this skill at Step 8 before delivery.
 
-## 12-Item Checklist
+## Pre-flight Checks (before running the checklist)
 
-1. Every key conclusion has primary-source support.
+Before running the 13-item checklist, verify these prerequisites:
+
+1. All 8 mandatory output sections are present (Scope, Conclusion, Issue tree, Analysis, Counter-analysis, Practical implications, Bibliography, Verification guide)
+2. `output/claim-registry.json` exists and `contradicted_count == 0`
+3. Citation numbering follows grade-priority order (A sources get lowest numbers)
+4. Temporal status tags are applied inline (not only in summary)
+5. All `[Unverified]` tags are inline at specific findings
+6. **Source laundering check:** No conclusion relies solely on a secondary source cited as if it were primary authority. Every key conclusion's supporting citation chain must trace back to a directly-fetched primary source.
+
+If any pre-flight check fails, remediate before proceeding to the checklist.
+
+## 13-Item Checklist
+
+1. Every key conclusion has **Grade A or B primary-authority** source support — not merely secondary commentary, regardless of the secondary source's grade.
 2. Legal hierarchy is not conflated.
 3. Amendment/effective dates and currency are checked; temporal tags applied where relevant (`[Recently Amended]`, `[Pending Amendment]`, `[Not Yet In Force]`, `[Repealed]`).
 4. Jurisdiction level is accurate.
@@ -21,6 +34,7 @@ Use this skill at Step 8 before delivery.
 10. Executive summary / conclusion summary is consistent with the detailed analysis — no conclusion in the summary that is unsupported or contradicted in the body.
 11. Every key conclusion is supported by at least one Grade A or Grade B source (not only C/D).
 12. No `[Material Risk]` finding is omitted from the executive summary / conclusion summary.
+13. **No source laundering detected:** No secondary source is cited as if it were primary authority. All secondary source citations use transparent attribution (e.g., "According to [Source]'s analysis..."). No conclusion relies on a paraphrased interpretation of a primary source without the primary source itself having been directly fetched and verified. Any `laundering_risk: true` flag from Step 4/5 has been resolved or the claim has been re-attributed.
 
 ## Output Format
 
