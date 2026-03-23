@@ -50,6 +50,45 @@ If all fail, return:
 - direct verification URL list
 - unresolved issue list tagged `Unverified`
 
+## PDF/DOCX Source Handling
+
+When a source URL points to a PDF or DOCX document, convert it to Markdown using the MarkItDown MCP tool before processing.
+
+### Detection Triggers
+
+- URL ends with `.pdf` or `.docx`
+- law.go.kr download links (often serve PDF)
+- EUR-Lex PDF versions (URLs containing `/TXT/PDF/`)
+- Agency guidance documents (commonly distributed as PDF)
+
+### Conversion Procedure
+
+1. Call `mcp__markitdown__convert_to_markdown` with the source URI (supports `http://`, `https://`, `file://`)
+2. Store the returned Markdown as `full_text` in the source record
+3. Extract `snippet` from the first 1200 characters of meaningful content (skip headers/footers/boilerplate)
+4. Set `document_type` to reflect original format (e.g., `statute_pdf`, `guidance_pdf`, `opinion_docx`)
+
+### Metadata Enrichment
+
+After conversion, scan the Markdown output for embedded metadata:
+- Title (first `#` heading or document title)
+- Publication/effective date
+- Issuer (agency, court, or legislature name)
+
+Populate `publication_date`, `effective_date`, and `issuer` from the extracted content. Set `accessed_date` to current date.
+
+### Failure Handling
+
+- If MarkItDown conversion fails → fall back to `fetch-mcp` for the HTML version of the same source
+- If converted text is < 100 characters → treat as extraction failure (likely a scanned/image-only PDF)
+- Mark failed sources as `[Unverified — PDF text extraction failed]` and preserve the direct URL for manual verification
+
+### Token Budget Awareness
+
+- For large PDFs (converted text > 10,000 words): store only the relevant sections (articles, clauses) in `full_text`
+- Use heading structure from the Markdown output to identify and extract relevant portions
+- Always record the source URL so the full document remains accessible for verification
+
 ## Scripts
 
 - Unix-like: `scripts/search-executor.sh`
