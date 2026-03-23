@@ -69,7 +69,8 @@
       "WebFetch(domain:www.monews.co.kr)",
       "WebFetch(domain:www.kpanews.co.kr)",
       "WebFetch(domain:m.ceoscoredaily.com)",
-      "Bash(pip list:*)"
+      "Bash(pip list:*)",
+      "mcp__markitdown__convert_to_markdown"
     ]
   }
 }

@@ -18,8 +18,8 @@ case "$EXT" in
     cp "$IN" "$OUT"
     ;;
   pdf|docx|pptx)
-    echo "converter stub: generate $EXT via dedicated skill/runtime" >&2
-    exit 2
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    python3 "${SCRIPT_DIR}/file-converter.py" "$IN" "$OUT"
     ;;
   *)
     echo "unsupported extension: $EXT" >&2

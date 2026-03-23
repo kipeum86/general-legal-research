@@ -74,6 +74,8 @@ At every session start, **before Step 1**, run silently:
 4. If `knowledge/_index.md` exists: read as domain context supplement (에이전트 생성 KB).
 5. If `library/_index.md` exists: read as attorney materials index.
    - `library/` 파일은 Step 3 source collection 시 **Grade A 소스**로 우선 참조.
+   - If `library/` contains unconverted PDF/DOCX files (no matching `.md` in `knowledge/library-converted/`), suggest running `python3 scripts/library-ingest.py` or use `mcp__markitdown__convert_to_markdown` to convert them inline.
+   - `knowledge/library-converted/` Markdown files are searchable by the agent during Step 3.
 
 Step 0은 `output/checkpoint.json`을 업데이트하지 않음 (session step이 아닌 config loading).
 
@@ -108,6 +110,8 @@ Fallback order: tavily -> brave -> fetch from curated URLs in `references/legal-
 **For Korean law:** Always attempt law.go.kr first before using search tools. Read `references/korean-law-reference.md` § 9 for the full Korean source collection sequence (본문 → 하위법령 → 연혁/부칙 → 판례 → 영문).
 **For EU law:** Always attempt eur-lex.europa.eu first.
 
+**PDF/DOCX source handling:** When source collection encounters a PDF or DOCX URL (from any official portal), use `mcp__markitdown__convert_to_markdown` to convert the document to Markdown text before extracting snippets. See web-researcher SKILL.md § PDF/DOCX Source Handling for full procedure.
+
 **Temporal status tagging (mandatory):** When collecting sources, check each statute/regulation for temporal status and apply the appropriate inline tag:
 - `[Recently Amended — YYYY-MM-DD]` — statute amended within the last 12 months. Include brief note on what changed.
 - `[Pending Amendment]` — amendment bill pending in legislature or regulatory guidance under consultation. Cite the bill/consultation reference.
@@ -122,6 +126,8 @@ Read `.claude/skills/fact-checker/SKILL.md` and follow it.
 **Purpose:** Intercept hallucinations **and source laundering** before they enter analysis. Extracts discrete verifiable claims (statute numbers, case citations, dates, thresholds) from Step 3 output, spot-checks them against primary sources within a token budget, detects cases where secondary sources are cited as primary authority, and produces `output/claim-registry.json`.
 
 **Skip when:** Quick Mode is active, OR single-jurisdiction KR-only with all sources directly confirmed from law.go.kr or equivalent primary portal.
+
+**PDF source verification:** When verifying anchors from PDF sources, use `mcp__markitdown__convert_to_markdown` to convert the document to searchable text. Check `knowledge/library-converted/` for pre-converted library files first.
 
 **Contradicted anchors:** Correct immediately before proceeding. If the correction is material to the legal conclusion, trigger a partial Step 3 loop-back for the affected jurisdiction only (max 1 loop).
 

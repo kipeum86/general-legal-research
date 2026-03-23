@@ -107,6 +107,28 @@ Sort anchors for verification in this order:
 4. **EU law**: fetch from eur-lex.europa.eu first
 5. **Record result**: `Verified` / `Unverified` / `Contradicted`
 
+### PDF/DOCX Source Verification
+
+When a source URL or file path points to a PDF or DOCX document:
+
+1. **Before verification**, convert the document to Markdown using `mcp__markitdown__convert_to_markdown` with the source URI
+2. **Search the converted text** for the specific claim being verified:
+   - For `statute_article` anchors: search for the article number (e.g., "제17조", "Article 17")
+   - For `case_citation` anchors: search for the case number
+   - For `numerical_threshold` anchors: search for the specific number
+   - For `effective_date` anchors: search for date patterns
+3. **Text matching rules:**
+   - Exact article number match required for `statute_article` anchors
+   - Date must match within the same document section for `effective_date` anchors
+   - Numerical values must match exactly for `numerical_threshold` anchors
+4. **If the PDF is from `library/`:**
+   - Check `knowledge/library-converted/` for an existing Markdown version first
+   - If available, use the pre-converted version (saves a conversion call)
+   - If not available, convert inline using markitdown
+5. **Failure handling:**
+   - If markitdown fails to convert the PDF → mark the anchor as `Unverified — PDF text extraction failed`
+   - Do not count a failed PDF conversion against the token budget
+
 ### Status definitions
 
 | Status | Meaning |
