@@ -63,6 +63,32 @@ For Korean statute, case law, and interpretation queries, **always use the Open 
 2. If API returns empty/error → fall back to `tavily-mcp` / `brave-search-mcp`
 3. Last resort: `fetch-mcp` using curated URLs in `references/legal-source-urls.md`
 
+### EU Law (EU jurisdiction) — API-first
+
+For EU regulations, directives, and CJEU case law, **use the EUR-Lex SOAP API first**:
+
+1. **`scripts/eurlex_api.py`** — on-demand SOAP calls to EUR-Lex
+   - `get-document {CELEX}` → 특정 법령 조회 (e.g., `32016R0679` = GDPR)
+   - `search-title "keywords"` → 제목 키워드 검색
+   - `search "expert query"` → Expert Query 문법으로 상세 검색
+
+   **Usage:** `python3 scripts/eurlex_api.py <command> [args]`
+
+   **Common CELEX numbers:**
+   - `32016R0679` — GDPR
+   - `32024R1689` — AI Act
+   - `32022R2065` — Digital Services Act (DSA)
+   - `32022R1925` — Digital Markets Act (DMA)
+   - `32002L0058` — ePrivacy Directive
+
+   **Workflow:**
+   1. `search-title "data protection"` → find relevant legislation
+   2. `get-document {CELEX}` → retrieve document metadata + EUR-Lex URL
+   3. Use the URL with `WebFetch` or `mcp__markitdown__convert_to_markdown` for full text
+
+2. If API returns empty/error → fall back to `tavily-mcp` / `brave-search-mcp`
+3. Last resort: direct fetch from `eur-lex.europa.eu`
+
 ### All other jurisdictions
 
 1. `tavily-mcp`

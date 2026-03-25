@@ -342,7 +342,7 @@ graph TD
 | 지역 | 포털 |
 |:-----|:-----|
 | **Korea** | `law.go.kr` (열린법령 API — 법령·판례·해석례 온디맨드 조회) · `supremecourt.go.kr` |
-| **EU** | `eur-lex.europa.eu` |
+| **EU** | `eur-lex.europa.eu` (EUR-Lex SOAP API — 규정·지침·CJEU 판례 온디맨드 조회) |
 | **US** | `congress.gov` · `ecfr.gov` · `federalregister.gov` |
 | **UK** | `legislation.gov.uk` |
 | **Germany** | `gesetze-im-internet.de` |
@@ -402,6 +402,7 @@ graph TD
 |   `-- misc/
 |-- scripts/
 |   |-- open_law_api.py                  # 열린법령 API CLI 래퍼 (온디맨드 법령·판례·해석례 조회)
+|   |-- eurlex_api.py                    # EUR-Lex SOAP API CLI 래퍼 (EU 법령·지침·판례 조회)
 |   |-- install-agentskills-set.ps1
 |   |-- library-ingest.py                # library/ PDF → Markdown 변환
 |   |-- render_professional_legal_opinion_docx.py

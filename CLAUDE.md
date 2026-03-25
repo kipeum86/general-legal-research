@@ -128,7 +128,13 @@ Read `.claude/skills/web-researcher/SKILL.md` and follow it.
 
 API 실패 시 fallback: tavily → brave → fetch from curated URLs in `references/legal-source-urls.md`.
 
-**For EU law:** Always attempt eur-lex.europa.eu first.
+**For EU law (API-first):** Use `scripts/eurlex_api.py` for structured EUR-Lex SOAP API access. Standard workflow:
+1. `python3 scripts/eurlex_api.py search-title "키워드"` → CELEX 번호 확보
+2. `python3 scripts/eurlex_api.py get-document {CELEX}` → 문서 메타데이터 + URL
+3. URL로 `WebFetch` 또는 `mcp__markitdown__convert_to_markdown`을 통해 본문 조회
+
+API 실패 시 fallback: tavily → brave → direct fetch from eur-lex.europa.eu.
+
 **For all other jurisdictions:** Fallback order: tavily → brave → fetch from curated URLs.
 
 **PDF/DOCX source handling:** When source collection encounters a PDF or DOCX URL (from any official portal), use `mcp__markitdown__convert_to_markdown` to convert the document to Markdown text before extracting snippets. See web-researcher SKILL.md § PDF/DOCX Source Handling for full procedure.
