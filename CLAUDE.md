@@ -73,9 +73,22 @@ At every session start, **before Step 1**, run silently:
    - Print one line: `[Config loaded: {persona.name} @ {persona.firm}]`
 4. If `knowledge/_index.md` exists: read as domain context supplement (에이전트 생성 KB).
 5. If `library/_index.md` exists: read as attorney materials index.
-   - `library/` 파일은 Step 3 source collection 시 **Grade A 소스**로 우선 참조.
-   - If `library/` contains unconverted PDF/DOCX files (no matching `.md` in `knowledge/library-converted/`), suggest running `python3 scripts/library-ingest.py` or use `mcp__markitdown__convert_to_markdown` to convert them inline.
+   - `library/grade-a/` 파일은 Step 3 source collection 시 **Grade A 소스**로 우선 참조.
+   - `library/grade-b/` 파일은 Grade B, `library/grade-c/`은 Grade C 소스로 참조.
+   - If `library/inbox/` contains unprocessed files, suggest running `/ingest` or `python3 scripts/library-ingest.py`.
    - `knowledge/library-converted/` Markdown files are searchable by the agent during Step 3.
+
+## 소스 Ingest
+
+사용자가 외부 소스 파일을 `library/inbox/`에 넣고 `/ingest`를 요청하면:
+
+1. `.claude/skills/ingest/SKILL.md`를 읽어 워크플로우 확인
+2. inbox 내 파일을 markitdown으로 .md 변환
+3. 내용 분석하여 Grade 자동 판별 (A/B/C)
+4. frontmatter 생성 + 적절한 `library/grade-{a,b,c}/` 폴더로 배치
+5. 인덱스 업데이트
+
+**트리거 키워드:** "ingest", "소스 추가", "자료 넣었어", "inbox", "파일 올렸", "파일 넣었"
 
 Step 0은 `output/checkpoint.json`을 업데이트하지 않음 (session step이 아닌 config loading).
 
@@ -316,6 +329,7 @@ All unresolved findings must remain explicit and traceable.
 
 The following externally sourced skills are installed under `.claude/skills/` and may be invoked when relevant:
 
+- `ingest` ← `/ingest` 또는 inbox 관련 키워드 시 트리거
 - `fact-checker` ← Step 4 (built-in workflow step, always dispatched per trigger conditions)
 - `legal-opinion-formatter`
 - `legal-research`
@@ -344,3 +358,4 @@ Routing rules:
 - If topic is IP enforcement/dispute risk, read `ip-infringement-analysis`.
 - If topic is platform/user policy terms, read `terms-of-service` and `api-acceptable-use-policy`.
 - If topic is case-law synthesis, read `judgment-summary` and `case-briefs`.
+- If user requests source ingestion (`/ingest`, "소스 추가", "자료 넣었어", "inbox", "파일 올렸", "파일 넣었"), read `ingest` and follow its workflow.
