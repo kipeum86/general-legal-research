@@ -118,10 +118,18 @@ Write search plan to `output/research-plan.json`.
 
 Read `.claude/skills/web-researcher/SKILL.md` and follow it.
 
-Fallback order: tavily -> brave -> fetch from curated URLs in `references/legal-source-urls.md`.
+**For Korean law (API-first):** Use `scripts/open_law_api.py` as the **1순위 소스 수집 도구**. Read `references/korean-law-reference.md` § 9 for the full API-based Korean source collection sequence. Standard workflow:
+1. `python3 scripts/open_law_api.py search-law "법률명"` → 법령 ID 확보
+2. `python3 scripts/open_law_api.py get-law --id {ID}` → 법령 전문 (조문·부칙 구조화)
+3. `python3 scripts/open_law_api.py get-article --id {ID} --article {N}` → 특정 조문만 (토큰 절약)
+4. `python3 scripts/open_law_api.py search-cases "키워드"` → 판례 검색
+5. `python3 scripts/open_law_api.py get-case --id {ID}` → 판례 전문
+6. `python3 scripts/open_law_api.py search-interpretations "키워드"` → 법령해석례
 
-**For Korean law:** Always attempt law.go.kr first before using search tools. Read `references/korean-law-reference.md` § 9 for the full Korean source collection sequence (본문 → 하위법령 → 연혁/부칙 → 판례 → 영문).
+API 실패 시 fallback: tavily → brave → fetch from curated URLs in `references/legal-source-urls.md`.
+
 **For EU law:** Always attempt eur-lex.europa.eu first.
+**For all other jurisdictions:** Fallback order: tavily → brave → fetch from curated URLs.
 
 **PDF/DOCX source handling:** When source collection encounters a PDF or DOCX URL (from any official portal), use `mcp__markitdown__convert_to_markdown` to convert the document to Markdown text before extracting snippets. See web-researcher SKILL.md § PDF/DOCX Source Handling for full procedure.
 

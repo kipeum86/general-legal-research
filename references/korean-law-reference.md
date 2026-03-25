@@ -219,9 +219,89 @@
 
 ---
 
-## 9. law.go.kr 활용 팁 — Practical Search Guide
+## 9. Open Law API (열린법령 API) 활용 가이드
 
-### 검색 방법
+### 9.1 개요
+
+**Step 3 한국법 소스 수집의 1순위 도구.** law.go.kr DRF API를 통해 구조화된 법령·판례·해석례 데이터를 온디맨드로 조회합니다.
+
+- **CLI 래퍼:** `scripts/open_law_api.py`
+- **인증:** `OPEN_LAW_OC` 환경변수 (`.env` 파일에 설정)
+- **외부 의존성 없음** — Python 표준 라이브러리만 사용
+
+### 9.2 핵심 엔드포인트
+
+| 서브커맨드 | API target | Base URL | 용도 |
+|-----------|-----------|----------|------|
+| `search-law` | `law` | `lawSearch.do` | 법령 키워드 검색 → ID/MST 확보 |
+| `get-law` | `law` | `lawService.do` | 법령 전문 조회 (조문·항·호·목·부칙) |
+| `get-article` | `lawjosub` | `lawService.do` | 특정 조문만 정밀 조회 |
+| `search-cases` | `prec` | `lawSearch.do` | 판례 키워드 검색 |
+| `get-case` | `prec` | `lawService.do` | 판례 전문 (판시사항·요지·참조조문) |
+| `search-interpretations` | `expc` | `lawSearch.do` | 법령해석례 검색 |
+
+### 9.3 표준 연구 순서 (API 우선)
+
+1. **`search-law "법률명"`** → 법령 ID 확보
+2. **`get-law --id {ID}`** → 전문 조회 (조문 구조화 + 부칙 포함)
+3. **`get-article --id {ID} --article {N}`** → 특정 조문만 조회 (토큰 절약)
+4. **`search-law "시행령명"`** → 하위법령(시행령·시행규칙) 검색 및 조회
+5. **`search-cases "키워드"`** → 관련 판례 검색
+6. **`get-case --id {ID}`** → 판례 전문 조회
+7. **`search-interpretations "키워드"`** → 법제처 해석례 확인
+8. 영문 번역 필요 시 elaw.klri.re.kr 참조 (Grade B max)
+
+### 9.4 사용 예시
+
+```bash
+# 법령 검색
+python3 scripts/open_law_api.py search-law "개인정보 보호법"
+
+# 법령 전문 조회 (ID로)
+python3 scripts/open_law_api.py get-law --id 001823
+
+# 특정 조문만 조회 (제17조)
+python3 scripts/open_law_api.py get-article --id 001823 --article 17
+
+# 판례 검색 (전문 검색 모드)
+python3 scripts/open_law_api.py search-cases "개인정보 유출" --fulltext
+
+# 판례 전문 조회
+python3 scripts/open_law_api.py get-case --id 228541
+
+# 법령해석례 검색
+python3 scripts/open_law_api.py search-interpretations "자동차"
+
+# 페이지네이션
+python3 scripts/open_law_api.py search-law "보호법" --display 50 --page 2
+```
+
+### 9.5 API Fallback 규칙
+
+1. Open Law API 호출 → 정상 응답 시 그대로 사용 (Grade A 소스)
+2. API 실패(HTTP 에러, 타임아웃, 빈 결과) → Tavily/Brave 검색으로 fallback
+3. 검색도 실패 → `references/legal-source-urls.md`의 큐레이팅된 URL로 직접 fetch
+
+### 9.6 기존 웹 검색과의 차이
+
+| 항목 | 기존 (WebFetch) | Open Law API |
+|------|----------------|-------------|
+| 데이터 형태 | HTML 파싱 필요 | 구조화된 XML (조문별 분리) |
+| 정확도 | 페이지 레이아웃 의존 | 필드 단위 정확 |
+| 부칙 접근 | 별도 탭 확인 필요 | 응답에 포함 |
+| 토큰 효율 | 전체 페이지 텍스트 | 필요 조문만 조회 가능 |
+| 안정성 | 웹 레이아웃 변경 시 깨짐 | 공식 API, 안정적 |
+
+## 10. law.go.kr 웹 직접 검색 (API Fallback용)
+
+API가 실패할 경우 아래 웹 검색 방식을 사용합니다:
+
+### URL 패턴
+
+- 법령 본문: `https://www.law.go.kr/법령/개인정보보호법`
+- 영문 법령 (비공식): `https://elaw.klri.re.kr/` (한국법제연구원 영문법령정보)
+
+### 웹 검색 방법
 
 1. **법령명 검색**: 정확한 법률명 입력 → 현행 법령 전문 확인
 2. **조문별 검색**: 법령명 + 조문번호 → 해당 조항만 확인
@@ -229,17 +309,3 @@
 4. **하위법령 탭**: 해당 법률의 시행령·시행규칙·관련 고시 일괄 확인
 5. **판례 탭**: 해당 법률 조항에 대한 관련 판례 링크
 6. **법령체계도**: 상위법-하위법 관계도 시각화
-
-### URL 패턴
-
-- 법령 본문: `https://www.law.go.kr/법령/개인정보보호법`
-- 영문 법령 (비공식): `https://elaw.klri.re.kr/` (한국법제연구원 영문법령정보)
-
-### 연구 순서 (한국법 포함 시)
-
-1. law.go.kr에서 해당 법률 본문 확인
-2. "하위법령" 탭에서 시행령·시행규칙 확인
-3. "연혁" 탭에서 최근 개정 이력 및 부칙 확인
-4. "판례" 탭에서 관련 대법원 판례 확인
-5. 필요 시 supremecourt.go.kr에서 판례 전문 검색
-6. 영문 번역이 필요한 경우 elaw.klri.re.kr 참조 (Grade B max)
