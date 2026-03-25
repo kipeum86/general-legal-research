@@ -60,7 +60,7 @@ The agent is configurable per user. On first launch, a brief setup wizard collec
 | **Source Hierarchy** | Primary sources (statutes, cases, agency documents) over secondary; low-trust blogs/wikis excluded as sole basis |
 | **Citation Integrity** | Every key conclusion traces back to a directly-fetched primary source; source laundering prevention enforced |
 | **Uncertainty Transparency** | All unresolved findings tagged `[Unverified]` or `[Unresolved Conflict]` |
-| **Jurisdiction-First** | Official portals fetched directly — `law.go.kr`, `eur-lex.europa.eu`, `congress.gov`, and others |
+| **Jurisdiction-First** | Official portals fetched directly — `law.go.kr` (via Open Law API), `eur-lex.europa.eu`, `congress.gov`, and others |
 
 ---
 
@@ -95,7 +95,7 @@ flowchart LR
 | **0** | User Config Loading | Loads `user-config.json`; auto-triggers `/onboard` if missing |
 | **1** | Query Interpretation & Parameter Resolution | Structured parameters and assumptions |
 | **2** | Jurisdiction Mapping & Research Plan | Jurisdiction profile, domain checklist, search plan |
-| **3** | Source Collection | Raw sources with metadata (PDF/DOCX auto-converted via MarkItDown) |
+| **3** | Source Collection | Raw sources with metadata (Korean law via Open Law API; PDF/DOCX auto-converted via MarkItDown) |
 | **3.5** | Factual Claim Spot-Check & Source Laundering Detection | `claim-registry.json` — Verified / Unverified / Contradicted per anchor |
 | **4** | Source Reliability Scoring (A–D) | Graded source list with rationale |
 | **5** | Analysis & Issue Structuring | Issue tree, conflict report, glossary updates |
@@ -305,7 +305,7 @@ graph TD
 | `onboard` | 0 | User profile setup & config loading |
 | `query-interpreter` | 1 | Parse natural language into structured parameters |
 | `jurisdiction-mapper` | 2 | Map jurisdictions & build research plan |
-| `web-researcher` | 3 | Collect sources from official portals |
+| `web-researcher` | 3 | Collect sources (Korean law via Open Law API; others via search/fetch) |
 | `fact-checker` | 3.5 | Verify claims & detect source laundering |
 | `source-scorer` | 4 | Grade sources A–D with rationale |
 | `conflict-detector` + `glossary-manager` | 5 | Analyze issues & manage legal terminology |
@@ -369,7 +369,7 @@ Every source is independently classified as `primary` (official original text), 
 
 | Region | Portal |
 |:-------|:-------|
-| **Korea** | `law.go.kr` · `supremecourt.go.kr` |
+| **Korea** | `law.go.kr` (Open Law API — statutes, cases, interpretations) · `supremecourt.go.kr` |
 | **EU** | `eur-lex.europa.eu` |
 | **US** | `congress.gov` · `ecfr.gov` · `federalregister.gov` |
 | **UK** | `legislation.gov.uk` |
@@ -432,6 +432,7 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |   |-- grade-b/                      # secondary sources (case law, commentary)
 |   `-- grade-c/                      # academic / reference
 |-- scripts/
+|   |-- open_law_api.py                  # Korean Open Law API CLI wrapper (on-demand)
 |   |-- install-agentskills-set.ps1
 |   |-- library-ingest.py                # inbox → grade classification + Markdown conversion
 |   |-- render_professional_legal_opinion_docx.py
@@ -515,7 +516,7 @@ satisfies Brazil LGPD Article 33 cross-border transfer requirements.
 
 | Mode | What Works | What Doesn't |
 |:-----|:-----------|:-------------|
-| **Local-only** | Direct URL fetch from whitelisted legal portals, skill dispatch, output generation, `library/` PDF ingestion via `markitdown` Python API | Keyword search (`tavily` / `brave`) |
+| **Local-only** | Open Law API for Korean statutes/cases/interpretations, direct URL fetch from whitelisted legal portals, skill dispatch, output generation, `library/` PDF ingestion via `markitdown` Python API | Keyword search (`tavily` / `brave`) |
 | **MCP-connected** | Full workflow including search + PDF/DOCX URL conversion via `markitdown` MCP | Requires API keys in `.env` |
 
 ---
@@ -525,6 +526,7 @@ satisfies Brazil LGPD Article 33 cross-border transfer requirements.
 - [ ] Add repeatable integration tests for the 9-step workflow
 - [ ] Expand conflict-resolution heuristics for more jurisdiction pairs
 - [x] Integrate MarkItDown for PDF/DOCX input parsing (source collection, library ingestion, fact-checking)
+- [x] Integrate Korean Open Law API for on-demand statute, case law, and interpretation retrieval
 - [ ] Add production MCP connectors to replace current script stubs
 - [ ] Add CI schema validation for checkpoint and glossary JSON artifacts
 - [ ] Expand `legal-source-urls.md` for additional jurisdictions (India, Netherlands, Mexico)

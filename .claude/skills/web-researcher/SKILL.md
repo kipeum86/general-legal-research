@@ -41,6 +41,30 @@ Use this skill at Step 3.
 
 ## Fallback Chain
 
+### Korean Law (KR jurisdiction) — API-first
+
+For Korean statute, case law, and interpretation queries, **always use the Open Law API first**:
+
+1. **`scripts/open_law_api.py`** — on-demand API calls to law.go.kr DRF
+   - `search-law` → 법령 키워드 검색 (returns law ID, MST, enforcement date, ministry)
+   - `get-law --id {ID}` → 법령 전문 조회 (structured: 조문, 항, 호, 목, 부칙)
+   - `get-article --id {ID} --article {N}` → 특정 조문만 조회
+   - `search-cases` → 판례 키워드 검색
+   - `get-case --id {ID}` → 판례 전문 (판시사항, 판결요지, 참조조문)
+   - `search-interpretations` → 법령해석례 검색
+
+   **Usage:** `python3 scripts/open_law_api.py <command> [args]`
+
+   **Workflow:**
+   1. `search-law "법률명"` → get law ID from results
+   2. `get-law --id {ID}` → full text with structured articles
+   3. `get-article --id {ID} --article {N}` → specific article only (token-efficient)
+
+2. If API returns empty/error → fall back to `tavily-mcp` / `brave-search-mcp`
+3. Last resort: `fetch-mcp` using curated URLs in `references/legal-source-urls.md`
+
+### All other jurisdictions
+
 1. `tavily-mcp`
 2. `brave-search-mcp`
 3. `fetch-mcp` using curated URLs in `references/legal-source-urls.md`
