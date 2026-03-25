@@ -370,7 +370,7 @@ Every source is independently classified as `primary` (official original text), 
 | Region | Portal |
 |:-------|:-------|
 | **Korea** | `law.go.kr` (Open Law API — statutes, cases, interpretations) · `supremecourt.go.kr` |
-| **EU** | `eur-lex.europa.eu` |
+| **EU** | `eur-lex.europa.eu` (EUR-Lex SOAP API — regulations, directives, CJEU case law) |
 | **US** | `congress.gov` · `ecfr.gov` · `federalregister.gov` |
 | **UK** | `legislation.gov.uk` |
 | **Germany** | `gesetze-im-internet.de` |
@@ -433,6 +433,7 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |   `-- grade-c/                      # academic / reference
 |-- scripts/
 |   |-- open_law_api.py                  # Korean Open Law API CLI wrapper (on-demand)
+|   |-- eurlex_api.py                    # EUR-Lex SOAP API CLI wrapper (on-demand)
 |   |-- install-agentskills-set.ps1
 |   |-- library-ingest.py                # inbox → grade classification + Markdown conversion
 |   |-- render_professional_legal_opinion_docx.py
