@@ -118,56 +118,53 @@ def _slugify_law_name(name: str) -> str:
     return slug or "unknown-law"
 
 
-def _save_law_articles(law_name: str, source_id: str, articles_data: list[dict]) -> str:
+def _normalize_kr_article_id(value: str | int) -> str:
+    """Normalize Korean article identifiers like 17 or 39의3."""
+    raw = str(value).strip()
+    match = re.fullmatch(r"(?:제\s*)?(\d+)(?:조)?(?:의\s*(\d+))?", raw)
+    if not match:
+        return raw
+    base = int(match.group(1))
+    suffix = int(match.group(2)) if match.group(2) else None
+    return str(base) if suffix is None else f"{base}의{suffix}"
+
+
+def _kr_article_fields(value: str | int) -> dict:
+    article_id = _normalize_kr_article_id(value)
+    match = re.fullmatch(r"(\d+)(?:의(\d+))?", article_id)
+    if not match:
+        raise ValueError(f"Unsupported article identifier: {value!r}")
+    base = int(match.group(1))
+    suffix = int(match.group(2)) if match.group(2) else None
+    return {
+        "article_number": base,
+        "article_id": article_id,
+        **({"article_suffix": suffix} if suffix is not None else {}),
+    }
+
+
+def _save_law_articles(
+    law_name: str,
+    source_id: str,
+    articles_data: list[dict],
+    *,
+    replace_existing: bool,
+) -> str:
     """Persist articles to library/grade-a/ using legal_store.
 
     Returns the law_dir name used.
     """
-    # Lazy import so the module works standalone without legal_store for basic usage
-    from legal_store import (
-        write_article_md,
-        update_index,
-        update_crossref_reverse_index,
-        extract_crossrefs,
-    )
+    from legal_store import save_law_articles
 
     law_dir = _slugify_law_name(law_name)
-    index_articles = []
-
-    for art in articles_data:
-        art_num = art["article_number"]
-        content = art.get("content", "")
-        title = art.get("title", "")
-        cross_refs = extract_crossrefs(content, "KR")
-
-        write_article_md(
-            law_name=law_name,
-            law_dir=law_dir,
-            article_number=art_num,
-            title=title,
-            content=content,
-            jurisdiction="KR",
-            source="law.go.kr",
-            source_id=source_id,
-            cross_refs=cross_refs,
-        )
-
-        update_crossref_reverse_index(
-            source_law=law_name,
-            source_article=art_num,
-            cross_refs=cross_refs,
-        )
-
-        index_articles.append({
-            "article_number": art_num,
-            "title": title,
-        })
-
-    update_index(
+    save_law_articles(
         law_name=law_name,
         law_dir=law_dir,
         jurisdiction="KR",
-        articles=index_articles,
+        source="law.go.kr",
+        source_id=source_id,
+        articles=articles_data,
+        replace_existing=replace_existing,
     )
 
     return law_dir
@@ -281,13 +278,10 @@ def cmd_get_law(args):
             if para_entry:
                 paragraphs.append(para_entry)
 
-        try:
-            art_num = int(jo_no)
-        except (ValueError, TypeError):
-            art_num = 0
+        article_fields = _kr_article_fields(jo_no)
 
         article_record = {
-            "article_number": art_num,
+            **article_fields,
             "title": jo_title,
             "content": "\n".join(content_parts),
             "enforce_date": jo_enforce,
@@ -337,7 +331,7 @@ def cmd_get_law(args):
         print("=" * 60)
 
         for art in articles_data:
-            jo_no = art["article_number"]
+            jo_no = art["article_id"]
             jo_title = art["title"]
             jo_enforce = art.get("enforce_date", "")
             header = f"\n제{jo_no}조"
@@ -358,7 +352,13 @@ def cmd_get_law(args):
 
     # --save to library/grade-a/
     if getattr(args, "save", False):
-        law_dir = _save_law_articles(name, source_id, articles_data)
+        from legal_store import StoreError
+
+        try:
+            law_dir = _save_law_articles(name, source_id, articles_data, replace_existing=True)
+        except StoreError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            sys.exit(1)
         print(f"\n[Saved] {len(articles_data)} articles → library/grade-a/{law_dir}/", file=sys.stderr)
 
 
@@ -371,12 +371,13 @@ def cmd_get_article(args):
 
     name = _text(root, "기본정보/법령명_한글") or _text(root, "법령명_한글")
     ministry = _text(root, "기본정보/소관부처") or _text(root, "소관부처")
-    target_no = str(args.article)
+    target_no = _normalize_kr_article_id(args.article)
 
     found = False
     for jo in root.iter("조문단위"):
         jo_no = _text(jo, "조문번호")
-        if jo_no != target_no:
+        jo_article_id = _normalize_kr_article_id(jo_no)
+        if jo_article_id != target_no:
             continue
         found = True
         jo_title = _text(jo, "조문제목")
@@ -422,7 +423,7 @@ def cmd_get_article(args):
 
         article_data = {
             "law_name": name,
-            "article_number": int(jo_no),
+            **_kr_article_fields(jo_no),
             "title": jo_title,
             "content": "\n".join(content_parts),
             "enforce_date": jo_enforce,
@@ -445,7 +446,13 @@ def cmd_get_article(args):
 
         # --save single article
         if getattr(args, "save", False):
-            law_dir = _save_law_articles(name, args.id, [article_data])
+            from legal_store import StoreError
+
+            try:
+                law_dir = _save_law_articles(name, args.id, [article_data], replace_existing=False)
+            except StoreError as exc:
+                print(f"ERROR: {exc}", file=sys.stderr)
+                sys.exit(1)
             print(f"\n[Saved] 1 article → library/grade-a/{law_dir}/", file=sys.stderr)
 
         break
@@ -546,14 +553,14 @@ def cmd_get_case(args):
 
     # --save: cases are not articles — save as JSON to library/grade-a/
     if getattr(args, "save", False):
-        from legal_store import LIBRARY_DIR
-        case_dir = LIBRARY_DIR / "_cases"
-        case_dir.mkdir(parents=True, exist_ok=True)
+        from legal_store import StoreError, save_case_json
+
         safe_id = re.sub(r"[^\w-]", "_", args.id)
-        case_path = case_dir / f"case_{safe_id}.json"
-        case_path.write_text(
-            json.dumps(case_data, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
+        try:
+            case_path = save_case_json(case_id=safe_id, payload=case_data)
+        except StoreError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            sys.exit(1)
         print(f"\n[Saved] case → {case_path}", file=sys.stderr)
 
 
@@ -618,7 +625,7 @@ def main():
     # -- get-article --
     p = sub.add_parser("get-article", help="특정 조문 조회")
     p.add_argument("--id", required=True, help="법령 ID")
-    p.add_argument("--article", type=int, required=True, help="조문 번호 (예: 17)")
+    p.add_argument("--article", required=True, help="조문 번호 (예: 17, 39의3)")
     p.add_argument("--paragraph", type=int, help="항 번호")
     p.add_argument("--clause", type=int, help="호 번호")
     p.add_argument("--item", help="목 (가, 나, 다...)")

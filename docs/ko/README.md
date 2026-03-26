@@ -163,7 +163,7 @@ flowchart LR
 |:-----|:----------|:-----|
 | `user-config.json` | `/onboard`가 자동 생성 | 페르소나, 기본 관할, 출력 선호 |
 | `knowledge/` | 에이전트가 조사 후 자동 생성 | 캐시된 조사 결과, 법령 다이제스트, 검증된 소스 스냅샷 |
-| `library/` | 변호사가 수동 업로드 | 자체 법률의견, 판례, 논문 — Step 3에서 **Grade A** 소스로 취급 |
+| `library/` | 변호사 수동 업로드 + 온디맨드 API 캐시 | 자체 자료를 넣어두고, `--save`로 가져온 법령/판례도 `grade-a/`에 누적 저장 |
 
 <details>
 <summary><strong><code>user-config.json</code> 스키마</strong></summary>
@@ -203,18 +203,21 @@ flowchart LR
 <details>
 <summary><strong><code>library/</code> 디렉터리</strong></summary>
 
-참고자료를 이 디렉터리에 넣어 두면 됩니다. 에이전트는 Step 0에서 `library/_index.md`를 읽고, 인덱싱된 파일을 Step 3 소스 수집 시 Grade A 자료로 취급합니다.
+참고자료는 `library/inbox/`에 넣고 `/ingest`를 실행하면 됩니다. 에이전트는 Step 0에서 `library/_index.md`를 읽고, 인덱싱된 파일을 Step 3 소스 수집 시 우선 자료로 활용합니다.
 
-**자동 변환:** `python3 scripts/library-ingest.py`를 실행하면 `library/` 안의 PDF/DOCX/PPTX 파일을 `knowledge/library-converted/`에 검색 가능한 Markdown으로 자동 변환합니다. 인덱스도 자동 갱신됩니다.
+온디맨드 API 저장도 같은 `library/grade-a/`를 사용합니다. `open_law_api.py --save`, `eurlex_api.py --save`로 가져온 1차 법령 자료는 Markdown/JSON으로 로컬 캐시에 쌓이고 다음 세션에서 재사용할 수 있습니다.
+
+**자동 변환:** `python3 scripts/library-ingest.py`를 실행하면 `library/inbox/` 안의 PDF/DOCX/PPTX 파일을 검색 가능한 Markdown으로 변환하고, 등급별 폴더와 인덱스를 자동 갱신합니다.
 
 ```text
 library/
 |-- _index.md          # library-ingest.py가 자동 생성
-|-- opinions/          # 법률의견서 (내부/외부)
-|-- cases/             # 판례 PDF
-|-- papers/            # 논문, law review 자료
-|-- regulations/       # 규제 가이드라인, 행정 매뉴얼
-`-- misc/
+|-- inbox/             # 자료 투입 후 /ingest
+|   |-- _processed/
+|   `-- _failed/
+|-- grade-a/           # 1차 자료 + on-demand API cache
+|-- grade-b/
+`-- grade-c/
 ```
 
 </details>
@@ -393,14 +396,20 @@ graph TD
 |   |-- cases/
 |   |-- templates/
 |   `-- precedents/
-|-- library/                           # gitignored; attorney-curated materials (Grade A)
+|-- library/                           # gitignored; 인제스트 자료 + 온디맨드 법령 캐시
 |   |-- _index.md
-|   |-- opinions/
-|   |-- cases/
-|   |-- papers/
-|   |-- regulations/
-|   `-- misc/
+|   |-- inbox/
+|   |   |-- _processed/
+|   |   `-- _failed/
+|   |-- grade-a/                      # 1차 자료 + on-demand API cache
+|   |-- grade-b/
+|   `-- grade-c/
+|-- index/                             # 온디맨드 법령 캐시 인덱스
+|   |-- article-index.json
+|   |-- source-registry.json
+|   `-- cross-refs-reverse.json
 |-- scripts/
+|   |-- legal_store.py                   # 원자적 저장, 조회, 인덱스/역참조 동기화
 |   |-- open_law_api.py                  # 열린법령 API CLI 래퍼 (온디맨드 법령·판례·해석례 조회)
 |   |-- eurlex_api.py                    # EUR-Lex SOAP API CLI 래퍼 (EU 법령·지침·판례 조회)
 |   |-- install-agentskills-set.ps1
@@ -460,6 +469,15 @@ cp .env.example .env   # API 키 추가
 
 > [!TIP]
 > **첫 세션만:** 에이전트가 자동으로 onboard 설정 마법사를 실행합니다. 스타터 템플릿을 고르거나 7개의 짧은 질문에 답하면 됩니다 (~2분). 로컬에 `user-config.json`이 생성됩니다.
+
+### On-Demand Legal Cache
+
+- `python3 scripts/open_law_api.py get-law --id 001823 --save`로 한국 법령 전체를 `library/grade-a/`에 저장합니다.
+- `python3 scripts/open_law_api.py get-article --id 001823 --article 39의3 --save`로 단일 조문을 기존 캐시에 병합 저장할 수 있습니다.
+- `python3 scripts/open_law_api.py get-case --id 228541 --save`는 판례 JSON을 `library/grade-a/_cases/` 아래에 원자적으로 저장합니다.
+- `python3 scripts/eurlex_api.py get-document 32016R0679 --save`는 EUR-Lex 문서를 같은 Grade A 캐시에 저장합니다.
+- 캐시 메타데이터는 `index/article-index.json`, `index/source-registry.json`, `index/cross-refs-reverse.json`에 동기화됩니다.
+- 저장 시 파일 락과 atomic replace를 사용하며, 인덱스 JSON이 손상돼 있으면 부분 덮어쓰기 대신 즉시 중단합니다.
 
 ### 예시 질문
 
