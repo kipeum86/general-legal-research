@@ -536,9 +536,9 @@ satisfies Brazil LGPD Article 33 cross-border transfer requirements.
 
 ---
 
-## Part of Law Firm Pearl
+## Part of Jinju Law Firm
 
-This agent is part of the **법무법인 진주 (Law Firm Pearl)** series of specialized legal AI agents:
+This agent is part of the **법무법인 진주 (Jinju Law Firm)** series of specialized legal AI agents:
 
 | Agent | Attorney | Specialty |
 |-------|----------|-----------|
