@@ -31,8 +31,8 @@ try:
     from zeep import Client as ZeepClient
     from zeep.wsse.username import UsernameToken
 except ImportError:
-    print("ERROR: zeep not installed. Run: pip install zeep", file=sys.stderr)
-    sys.exit(1)
+    ZeepClient = None
+    UsernameToken = None
 
 try:
     from dotenv import load_dotenv
@@ -64,6 +64,9 @@ def _load_credentials() -> tuple[str, str]:
 
 def _create_client(username: str, password: str) -> ZeepClient:
     """Create SOAP client with WS-Security authentication."""
+    if ZeepClient is None or UsernameToken is None:
+        print("ERROR: zeep not installed. Run: pip install zeep", file=sys.stderr)
+        sys.exit(1)
     return ZeepClient(WSDL_URL, wsse=UsernameToken(username, password))
 
 
@@ -206,7 +209,11 @@ def cmd_get_document(args):
 
     # --save flag: persist to library/grade-a/ via legal_store
     if getattr(args, "save", False):
-        _save_eurlex_document(doc)
+        try:
+            _save_eurlex_document(doc)
+        except Exception as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            sys.exit(1)
 
 
 def _save_eurlex_document(doc: dict) -> None:
@@ -216,7 +223,7 @@ def _save_eurlex_document(doc: dict) -> None:
     if str(scripts_dir) not in sys.path:
         sys.path.insert(0, str(scripts_dir))
 
-    from legal_store import write_article_md, update_index, update_crossref_reverse_index
+    from legal_store import StoreError, save_law_articles
 
     celex = doc["celex"]
     title = doc.get("title", "")
@@ -236,36 +243,24 @@ def _save_eurlex_document(doc: dict) -> None:
     content_lines.append(f"CELEX: {celex}")
     content = "\n".join(content_lines)
 
-    art_path = write_article_md(
-        law_name=title or celex,
-        law_dir=law_dir,
-        article_number=1,
-        title=title or celex,
-        content=content,
-        jurisdiction="EU",
-        source="EUR-Lex",
-        source_id=celex,
-    )
-
-    # Update index
-    update_index(
-        law_name=title or celex,
-        law_dir=law_dir,
-        jurisdiction="EU",
-        articles=[{"article_number": 1, "title": title or celex, "file": "art001.md"}],
-    )
-
-    # Update cross-reference reverse index
-    from legal_store import extract_crossrefs
-
-    cross_refs = extract_crossrefs(content, "EU")
-    if cross_refs:
-        update_crossref_reverse_index(
-            source_law=title or celex,
-            source_article=1,
-            cross_refs=cross_refs,
+    try:
+        law_path = save_law_articles(
+            law_name=title or celex,
+            law_dir=law_dir,
+            jurisdiction="EU",
+            source="EUR-Lex",
+            source_id=celex,
+            articles=[{
+                "article_number": 1,
+                "title": title or celex,
+                "content": content,
+            }],
+            replace_existing=True,
         )
+    except StoreError as exc:
+        raise StoreError(f"Failed to persist EUR-Lex document {celex}: {exc}") from exc
 
+    art_path = law_path / "art001.md"
     print(f"[Saved] {art_path}", file=sys.stderr)
 
 

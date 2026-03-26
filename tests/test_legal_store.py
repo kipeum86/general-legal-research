@@ -4,9 +4,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 import json
 import tempfile
 import shutil
+import pytest
+
 from legal_store import (
     extract_crossrefs, write_article_md, update_index, lookup,
     update_crossref_reverse_index, query_reverse_crossrefs,
+    save_law_articles,
+    StoreError,
 )
 
 
@@ -27,6 +31,14 @@ def test_extract_kr_external_law_ref():
     assert external[0]["article"] == 24
 
 
+def test_extract_kr_subarticle_ref_preserves_suffix():
+    text = "제39조의3에 따른 처리 기준은 제39조의4에 따른다."
+    refs = extract_crossrefs(text, "KR")
+    ids = [r["article_id"] for r in refs if r["type"] == "internal"]
+    assert "39의3" in ids
+    assert "39의4" in ids
+
+
 def test_extract_kr_no_refs():
     text = "이 법은 개인정보의 처리에 관한 사항을 정함으로써 개인의 자유와 권리를 보호한다."
     refs = extract_crossrefs(text, "KR")
@@ -43,6 +55,17 @@ def test_extract_eu_no_refs():
     text = "This regulation shall be binding in its entirety."
     refs = extract_crossrefs(text, "EU")
     assert refs == []
+
+
+def test_extract_eu_plural_articles_and_multiple_instruments():
+    text = "Articles 5 and 6 of Directive (EU) 2016/680 and Regulation (EU) No 2016/679."
+    refs = extract_crossrefs(text, "EU")
+    article_ids = [r["article_id"] for r in refs if r["type"] == "internal"]
+    instruments = [r["regulation"] for r in refs if r["type"] == "external_instrument"]
+    assert "5" in article_ids
+    assert "6" in article_ids
+    assert "2016/680" in instruments
+    assert "2016/679" in instruments
 
 
 def test_write_article_creates_md_file(tmp_path):
@@ -163,3 +186,125 @@ def test_reverse_index_creation(tmp_path):
     assert len(result) >= 1
     assert result[0]["source_law"] == "개인정보보호법"
     assert result[0]["source_article"] == 17
+
+
+def test_save_law_articles_preserves_existing_articles_on_partial_update(tmp_path):
+    library_dir = tmp_path / "library"
+    index_dir = tmp_path / "index"
+
+    save_law_articles(
+        law_name="테스트법",
+        law_dir="test-law",
+        jurisdiction="KR",
+        source="law.go.kr",
+        source_id="001",
+        articles=[
+            {"article_number": 1, "title": "총칙", "content": "제2조를 따른다."},
+            {"article_number": 2, "title": "정의", "content": "원래 내용"},
+        ],
+        library_dir=library_dir,
+        index_dir=index_dir,
+        replace_existing=True,
+    )
+    save_law_articles(
+        law_name="테스트법",
+        law_dir="test-law",
+        jurisdiction="KR",
+        source="law.go.kr",
+        source_id="001",
+        articles=[
+            {"article_number": 2, "title": "정의", "content": "개정된 내용"},
+        ],
+        library_dir=library_dir,
+        index_dir=index_dir,
+        replace_existing=False,
+    )
+
+    idx = json.loads((index_dir / "article-index.json").read_text(encoding="utf-8"))
+    articles = idx["테스트법"]["articles"]
+    assert [article["article_id"] for article in articles] == ["1", "2"]
+    assert (library_dir / "test-law" / "art001.md").exists()
+    assert "개정된 내용" in (library_dir / "test-law" / "art002.md").read_text(encoding="utf-8")
+
+
+def test_save_law_articles_removes_stale_reverse_links(tmp_path):
+    library_dir = tmp_path / "library"
+    index_dir = tmp_path / "index"
+
+    save_law_articles(
+        law_name="테스트법",
+        law_dir="test-law",
+        jurisdiction="KR",
+        source="law.go.kr",
+        source_id="001",
+        articles=[
+            {"article_number": 1, "title": "총칙", "content": "제2조를 따른다."},
+        ],
+        library_dir=library_dir,
+        index_dir=index_dir,
+        replace_existing=True,
+    )
+    save_law_articles(
+        law_name="테스트법",
+        law_dir="test-law",
+        jurisdiction="KR",
+        source="law.go.kr",
+        source_id="001",
+        articles=[
+            {"article_number": 1, "title": "총칙", "content": "참조 없음"},
+        ],
+        library_dir=library_dir,
+        index_dir=index_dir,
+        replace_existing=False,
+    )
+
+    rev = json.loads((index_dir / "cross-refs-reverse.json").read_text(encoding="utf-8"))
+    assert rev == {}
+
+
+def test_save_law_articles_stores_subarticle_without_collision(tmp_path):
+    library_dir = tmp_path / "library"
+    index_dir = tmp_path / "index"
+
+    save_law_articles(
+        law_name="테스트법",
+        law_dir="test-law",
+        jurisdiction="KR",
+        source="law.go.kr",
+        source_id="001",
+        articles=[
+            {"article_number": "39의3", "article_id": "39의3", "title": "특례", "content": "내용"},
+        ],
+        library_dir=library_dir,
+        index_dir=index_dir,
+        replace_existing=True,
+    )
+
+    assert (library_dir / "test-law" / "art039-003.md").exists()
+    result = lookup("테스트법", article="39의3", library_dir=library_dir)
+    assert result is not None
+    assert result["hit"] is True
+
+
+def test_save_law_articles_stops_on_corrupted_index_json(tmp_path):
+    library_dir = tmp_path / "library"
+    index_dir = tmp_path / "index"
+    index_dir.mkdir(parents=True)
+    (index_dir / "article-index.json").write_text("{broken", encoding="utf-8")
+
+    with pytest.raises(StoreError):
+        save_law_articles(
+            law_name="테스트법",
+            law_dir="test-law",
+            jurisdiction="KR",
+            source="law.go.kr",
+            source_id="001",
+            articles=[
+                {"article_number": 1, "title": "총칙", "content": "내용"},
+            ],
+            library_dir=library_dir,
+            index_dir=index_dir,
+            replace_existing=True,
+        )
+
+    assert not (library_dir / "test-law").exists()
