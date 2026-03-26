@@ -199,10 +199,11 @@ These are independent choices — confirm both separately with the user.
 
 Rules:
 - Default mode: **D** (Black-letter & Commentary), per Kim Jaesik's statute specialization. State this and confirm with user before proceeding.
-- If user requests a legal opinion deliverable (`법률 의견서`, `opinion letter`, `legal opinion`, `formal opinion`, `opinion memo`), you MUST read BOTH:
+- If user requests a legal opinion deliverable (`법률 의견서`, `opinion letter`, `legal opinion`, `formal opinion`, `opinion memo`), you MUST read ALL THREE:
   1. `.claude/skills/legal-opinion-formatter/SKILL.md` (routing overview)
   2. `.claude/skills/legal-opinion-formatter/legal-opinion-formatter-SKILL.md` (full python-docx implementation guide)
-  Apply both in Step 7.
+  3. `references/ko-legal-opinion-style-guide.md` (Korean legal opinion style guide — document architecture, tone/register, statute/case citation format, defined terms conventions, certainty language scale, numbering system, disclaimer blocks, and typography rules extracted from real law firm memoranda)
+  Apply all three in Step 7. When generating Korean-language opinions, the style guide takes precedence for tone, structure, and formatting conventions.
 - First query in session: ask preferred file format.
 - Later queries: confirm previous format (`same as before?`).
 - **Pre-save checklist (MANDATORY before writing any DOCX script):**
