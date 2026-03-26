@@ -171,3 +171,125 @@ def _atomic_json_write(path: Path, data: dict | list) -> None:
     tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     tmp.rename(path)
+
+
+# ---------------------------------------------------------------------------
+# Index management
+# ---------------------------------------------------------------------------
+
+def update_index(
+    *,
+    law_name: str,
+    law_dir: str,
+    jurisdiction: str,
+    articles: list[dict],
+    index_dir: Path | None = None,
+) -> None:
+    """Update article-index.json and source-registry.json."""
+    idx_dir = index_dir or INDEX_DIR
+    idx_dir.mkdir(parents=True, exist_ok=True)
+
+    now = datetime.now(timezone.utc).isoformat()
+
+    # article-index.json
+    ai_path = idx_dir / "article-index.json"
+    ai = {}
+    if ai_path.exists():
+        ai = json.loads(ai_path.read_text(encoding="utf-8"))
+    ai[law_name] = {
+        "law_dir": law_dir,
+        "jurisdiction": jurisdiction,
+        "articles": articles,
+        "last_updated": now,
+    }
+    _atomic_json_write(ai_path, ai)
+
+    # source-registry.json
+    sr_path = idx_dir / "source-registry.json"
+    sr = {}
+    if sr_path.exists():
+        sr = json.loads(sr_path.read_text(encoding="utf-8"))
+    sr[law_name] = {
+        "law_dir": law_dir,
+        "jurisdiction": jurisdiction,
+        "article_count": len(articles),
+        "last_fetched": now,
+    }
+    _atomic_json_write(sr_path, sr)
+
+
+# ---------------------------------------------------------------------------
+# Cache lookup
+# ---------------------------------------------------------------------------
+
+def lookup(
+    law_name: str,
+    article: int | None = None,
+    *,
+    library_dir: Path | None = None,
+) -> dict | None:
+    """Look up a cached law or article.
+
+    Returns dict with keys: hit, content, path, stale, fetched_at
+    Returns None if not found.
+    """
+    lib = library_dir or LIBRARY_DIR
+
+    # Find matching law directory
+    law_dir = None
+    if not lib.exists():
+        return {"hit": False}
+    for d in lib.iterdir():
+        if not d.is_dir():
+            continue
+        meta_path = d / "_meta.json"
+        if meta_path.exists():
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+            if meta.get("law_name") == law_name:
+                law_dir = d
+                break
+
+    if law_dir is None:
+        return {"hit": False}
+
+    if article is not None:
+        art_path = law_dir / f"art{article:03d}.md"
+        if not art_path.exists():
+            return {"hit": False}
+        content = art_path.read_text(encoding="utf-8")
+        fetched_at = _parse_fetched_at(content)
+        stale = _is_stale(fetched_at)
+        return {
+            "hit": True,
+            "content": content,
+            "path": str(art_path),
+            "fetched_at": fetched_at,
+            "stale": stale,
+        }
+    else:
+        # Return law-level info
+        meta = json.loads((law_dir / "_meta.json").read_text(encoding="utf-8"))
+        return {
+            "hit": True,
+            "law_dir": str(law_dir),
+            "meta": meta,
+            "stale": _is_stale(meta.get("last_fetched")),
+        }
+
+
+def _parse_fetched_at(content: str) -> str | None:
+    """Extract fetched_at from frontmatter."""
+    m = re.search(r"fetched_at:\s*(.+)", content)
+    return m.group(1).strip() if m else None
+
+
+def _is_stale(fetched_at: str | None) -> bool:
+    """Check if fetched_at is older than STALENESS_DAYS."""
+    if not fetched_at:
+        return True
+    try:
+        dt = datetime.fromisoformat(fetched_at)
+        age = (datetime.now(timezone.utc) - dt).days
+        return age > STALENESS_DAYS
+    except (ValueError, TypeError):
+        return True

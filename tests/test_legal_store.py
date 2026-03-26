@@ -4,7 +4,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 import json
 import tempfile
 import shutil
-from legal_store import extract_crossrefs, write_article_md
+from legal_store import extract_crossrefs, write_article_md, update_index, lookup
 
 
 def test_extract_kr_explicit_article_ref():
@@ -99,3 +99,48 @@ def test_write_article_creates_meta_json(tmp_path):
     data = json.loads(meta.read_text())
     assert data["law_name"] == "테스트법"
     assert data["jurisdiction"] == "KR"
+
+
+def test_update_index_creates_files(tmp_path):
+    update_index(
+        law_name="테스트법",
+        law_dir="test-law",
+        jurisdiction="KR",
+        articles=[{"number": 1, "title": "총칙"}, {"number": 2, "title": "정의"}],
+        index_dir=tmp_path,
+    )
+    assert (tmp_path / "article-index.json").exists()
+    assert (tmp_path / "source-registry.json").exists()
+    idx = json.loads((tmp_path / "article-index.json").read_text())
+    assert "테스트법" in idx
+
+
+def test_lookup_hit(tmp_path):
+    write_article_md(
+        law_name="테스트법", law_dir="test-law", article_number=1,
+        title="총칙", content="내용", jurisdiction="KR",
+        source="test", source_id="000", library_dir=tmp_path,
+    )
+    result = lookup("테스트법", article=1, library_dir=tmp_path)
+    assert result is not None
+    assert result["hit"] is True
+    assert "내용" in result["content"]
+
+
+def test_lookup_miss(tmp_path):
+    result = lookup("존재안하는법", library_dir=tmp_path)
+    assert result is None or result["hit"] is False
+
+
+def test_lookup_staleness_warning(tmp_path):
+    art_path = tmp_path / "test-law"
+    art_path.mkdir(parents=True)
+    old_date = "2025-01-01T00:00:00+00:00"
+    content = f"---\nlaw: 테스트법\narticle_number: 1\nfetched_at: {old_date}\n---\n내용"
+    (art_path / "art001.md").write_text(content, encoding="utf-8")
+    # Need _meta.json for lookup to find the law dir
+    meta = json.dumps({"law_name": "테스트법", "law_dir": "test-law", "jurisdiction": "KR"})
+    (art_path / "_meta.json").write_text(meta, encoding="utf-8")
+    result = lookup("테스트법", article=1, library_dir=tmp_path)
+    assert result is not None
+    assert result.get("stale") is True
