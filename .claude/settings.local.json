@@ -70,7 +70,9 @@
       "WebFetch(domain:www.kpanews.co.kr)",
       "WebFetch(domain:m.ceoscoredaily.com)",
       "Bash(pip list:*)",
-      "mcp__markitdown__convert_to_markdown"
+      "mcp__markitdown__convert_to_markdown",
+      "Bash(source \"/Users/kpsfamily/코딩 프로젝트/general-legal-research/.venv/bin/activate\")",
+      "Bash(wc -l /private/tmp/claude-501/-Users-kpsfamily---------general-legal-research/69e48393-548c-464c-bb37-92900605f9dc/tasks/*.output)"
     ]
   }
 }
