@@ -22,6 +22,7 @@ Dependencies:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from pathlib import Path
@@ -188,14 +189,84 @@ def cmd_get_document(args):
 
     docs = _format_results(response)
 
-    if docs:
-        doc = docs[0]
+    if not docs:
+        print(f"ERROR: Document {celex} not found", file=sys.stderr)
+        sys.exit(1)
+
+    doc = docs[0]
+
+    # --json flag: output structured JSON
+    if getattr(args, "json", False):
+        print(json.dumps(doc, ensure_ascii=False, indent=2))
+    else:
         print(f"=== {doc['title']} ===")
         print(f"CELEX: {doc['celex']}")
         if doc['url']:
             print(f"URL: {doc['url']}")
-    else:
-        print(f"ERROR: Document {celex} not found", file=sys.stderr)
+
+    # --save flag: persist to library/grade-a/ via legal_store
+    if getattr(args, "save", False):
+        _save_eurlex_document(doc)
+
+
+def _save_eurlex_document(doc: dict) -> None:
+    """Persist an EUR-Lex document to library/grade-a/ via legal_store."""
+    # Import legal_store from the same scripts/ directory
+    scripts_dir = Path(__file__).resolve().parent
+    if str(scripts_dir) not in sys.path:
+        sys.path.insert(0, str(scripts_dir))
+
+    from legal_store import write_article_md, update_index, update_crossref_reverse_index
+
+    celex = doc["celex"]
+    title = doc.get("title", "")
+    url = doc.get("url", "")
+
+    # Use CELEX as the directory name (sanitised)
+    law_dir = celex.replace("/", "_")
+
+    # Save as art001.md (single document = single article file)
+    content_lines = []
+    if title:
+        content_lines.append(title)
+        content_lines.append("")
+    if url:
+        content_lines.append(f"Source: {url}")
+        content_lines.append("")
+    content_lines.append(f"CELEX: {celex}")
+    content = "\n".join(content_lines)
+
+    art_path = write_article_md(
+        law_name=title or celex,
+        law_dir=law_dir,
+        article_number=1,
+        title=title or celex,
+        content=content,
+        jurisdiction="EU",
+        source="EUR-Lex",
+        source_id=celex,
+    )
+
+    # Update index
+    update_index(
+        law_name=title or celex,
+        law_dir=law_dir,
+        jurisdiction="EU",
+        articles=[{"article_number": 1, "title": title or celex, "file": "art001.md"}],
+    )
+
+    # Update cross-reference reverse index
+    from legal_store import extract_crossrefs
+
+    cross_refs = extract_crossrefs(content, "EU")
+    if cross_refs:
+        update_crossref_reverse_index(
+            source_law=title or celex,
+            source_article=1,
+            cross_refs=cross_refs,
+        )
+
+    print(f"[Saved] {art_path}", file=sys.stderr)
 
 
 def cmd_search_title(args):
@@ -289,6 +360,8 @@ def main():
     p = sub.add_parser("get-document", help="Get document by CELEX number")
     p.add_argument("celex", help="CELEX number (e.g., 32016R0679 for GDPR)")
     p.add_argument("--lang", default="en", help="Language (default: en)")
+    p.add_argument("--json", action="store_true", help="Output structured JSON")
+    p.add_argument("--save", action="store_true", help="Save to library/grade-a/ cache")
     p.set_defaults(func=cmd_get_document)
 
     # -- search-title --
