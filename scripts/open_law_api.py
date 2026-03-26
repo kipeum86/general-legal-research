@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.parse
@@ -106,6 +107,72 @@ def _pad6(n: int) -> str:
     return str(n).zfill(6)
 
 
+def _slugify_law_name(name: str) -> str:
+    """Create a filesystem-safe directory name from a Korean law name.
+
+    Keeps Korean characters, digits, and hyphens. Replaces whitespace/special
+    chars with hyphens and collapses consecutive hyphens.
+    """
+    slug = re.sub(r"[^\w가-힣-]", "-", name)
+    slug = re.sub(r"-{2,}", "-", slug).strip("-")
+    return slug or "unknown-law"
+
+
+def _save_law_articles(law_name: str, source_id: str, articles_data: list[dict]) -> str:
+    """Persist articles to library/grade-a/ using legal_store.
+
+    Returns the law_dir name used.
+    """
+    # Lazy import so the module works standalone without legal_store for basic usage
+    from legal_store import (
+        write_article_md,
+        update_index,
+        update_crossref_reverse_index,
+        extract_crossrefs,
+    )
+
+    law_dir = _slugify_law_name(law_name)
+    index_articles = []
+
+    for art in articles_data:
+        art_num = art["article_number"]
+        content = art.get("content", "")
+        title = art.get("title", "")
+        cross_refs = extract_crossrefs(content, "KR")
+
+        write_article_md(
+            law_name=law_name,
+            law_dir=law_dir,
+            article_number=art_num,
+            title=title,
+            content=content,
+            jurisdiction="KR",
+            source="law.go.kr",
+            source_id=source_id,
+            cross_refs=cross_refs,
+        )
+
+        update_crossref_reverse_index(
+            source_law=law_name,
+            source_article=art_num,
+            cross_refs=cross_refs,
+        )
+
+        index_articles.append({
+            "article_number": art_num,
+            "title": title,
+        })
+
+    update_index(
+        law_name=law_name,
+        law_dir=law_dir,
+        jurisdiction="KR",
+        articles=index_articles,
+    )
+
+    return law_dir
+
+
 # ---------------------------------------------------------------------------
 # Commands
 # ---------------------------------------------------------------------------
@@ -167,59 +234,132 @@ def cmd_get_law(args):
     enforce_date = _text(root, "기본정보/시행일자") or _text(root, "시행일자")
     ministry = _text(root, "기본정보/소관부처명") or _text(root, "소관부처명")
 
-    print(f"=== {name} ===")
-    print(f"법종: {kind} | 소관: {ministry}")
-    print(f"공포: {promulgate_date} (제{promulgate_no}호) | 시행: {enforce_date}")
-    print("=" * 60)
+    source_id = args.id or args.mst or ""
 
-    # Articles — XML uses <조문단위> with nested <항>, <호>, <목>
+    # Collect structured article data
+    articles_data = []
     for jo in root.iter("조문단위"):
         jo_no = _text(jo, "조문번호")
         jo_title = _text(jo, "조문제목")
         jo_content = _text(jo, "조문내용")
         jo_enforce = _text(jo, "조문시행일자")
 
-        header = f"\n제{jo_no}조"
-        if jo_title:
-            header += f"({jo_title})"
-        if jo_enforce:
-            header += f"  [시행 {jo_enforce}]"
-        print(header)
+        # Build full content string (article + paragraphs + clauses + items)
+        content_parts = []
         if jo_content:
-            print(jo_content)
+            content_parts.append(jo_content)
 
-        # 항 (paragraphs)
+        paragraphs = []
         for hang in jo.findall("항"):
             hang_no = _text(hang, "항번호")
             hang_content = _text(hang, "항내용")
-            if hang_content:
-                print(f"  {hang_content}")
-
-            # 호 (clauses) within 항
+            clauses = []
             for ho in hang.findall("호"):
                 ho_content = _text(ho, "호내용")
-                if ho_content:
-                    print(f"    {ho_content}")
-
-                # 목 (items) within 호
+                items = []
                 for mok in ho.findall("목"):
                     mok_content = _text(mok, "목내용")
                     if mok_content:
-                        print(f"      {mok_content}")
+                        items.append(mok_content)
+                if ho_content:
+                    clause_entry = {"content": ho_content}
+                    if items:
+                        clause_entry["items"] = items
+                    clauses.append(clause_entry)
+            para_entry = {}
+            if hang_no:
+                para_entry["number"] = hang_no
+            if hang_content:
+                para_entry["content"] = hang_content
+                content_parts.append(f"  {hang_content}")
+            if clauses:
+                para_entry["clauses"] = clauses
+                for cl in clauses:
+                    content_parts.append(f"    {cl['content']}")
+                    for it in cl.get("items", []):
+                        content_parts.append(f"      {it}")
+            if para_entry:
+                paragraphs.append(para_entry)
 
-    # 부칙 (Supplementary provisions)
+        try:
+            art_num = int(jo_no)
+        except (ValueError, TypeError):
+            art_num = 0
+
+        article_record = {
+            "article_number": art_num,
+            "title": jo_title,
+            "content": "\n".join(content_parts),
+            "enforce_date": jo_enforce,
+        }
+        if paragraphs:
+            article_record["paragraphs"] = paragraphs
+        articles_data.append(article_record)
+
+    # Collect 부칙 (supplementary provisions)
+    buchik_data = []
     for buchik in root.iter("부칙단위"):
         buchik_date = _text(buchik, "공포일자")
         buchik_no = _text(buchik, "공포번호")
         buchik_content = _text(buchik, "부칙내용")
-        if buchik_content:
-            print(f"\n[부칙] ({buchik_date}, 제{buchik_no}호)")
-            print(buchik_content)
-        # Also check 항 within 부칙
+        buchik_hangs = []
         for hang in buchik.findall("항"):
             hang_content = _text(hang, "항내용")
             if hang_content:
-                print(f"  {hang_content}")
+                buchik_hangs.append(hang_content)
+        if buchik_content or buchik_hangs:
+            buchik_data.append({
+                "date": buchik_date,
+                "number": buchik_no,
+                "content": buchik_content,
+                "paragraphs": buchik_hangs,
+            })
+
+    # --json output
+    if getattr(args, "json", False):
+        output = {
+            "law_name": name,
+            "kind": kind,
+            "ministry": ministry,
+            "promulgate_date": promulgate_date,
+            "promulgate_no": promulgate_no,
+            "enforce_date": enforce_date,
+            "source_id": source_id,
+            "articles": articles_data,
+            "supplementary_provisions": buchik_data,
+        }
+        print(json.dumps(output, ensure_ascii=False, indent=2))
+    else:
+        # Default human-readable output (preserves original behavior)
+        print(f"=== {name} ===")
+        print(f"법종: {kind} | 소관: {ministry}")
+        print(f"공포: {promulgate_date} (제{promulgate_no}호) | 시행: {enforce_date}")
+        print("=" * 60)
+
+        for art in articles_data:
+            jo_no = art["article_number"]
+            jo_title = art["title"]
+            jo_enforce = art.get("enforce_date", "")
+            header = f"\n제{jo_no}조"
+            if jo_title:
+                header += f"({jo_title})"
+            if jo_enforce:
+                header += f"  [시행 {jo_enforce}]"
+            print(header)
+            if art["content"]:
+                print(art["content"])
+
+        for b in buchik_data:
+            if b["content"]:
+                print(f"\n[부칙] ({b['date']}, 제{b['number']}호)")
+                print(b["content"])
+            for h in b.get("paragraphs", []):
+                print(f"  {h}")
+
+    # --save to library/grade-a/
+    if getattr(args, "save", False):
+        law_dir = _save_law_articles(name, source_id, articles_data)
+        print(f"\n[Saved] {len(articles_data)} articles → library/grade-a/{law_dir}/", file=sys.stderr)
 
 
 def cmd_get_article(args):
@@ -243,27 +383,71 @@ def cmd_get_article(args):
         jo_content = _text(jo, "조문내용")
         jo_enforce = _text(jo, "조문시행일자")
 
-        print(f"=== {name} 제{jo_no}조({jo_title}) ===")
-        print(f"시행일: {jo_enforce} | 소관: {ministry}")
-        print("-" * 40)
-
+        # Build structured data
+        content_parts = []
         if jo_content:
-            print(jo_content)
+            content_parts.append(jo_content)
 
+        paragraphs = []
         for hang in jo.findall("항"):
+            hang_no = _text(hang, "항번호")
             hang_content = _text(hang, "항내용")
-            if hang_content:
-                print(f"  {hang_content}")
-
+            clauses = []
             for ho in hang.findall("호"):
                 ho_content = _text(ho, "호내용")
-                if ho_content:
-                    print(f"    {ho_content}")
-
+                items = []
                 for mok in ho.findall("목"):
                     mok_content = _text(mok, "목내용")
                     if mok_content:
-                        print(f"      {mok_content}")
+                        items.append(mok_content)
+                if ho_content:
+                    clause_entry = {"content": ho_content}
+                    if items:
+                        clause_entry["items"] = items
+                    clauses.append(clause_entry)
+            para_entry = {}
+            if hang_no:
+                para_entry["number"] = hang_no
+            if hang_content:
+                para_entry["content"] = hang_content
+                content_parts.append(f"  {hang_content}")
+            if clauses:
+                para_entry["clauses"] = clauses
+                for cl in clauses:
+                    content_parts.append(f"    {cl['content']}")
+                    for it in cl.get("items", []):
+                        content_parts.append(f"      {it}")
+            if para_entry:
+                paragraphs.append(para_entry)
+
+        article_data = {
+            "law_name": name,
+            "article_number": int(jo_no),
+            "title": jo_title,
+            "content": "\n".join(content_parts),
+            "enforce_date": jo_enforce,
+            "ministry": ministry,
+            "source_id": args.id,
+        }
+        if paragraphs:
+            article_data["paragraphs"] = paragraphs
+
+        # --json output
+        if getattr(args, "json", False):
+            print(json.dumps(article_data, ensure_ascii=False, indent=2))
+        else:
+            # Default human-readable output
+            print(f"=== {name} 제{jo_no}조({jo_title}) ===")
+            print(f"시행일: {jo_enforce} | 소관: {ministry}")
+            print("-" * 40)
+            if article_data["content"]:
+                print(article_data["content"])
+
+        # --save single article
+        if getattr(args, "save", False):
+            law_dir = _save_law_articles(name, args.id, [article_data])
+            print(f"\n[Saved] 1 article → library/grade-a/{law_dir}/", file=sys.stderr)
+
         break
 
     if not found:
@@ -324,21 +508,53 @@ def cmd_get_case(args):
     ref_cases = _text(root, "참조판례")
     full_text = _text(root, "판례내용")
 
-    print(f"=== {case_name} ===")
-    print(f"사건번호: {case_no} | {court} | {date}")
-    print(f"사건종류: {case_type} | 판결유형: {judgment_type}")
-    print("=" * 60)
+    case_data = {
+        "case_name": case_name,
+        "case_no": case_no,
+        "court": court,
+        "date": date,
+        "case_type": case_type,
+        "judgment_type": judgment_type,
+        "holdings": holdings,
+        "summary": summary,
+        "ref_articles": ref_articles,
+        "ref_cases": ref_cases,
+        "full_text": full_text,
+        "source_id": args.id,
+    }
 
-    if holdings:
-        print(f"\n[판시사항]\n{holdings}")
-    if summary:
-        print(f"\n[판결요지]\n{summary}")
-    if ref_articles:
-        print(f"\n[참조조문] {ref_articles}")
-    if ref_cases:
-        print(f"\n[참조판례] {ref_cases}")
-    if full_text:
-        print(f"\n[판례내용]\n{full_text}")
+    # --json output
+    if getattr(args, "json", False):
+        print(json.dumps(case_data, ensure_ascii=False, indent=2))
+    else:
+        # Default human-readable output
+        print(f"=== {case_name} ===")
+        print(f"사건번호: {case_no} | {court} | {date}")
+        print(f"사건종류: {case_type} | 판결유형: {judgment_type}")
+        print("=" * 60)
+
+        if holdings:
+            print(f"\n[판시사항]\n{holdings}")
+        if summary:
+            print(f"\n[판결요지]\n{summary}")
+        if ref_articles:
+            print(f"\n[참조조문] {ref_articles}")
+        if ref_cases:
+            print(f"\n[참조판례] {ref_cases}")
+        if full_text:
+            print(f"\n[판례내용]\n{full_text}")
+
+    # --save: cases are not articles — save as JSON to library/grade-a/
+    if getattr(args, "save", False):
+        from legal_store import LIBRARY_DIR
+        case_dir = LIBRARY_DIR / "_cases"
+        case_dir.mkdir(parents=True, exist_ok=True)
+        safe_id = re.sub(r"[^\w-]", "_", args.id)
+        case_path = case_dir / f"case_{safe_id}.json"
+        case_path.write_text(
+            json.dumps(case_data, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        print(f"\n[Saved] case → {case_path}", file=sys.stderr)
 
 
 def cmd_search_interpretations(args):
@@ -395,6 +611,8 @@ def main():
     p = sub.add_parser("get-law", help="법령 본문 조회 (ID 또는 MST)")
     p.add_argument("--id", help="법령 ID")
     p.add_argument("--mst", help="법령 일련번호 (MST)")
+    p.add_argument("--json", action="store_true", help="Output structured JSON")
+    p.add_argument("--save", action="store_true", help="Save to library/grade-a/ cache")
     p.set_defaults(func=cmd_get_law)
 
     # -- get-article --
@@ -404,6 +622,8 @@ def main():
     p.add_argument("--paragraph", type=int, help="항 번호")
     p.add_argument("--clause", type=int, help="호 번호")
     p.add_argument("--item", help="목 (가, 나, 다...)")
+    p.add_argument("--json", action="store_true", help="Output structured JSON")
+    p.add_argument("--save", action="store_true", help="Save to library/grade-a/ cache")
     p.set_defaults(func=cmd_get_article)
 
     # -- search-cases --
@@ -419,6 +639,8 @@ def main():
     # -- get-case --
     p = sub.add_parser("get-case", help="판례 본문 조회")
     p.add_argument("--id", required=True, help="판례 일련번호")
+    p.add_argument("--json", action="store_true", help="Output structured JSON")
+    p.add_argument("--save", action="store_true", help="Save to library/grade-a/ cache")
     p.set_defaults(func=cmd_get_case)
 
     # -- search-interpretations --
