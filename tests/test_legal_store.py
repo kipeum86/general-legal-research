@@ -4,7 +4,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 import json
 import tempfile
 import shutil
-from legal_store import extract_crossrefs, write_article_md, update_index, lookup
+from legal_store import (
+    extract_crossrefs, write_article_md, update_index, lookup,
+    update_crossref_reverse_index, query_reverse_crossrefs,
+)
 
 
 def test_extract_kr_explicit_article_ref():
@@ -144,3 +147,19 @@ def test_lookup_staleness_warning(tmp_path):
     result = lookup("테스트법", article=1, library_dir=tmp_path)
     assert result is not None
     assert result.get("stale") is True
+
+
+def test_reverse_index_creation(tmp_path):
+    refs = [
+        {"type": "external", "law": "정보통신망법", "article": 24, "raw": "「정보통신망법」 제24조"},
+    ]
+    update_crossref_reverse_index(
+        source_law="개인정보보호법",
+        source_article=17,
+        cross_refs=refs,
+        index_dir=tmp_path,
+    )
+    result = query_reverse_crossrefs("정보통신망법", article=24, index_dir=tmp_path)
+    assert len(result) >= 1
+    assert result[0]["source_law"] == "개인정보보호법"
+    assert result[0]["source_article"] == 17
