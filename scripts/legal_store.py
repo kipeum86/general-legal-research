@@ -293,3 +293,66 @@ def _is_stale(fetched_at: str | None) -> bool:
         return age > STALENESS_DAYS
     except (ValueError, TypeError):
         return True
+
+
+# ---------------------------------------------------------------------------
+# Reverse cross-reference index
+# ---------------------------------------------------------------------------
+
+def update_crossref_reverse_index(
+    *,
+    source_law: str,
+    source_article: int,
+    cross_refs: list[dict],
+    index_dir: Path | None = None,
+) -> None:
+    """Update the global reverse cross-reference index.
+
+    For each outbound reference from source_law:source_article,
+    add an entry so the target can find who references it.
+    """
+    idx_dir = index_dir or INDEX_DIR
+    idx_dir.mkdir(parents=True, exist_ok=True)
+    rev_path = idx_dir / "cross-refs-reverse.json"
+
+    rev = {}
+    if rev_path.exists():
+        rev = json.loads(rev_path.read_text(encoding="utf-8"))
+
+    for ref in cross_refs:
+        target_law = ref.get("law", source_law)  # internal refs = same law
+        target_article = ref.get("article")
+        if target_article is None:
+            continue
+        key = f"{target_law}:art{target_article}"
+        if key not in rev:
+            rev[key] = []
+        entry = {"source_law": source_law, "source_article": source_article}
+        if entry not in rev[key]:
+            rev[key].append(entry)
+
+    _atomic_json_write(rev_path, rev)
+
+
+def query_reverse_crossrefs(
+    law_name: str,
+    article: int | None = None,
+    *,
+    index_dir: Path | None = None,
+) -> list[dict]:
+    """Query who references a given law/article."""
+    idx_dir = index_dir or INDEX_DIR
+    rev_path = idx_dir / "cross-refs-reverse.json"
+    if not rev_path.exists():
+        return []
+    rev = json.loads(rev_path.read_text(encoding="utf-8"))
+    if article is not None:
+        key = f"{law_name}:art{article}"
+        return rev.get(key, [])
+    else:
+        results = []
+        prefix = f"{law_name}:art"
+        for k, v in rev.items():
+            if k.startswith(prefix):
+                results.extend(v)
+        return results
