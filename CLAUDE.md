@@ -77,6 +77,8 @@ At every session start, **before Step 1**, run silently:
    - `library/grade-b/` 파일은 Grade B, `library/grade-c/`은 Grade C 소스로 참조.
    - If `library/inbox/` contains unprocessed files, suggest running `/ingest` or `python3 scripts/library-ingest.py`.
    - `knowledge/library-converted/` Markdown files are searchable by the agent during Step 3.
+6. Session reminder: if the session touches document ingestion, `HWP/HWPX`, Korean public-sector PDFs, or MCP parsing integration, review `kordoc-integration-evaluation.md` before proposing architecture changes or implementation work.
+   - Mention once to the user that the evaluation note exists and can guide next steps.
 
 ## 소스 Ingest
 
