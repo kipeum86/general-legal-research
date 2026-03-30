@@ -104,7 +104,60 @@ cd "C:\path\to\general-legal-research"
 - 성공 시: `"engine": "tavily-mcp"` (또는 brave/fetch)와 `results` 배열이 채워진 JSON이 출력됩니다.
 - 실패 시: `"engine": "none"`과 `fallback_urls`를 포함한 JSON이 출력됩니다.
 
-## C. Troubleshooting
+## C. Korean Law MCP Server (law.go.kr — 64개 도구)
+
+`korean-law-mcp` 서버는 한국법 조사를 위한 64개 네이티브 도구를 제공합니다 (법령, 판례, 해석례, 전문기관 결정, chain 워크플로우, 별표/서식 등). `open_law_api.py`와 동일한 law.go.kr Open API를 사용하지만, MCP 서버로 실행되어 Claude Code에서 직접 도구 호출이 가능합니다.
+
+### 1) 사전 요구사항
+
+- Node.js >= 20 (`node -v`로 확인)
+
+### 2) API 키 발급 (열린법령 API와 동일)
+
+1. `https://open.law.go.kr`에서 회원가입 (무료)
+2. OC 키 = 이메일 ID 앞부분 (예: `kipeum86@gmail.com` → `kipeum86`)
+
+### 3) `.mcp.json` 설정 (레포를 클론했다면 이미 설정됨)
+
+프로젝트 루트에 `.mcp.json`이 korean-law MCP 서버로 사전 설정되어 있습니다:
+
+```json
+{
+  "mcpServers": {
+    "korean-law": {
+      "command": "npx",
+      "args": ["-y", "korean-law-mcp@latest"],
+      "env": {
+        "LAW_OC": "your_oc_key"
+      }
+    }
+  }
+}
+```
+
+`your_oc_key`를 실제 OC 키로 교체하세요.
+
+### 4) 확인
+
+Claude Code를 재시작합니다. 64개 도구 (예: `search_law`, `get_law_text`, `chain_full_research`)가 사용 가능한 MCP 도구로 표시됩니다.
+
+### 5) 주요 도구
+
+| 도구 | 용도 |
+|:-----|:-----|
+| `search_law` | 법령 키워드 검색 (약칭 자동 변환) |
+| `get_law_text` | MST/lawId로 법령 전문 조회 |
+| `get_three_tier` | 3단 위임 추적: 법률 → 시행령 → 시행규칙 |
+| `chain_full_research` | 법령+판례+해석례 병렬 통합 검색 (1회 호출) |
+| `search_constitutional_decisions` | 헌법재판소 결정 검색 |
+| `search_ftc_decisions` | 공정거래위원회 의결 검색 |
+| `search_tax_tribunal_decisions` | 조세심판원 결정 검색 |
+| `get_annexes` | 별표/서식 추출 (HWPX/HWP 자동 파싱) |
+| `compare_old_new` | 법령 신구대조표 |
+
+> **참고:** MCP 서버는 인메모리 캐시를 사용합니다 (세션 종료 시 리셋). 영구 파일 캐싱은 `python3 scripts/open_law_api.py --save`를 사용하세요.
+
+## D. Troubleshooting
 
 - `WinError 2`가 `search-executor` 실행 중 발생:
   - 명령을 찾을 수 없는 상태입니다. 해당 도구를 설치하거나 `*_MCP_SERVER_CMD` 값을 올바르게 수정하세요.

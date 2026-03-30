@@ -128,15 +128,53 @@ Before calling any API, check the local cache:
 
 **On every `get-law` or `get-article` call, append `--save`** to accumulate the law library over time.
 
-**For Korean law (API-first):** Use `scripts/open_law_api.py` as the **1순위 소스 수집 도구**. Read `references/korean-law-reference.md` § 9 for the full API-based Korean source collection sequence. Standard workflow:
-1. `python3 scripts/open_law_api.py search-law "법률명"` → 법령 ID 확보
-2. `python3 scripts/open_law_api.py get-law --id {ID} --save` → 법령 전문 (조문·부칙 구조화, 자동 캐시)
-3. `python3 scripts/open_law_api.py get-article --id {ID} --article {N} --save` → 특정 조문만 (토큰 절약, 자동 캐시)
-4. `python3 scripts/open_law_api.py search-cases "키워드"` → 판례 검색
-5. `python3 scripts/open_law_api.py get-case --id {ID}` → 판례 전문
-6. `python3 scripts/open_law_api.py search-interpretations "키워드"` → 법령해석례
+**For Korean law — dual-tool strategy:**
 
-API 실패 시 fallback: tavily → brave → fetch from curated URLs in `references/legal-source-urls.md`.
+**Tool A: `korean-law` MCP Server (64 tools, primary interface).**
+MCP 서버가 `.mcp.json`에 등록되어 있으며, Claude Code에서 네이티브 MCP tool로 직접 호출 가능.
+
+Core workflow:
+1. `search_law` (query: "법률명") → lawId, mst 확보 (약칭 자동변환: 화관법→화학물질관리법)
+2. `get_law_text` (mst: "{mst}") → 법령 전문 조회, jo 파라미터로 특정 조문만 가능
+3. `get_three_tier` (mst: "{mst}") → 법률→시행령→시행규칙 3단 위임 구조 자동 추적
+4. `search_precedents` (query: "키워드") → 판례 검색
+5. `get_precedent_text` (precId: "{ID}") → 판례 전문
+6. `search_interpretations` (query: "키워드") → 법령해석례
+
+Extended capabilities (MCP 서버 전용):
+- `search_admin_rule` / `get_admin_rule` → 행정규칙 검색/조회
+- `search_ordinance` / `get_ordinance` → 자치법규 검색/조회
+- `search_constitutional_decisions` → 헌법재판소 결정
+- `search_ftc_decisions` → 공정거래위원회 의결
+- `search_tax_tribunal_decisions` → 조세심판원 결정
+- `search_nlrc_decisions` → 노동위원회 결정
+- `search_pipc_decisions` → 개인정보보호위원회 결정
+- `search_admin_appeals` → 행정심판 재결
+- `search_customs_interpretations` → 관세 해석
+- `get_annexes` (mst: "{mst}") → 별표/서식 (HWPX/HWP 자동 파싱)
+- `compare_old_new` (mst: "{mst}") → 법령 신구대조표
+- `get_article_history` (mst, jo) → 특정 조문 개정 이력
+- `get_law_tree` (mst) → 법령 체계도 (편·장·절·조 구조)
+- `suggest_law_names` (query) → 법령명 자동완성/약칭 해석
+- `get_legal_term_kb` / `get_legal_term_detail` → 법령용어사전
+- `chain_full_research` (query) → 법령+판례+해석례 병렬 통합 검색 (간단한 조사 시 1회 호출로 Step 3 완료 가능)
+- `chain_law_system` (mst) → 법령 체계 전체 분석 (본법+하위법령+행정규칙)
+- `chain_dispute_prep` (query) → 분쟁 대비 자료 수집 (법령+판례+해석례+행정심판)
+
+**Tool B: `scripts/open_law_api.py` (영구 파일 캐싱용, 보조).**
+MCP 서버는 인메모리 캐시(세션 종료 시 리셋)를 사용하므로, 장기 보존이 필요한 법령은 기존 Python 스크립트로 `library/grade-a/`에 파일 캐싱:
+1. `python3 scripts/open_law_api.py get-law --id {ID} --save` → 영구 캐시 저장
+2. `python3 scripts/open_law_api.py get-article --id {ID} --article {N} --save` → 조문별 영구 캐시
+
+**Tool 선택 기준:**
+- 일반 조사/검색 → MCP 서버 (Tool A) 우선 사용
+- 전문기관 결정 (헌재, 공정위, 조세심판 등) → MCP 서버만 가능
+- 3단 위임 구조, 별표/서식, 신구대조 → MCP 서버만 가능
+- Chain 워크플로우 (통합 검색) → MCP 서버만 가능
+- 영구 파일 캐싱이 필요한 핵심 법령 → Python 스크립트 (Tool B)로 저장
+- MCP 서버 장애 시 → Python 스크립트로 fallback
+
+API 실패 시 fallback: MCP 서버 → Python 스크립트 → tavily → brave → fetch from curated URLs in `references/legal-source-urls.md`.
 
 **For EU law (API-first):** Use `scripts/eurlex_api.py` for structured EUR-Lex SOAP API access. Standard workflow:
 1. `python3 scripts/eurlex_api.py search-title "키워드"` → CELEX 번호 확보

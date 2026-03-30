@@ -66,8 +66,8 @@ If a session is interrupted, progress is saved to `output/checkpoint.json`. On t
 
 | Mode | What works | What doesn't |
 |------|------------|--------------|
-| Local-only | Direct URL fetch from whitelisted legal portals, skill dispatch, output generation | Keyword search (`tavily` / `brave`) |
-| MCP-connected | Full workflow including keyword search | Requires API keys. See the [MCP Setup Guide](mcp-setup-guide.md) |
+| Local-only | Open Law API for Korean statutes/cases, direct URL fetch from whitelisted legal portals, skill dispatch, output generation | Keyword search (`tavily` / `brave`), korean-law MCP tools |
+| MCP-connected | Full workflow including korean-law MCP (64 tools for KR law), keyword search, PDF/DOCX conversion | Requires API keys + Node.js. See the [MCP Setup Guide](mcp-setup-guide.md) |
 
 ## Tips
 
@@ -75,5 +75,5 @@ If a session is interrupted, progress is saved to `output/checkpoint.json`. On t
 - **Ask for a specific output mode** if you have a preference, such as "give me a comparative matrix" or "use Mode B".
 - **Request a legal opinion format** by saying "legal opinion" or "formal opinion letter" so the formatter uses the A4 law-firm layout.
 - **Check the glossary**: jurisdiction-specific legal term translations are stored in `output/glossary/` and reused across sessions.
-- **Korean law queries** are routed to `law.go.kr` first, and **EU law queries** to EUR-Lex first.
+- **Korean law queries** are routed through the `korean-law` MCP server (64 tools including tribunal decisions and chain research) first, with `open_law_api.py` for file caching. **EU law queries** go to EUR-Lex first.
 - **Review every output**: this is a research tool, not a substitute for legal judgment. See the [Disclaimer](disclaimer.md)
