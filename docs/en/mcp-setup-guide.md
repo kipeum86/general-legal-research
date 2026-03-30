@@ -104,7 +104,60 @@ Expected output:
 - Success: JSON with `"engine": "tavily-mcp"` (or brave/fetch) and non-empty `results`
 - Failure: JSON with `"engine": "none"` plus `fallback_urls`
 
-## C. Troubleshooting
+## C. Korean Law MCP Server (law.go.kr — 64 tools)
+
+The `korean-law-mcp` server provides 64 native tools for Korean law research (statutes, cases, interpretations, tribunal decisions, chain workflows, annexes, and more). It connects to the same law.go.kr Open API used by `open_law_api.py`, but runs as an MCP server so Claude Code can invoke tools directly.
+
+### 1) Prerequisites
+
+- Node.js >= 20 (`node -v` to check)
+
+### 2) Get API key (same as Open Law API)
+
+1. Register at `https://open.law.go.kr` (free)
+2. Your OC key = your email ID prefix (e.g., `kipeum86` from `kipeum86@gmail.com`)
+
+### 3) Configure `.mcp.json` (already done if you cloned the repo)
+
+The project root contains `.mcp.json` with the korean-law MCP server pre-configured:
+
+```json
+{
+  "mcpServers": {
+    "korean-law": {
+      "command": "npx",
+      "args": ["-y", "korean-law-mcp@latest"],
+      "env": {
+        "LAW_OC": "your_oc_key"
+      }
+    }
+  }
+}
+```
+
+Replace `your_oc_key` with your actual OC key.
+
+### 4) Verify
+
+Restart Claude Code. The 64 tools (e.g., `search_law`, `get_law_text`, `chain_full_research`) should appear as available MCP tools.
+
+### 5) Key tools
+
+| Tool | Purpose |
+|:-----|:--------|
+| `search_law` | Search statutes by keyword (auto-resolves abbreviations) |
+| `get_law_text` | Retrieve full statute text by MST/lawId |
+| `get_three_tier` | Trace 3-tier delegation: Act → Decree → Rules |
+| `chain_full_research` | One-call parallel search across statutes, cases, and interpretations |
+| `search_constitutional_decisions` | Constitutional Court decisions |
+| `search_ftc_decisions` | Fair Trade Commission decisions |
+| `search_tax_tribunal_decisions` | Tax Tribunal decisions |
+| `get_annexes` | Extract annexes (별표/서식) from HWPX/HWP files |
+| `compare_old_new` | Old vs new article comparison table |
+
+> **Note:** The MCP server uses in-memory caching (resets on session end). For persistent file-based caching, use `python3 scripts/open_law_api.py --save`.
+
+## D. Troubleshooting
 
 - `WinError 2` when running `search-executor`:
   - The command was not found. Install the tool or fix `*_MCP_SERVER_CMD`.

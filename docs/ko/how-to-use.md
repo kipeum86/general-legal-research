@@ -66,8 +66,8 @@ Mode D가 기본값입니다. 이 에이전트가 법령과 규정 조사에 특
 
 | Mode | What works | What doesn't |
 |------|------------|--------------|
-| Local-only | 허용된 법률 포털 직접 URL fetch, skill dispatch, 결과물 생성 | 키워드 검색 (`tavily` / `brave`) |
-| MCP-connected | 키워드 검색까지 포함한 전체 워크플로 | API 키 필요. [MCP Setup Guide](mcp-setup-guide.md) 참고 |
+| Local-only | 열린법령 API로 한국 법령·판례 조회, 허용된 법률 포털 직접 URL fetch, skill dispatch, 결과물 생성 | 키워드 검색 (`tavily` / `brave`), korean-law MCP 도구 |
+| MCP-connected | korean-law MCP (한국법 64개 도구) + 키워드 검색 + PDF/DOCX 변환 포함 전체 워크플로 | API 키 + Node.js 필요. [MCP Setup Guide](mcp-setup-guide.md) 참고 |
 
 ## Tips
 
@@ -75,5 +75,5 @@ Mode D가 기본값입니다. 이 에이전트가 법령과 규정 조사에 특
 - **출력 모드를 직접 요청하기**: 예를 들어 "comparative matrix로 작성" 또는 "Mode B로 해줘"처럼 지정할 수 있습니다.
 - **법률의견서 형식 요청하기**: "법률 의견서" 또는 "legal opinion"이라고 쓰면 정식 opinion formatter를 사용합니다.
 - **용어집 확인하기**: 관할별 법률 용어 번역은 `output/glossary/`에 저장되어 다음 세션에서 재사용됩니다.
-- **한국 법률 질의는 law.go.kr을 우선 조회**하고, **EU 법률 질의는 EUR-Lex를 우선 조회**합니다.
+- **한국 법률 질의는 `korean-law` MCP 서버를 우선 사용** (64개 도구 — 전문기관 결정, chain 리서치 포함)하고, 파일 캐싱은 `open_law_api.py`로 합니다. **EU 법률 질의는 EUR-Lex를 우선 조회**합니다.
 - **모든 결과물은 최종 검토 필요**: 이 프로젝트는 리서치 도구이며 법률 판단의 대체재가 아닙니다. 자세한 내용은 [Disclaimer](disclaimer.md) 참고
