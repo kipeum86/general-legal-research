@@ -381,15 +381,15 @@ def _parse_kordoc_json(stdout: str, stderr: str, returncode: int) -> dict:
     return payload
 
 
-def _build_parser_notes(parser_name: str, payload: dict | None = None) -> str:
+def _build_parser_notes(parser_name: str, conversion: dict | None = None) -> str:
     """Render parser notes so warnings stay alongside converted Markdown."""
     if parser_name != "kordoc":
         return ""
 
-    payload = payload or {}
-    metadata = payload.get("metadata") or {}
-    warnings = payload.get("warnings") or []
-    file_type = payload.get("fileType") or "unknown"
+    conversion = conversion or {}
+    metadata = conversion.get("metadata") or {}
+    warnings = conversion.get("warnings") or []
+    file_type = conversion.get("file_type") or "unknown"
 
     lines = [
         "## Parser Notes",
@@ -403,7 +403,7 @@ def _build_parser_notes(parser_name: str, payload: dict | None = None) -> str:
         page_count = metadata.get("pageCount")
         if creator:
             lines.append(f"- Creator: {creator}")
-        if page_count:
+        if page_count is not None:
             lines.append(f"- Page count: {page_count}")
 
     if isinstance(warnings, list) and warnings:
@@ -442,7 +442,13 @@ def _convert_with_kordoc(src: Path, kordoc_command: str) -> tuple[str, str, dict
             capture_output=True,
             text=True,
             check=False,
+            timeout=120,
         )
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(
+            f"kordoc timed out after 120 seconds for {src.name}. "
+            "The file may be too large or corrupted."
+        ) from exc
     except FileNotFoundError as exc:
         raise RuntimeError(
             "kordoc command not found. Install Node.js 18+ and use "
@@ -456,14 +462,14 @@ def _convert_with_kordoc(src: Path, kordoc_command: str) -> tuple[str, str, dict
             "parser": "kordoc",
             "metadata": payload.get("metadata") or {},
             "warnings": payload.get("warnings") or [],
-            "payload": payload,
+            "file_type": payload.get("fileType") or "unknown",
         }
 
     return text, "ok", {
         "parser": "kordoc",
         "metadata": payload.get("metadata") or {},
         "warnings": payload.get("warnings") or [],
-        "payload": payload,
+        "file_type": payload.get("fileType") or "unknown",
     }
 
 
@@ -648,7 +654,7 @@ def main() -> None:
             )
             parser_notes = _build_parser_notes(
                 str(conversion["parser"]),
-                conversion.get("payload"),
+                conversion,
             )
             full_content = frontmatter + parser_notes + text
 
