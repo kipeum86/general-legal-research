@@ -4,10 +4,11 @@
 
 > **[README](../../README.md)** | **[How to Use](how-to-use.md)** | **[Disclaimer](disclaimer.md)**
 
-This guide covers the two MCP paths used in this project:
+This guide covers the MCP/parser integrations most commonly used in this project:
 
 1. `legal-skills` (AgentSkills/Case.dev) for legal skill discovery
 2. The web-research MCP chain (`tavily -> brave -> fetch`) used by `search-executor.py`
+3. Korean law retrieval and document parsing via `korean-law-mcp` and `kordoc`
 
 ## A. Legal Skills MCP (Recommended First)
 
@@ -108,6 +109,9 @@ Expected output:
 
 The `korean-law-mcp` server provides 64 native tools for Korean law research (statutes, cases, interpretations, tribunal decisions, chain workflows, annexes, and more). It connects to the same law.go.kr Open API used by `open_law_api.py`, but runs as an MCP server so Claude Code can invoke tools directly.
 
+- GitHub: `https://github.com/chrisryugj/korean-law-mcp`
+- In this repository, it is wired through `.mcp.json`.
+
 ### 1) Prerequisites
 
 - Node.js >= 20 (`node -v` to check)
@@ -115,7 +119,8 @@ The `korean-law-mcp` server provides 64 native tools for Korean law research (st
 ### 2) Get API key (same as Open Law API)
 
 1. Register at `https://open.law.go.kr` (free)
-2. Your OC key = your email ID prefix (e.g., `kipeum86` from `kipeum86@gmail.com`)
+2. Your OC key is the local-part of the email ID registered with the service.
+3. In docs, examples, and commits, use a placeholder such as `your_openlaw_oc` instead of a real identifier.
 
 ### 3) Configure `.mcp.json` (already done if you cloned the repo)
 
@@ -128,14 +133,14 @@ The project root contains `.mcp.json` with the korean-law MCP server pre-configu
       "command": "npx",
       "args": ["-y", "korean-law-mcp@latest"],
       "env": {
-        "LAW_OC": "your_oc_key"
+        "LAW_OC": "your_openlaw_oc"
       }
     }
   }
 }
 ```
 
-Replace `your_oc_key` with your actual OC key.
+Replace `your_openlaw_oc` locally with your own OC key. Avoid committing personal identifiers into the repository.
 
 ### 4) Verify
 
@@ -157,7 +162,24 @@ Restart Claude Code. The 64 tools (e.g., `search_law`, `get_law_text`, `chain_fu
 
 > **Note:** The MCP server uses in-memory caching (resets on session end). For persistent file-based caching, use `python3 scripts/open_law_api.py --save`.
 
-## D. Troubleshooting
+## D. Optional: `kordoc` Document Parser (HWP/HWPX)
+
+`kordoc` is not a replacement for `korean-law-mcp`; it is a separate parser for Korean public-sector documents.
+
+- GitHub: `https://github.com/chrisryugj/kordoc`
+- Typical use: convert `.hwp`, `.hwpx`, and some Korean PDFs into Markdown/structured output
+- How this repo uses it by default: via `library-ingest.py` as a CLI, rather than as an always-on MCP server
+- Open Law API key not required: `kordoc` itself does not use the law.go.kr OC credential
+
+Default launch example:
+
+```bash
+npx -y -p kordoc -p pdfjs-dist kordoc
+```
+
+If your MCP setup guide introduces Korean law tooling, it helps to mention `kordoc` alongside `korean-law-mcp` so users understand the split between official-law retrieval and document parsing.
+
+## E. Troubleshooting
 
 - `WinError 2` when running `search-executor`:
   - The command was not found. Install the tool or fix `*_MCP_SERVER_CMD`.
