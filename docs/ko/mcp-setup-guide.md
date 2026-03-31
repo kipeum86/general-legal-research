@@ -4,10 +4,11 @@
 
 > **[README](README.md)** | **[How to Use](how-to-use.md)** | **[Disclaimer](disclaimer.md)**
 
-이 가이드는 이 프로젝트에서 사용하는 두 가지 MCP 경로를 설명합니다.
+이 가이드는 이 프로젝트에서 자주 쓰는 MCP/파서 연동 경로를 설명합니다.
 
 1. `legal-skills` (AgentSkills/Case.dev): 법률 스킬 탐색용
 2. 웹 리서치 MCP 체인 (`tavily -> brave -> fetch`): `search-executor.py`에서 사용
+3. 한국 법령/판례 조회 및 문서 파싱: `korean-law-mcp`, `kordoc`
 
 ## A. Legal Skills MCP (Recommended First)
 
@@ -108,6 +109,9 @@ cd "C:\path\to\general-legal-research"
 
 `korean-law-mcp` 서버는 한국법 조사를 위한 64개 네이티브 도구를 제공합니다 (법령, 판례, 해석례, 전문기관 결정, chain 워크플로우, 별표/서식 등). `open_law_api.py`와 동일한 law.go.kr Open API를 사용하지만, MCP 서버로 실행되어 Claude Code에서 직접 도구 호출이 가능합니다.
 
+- GitHub: `https://github.com/chrisryugj/korean-law-mcp`
+- 이 저장소에서는 `.mcp.json`으로 바로 연결됩니다.
+
 ### 1) 사전 요구사항
 
 - Node.js >= 20 (`node -v`로 확인)
@@ -115,7 +119,8 @@ cd "C:\path\to\general-legal-research"
 ### 2) API 키 발급 (열린법령 API와 동일)
 
 1. `https://open.law.go.kr`에서 회원가입 (무료)
-2. OC 키 = 이메일 ID 앞부분 (예: `kipeum86@gmail.com` → `kipeum86`)
+2. OC 키는 가입한 계정의 이메일 ID 앞부분(local part)입니다.
+3. 문서, 예시 코드, 커밋에는 실제 OC를 넣지 말고 `your_openlaw_oc` 같은 placeholder만 사용하세요.
 
 ### 3) `.mcp.json` 설정 (레포를 클론했다면 이미 설정됨)
 
@@ -128,14 +133,14 @@ cd "C:\path\to\general-legal-research"
       "command": "npx",
       "args": ["-y", "korean-law-mcp@latest"],
       "env": {
-        "LAW_OC": "your_oc_key"
+        "LAW_OC": "your_openlaw_oc"
       }
     }
   }
 }
 ```
 
-`your_oc_key`를 실제 OC 키로 교체하세요.
+`your_openlaw_oc`를 본인 계정의 실제 OC로 로컬에서만 교체하세요. 개인 식별자가 저장소에 남지 않도록 커밋하지 않는 것을 권장합니다.
 
 ### 4) 확인
 
@@ -157,7 +162,24 @@ Claude Code를 재시작합니다. 64개 도구 (예: `search_law`, `get_law_tex
 
 > **참고:** MCP 서버는 인메모리 캐시를 사용합니다 (세션 종료 시 리셋). 영구 파일 캐싱은 `python3 scripts/open_law_api.py --save`를 사용하세요.
 
-## D. Troubleshooting
+## D. Optional: `kordoc` 문서 파서 (HWP/HWPX)
+
+`kordoc`는 `korean-law-mcp`의 대체제가 아니라, 한국 공공문서 파싱을 보완하는 별도 도구입니다.
+
+- GitHub: `https://github.com/chrisryugj/kordoc`
+- 용도: `.hwp`, `.hwpx`, 일부 한국형 PDF를 Markdown/구조화 데이터로 변환
+- 이 저장소의 기본 사용 방식: MCP 서버보다는 `library-ingest.py`에서 CLI로 호출
+- Open Law API 키 불필요: `kordoc` 자체는 별도 API 키 없이 사용할 수 있습니다
+
+기본 실행 예시는 아래와 같습니다.
+
+```bash
+npx -y -p kordoc -p pdfjs-dist kordoc
+```
+
+문서 파싱 품질이 중요하거나 HWP/HWPX 원문을 많이 다룬다면, MCP 셋업 가이드에서 `korean-law-mcp`와 함께 `kordoc`도 소개해 두는 편이 좋습니다.
+
+## E. Troubleshooting
 
 - `WinError 2`가 `search-executor` 실행 중 발생:
   - 명령을 찾을 수 없는 상태입니다. 해당 도구를 설치하거나 `*_MCP_SERVER_CMD` 값을 올바르게 수정하세요.

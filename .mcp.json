@@ -4,7 +4,7 @@
       "command": "npx",
       "args": ["-y", "korean-law-mcp@latest"],
       "env": {
-        "LAW_OC": "kipeum86"
+        "LAW_OC": "your_openlaw_oc"
       }
     }
   }
