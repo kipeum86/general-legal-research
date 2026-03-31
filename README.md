@@ -203,7 +203,13 @@ All user-specific data stays on your machine and is never committed to git:
 <details>
 <summary><strong><code>library/</code> directory</strong></summary>
 
-Drop source files into `library/inbox/` and run `/ingest`. The agent automatically converts them to Markdown, classifies their reliability grade (A/B/C), generates metadata frontmatter, and places them into the appropriate graded folder. Grade A sources are prioritized during Step 3 research.
+Drop source files into `library/inbox/` and run `/ingest`. The agent automatically converts supported files to Markdown, classifies their reliability grade (A/B/C), generates metadata frontmatter, and places them into the appropriate graded folder. Grade A sources are prioritized during Step 3 research.
+
+Supported ingest formats:
+
+- `PDF`, `DOCX`, `PPTX`, `XLSX`, `HTML` via MarkItDown
+- `HWP`, `HWPX` via `kordoc`
+- `MD`, `TXT` as passthrough
 
 On-demand API fetches use the same `library/grade-a/` area. `open_law_api.py --save` and `eurlex_api.py --save` persist primary law materials there as Markdown or JSON so future sessions can reuse them locally. The `korean-law` MCP server provides real-time access to the same law.go.kr data with 64 tools, but uses in-memory caching; use the Python script for persistent file-based caching.
 
@@ -490,6 +496,9 @@ git clone <repo-url> && cd general-legal-research
 # 2. Set up Python environment
 python3 -m venv .venv && source .venv/bin/activate
 pip install python-docx 'markitdown[pdf,docx]'
+# Optional for HWP/HWPX ingest support
+# Requires Node.js 18+, then library-ingest.py uses:
+# npx -y -p kordoc -p pdfjs-dist kordoc
 
 # 3. (Optional) Configure MCP search
 cp .env.example .env   # then add your API keys

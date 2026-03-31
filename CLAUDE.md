@@ -85,7 +85,9 @@ At every session start, **before Step 1**, run silently:
 사용자가 외부 소스 파일을 `library/inbox/`에 넣고 `/ingest`를 요청하면:
 
 1. `.claude/skills/ingest/SKILL.md`를 읽어 워크플로우 확인
-2. inbox 내 파일을 markitdown으로 .md 변환
+2. inbox 내 파일을 포맷별 변환기로 .md 변환
+   - PDF/DOCX/PPTX/XLSX/HTML → MarkItDown
+   - HWP/HWPX → `kordoc`
 3. 내용 분석하여 Grade 자동 판별 (A/B/C)
 4. frontmatter 생성 + 적절한 `library/grade-{a,b,c}/` 폴더로 배치
 5. 인덱스 업데이트
