@@ -31,6 +31,13 @@ For each conclusion, ask:
 - What is the realistic enforcement probability?
 - Are there safe harbors, compliance programs, or mitigating factors?
 
+### 6. Similar-Statute Confusion
+- 동일 관할 내 동일·유사 주제를 다루는 법령이 2개 이상 있는가?
+- 한 법령의 operative language, safe harbor 조건, 또는 정의 조항이 관련 법령의 것과 혼동될 수 있는가?
+- 법령 번호가 유사한가 (인접 조문, 유사한 명칭)?
+- 분석에서 어떤 조항이 어떤 법령에 속하는지 명확히 구분했는가?
+- **고위험 패턴:** 동일 code section 범위를 공유하는 법령 (예: Cal. Civ. Code §§1798.80-1798.84, 개인정보 보호법 vs. 신용정보법)이 관련되면 subsection 수준 인용 검증 필수.
+
 ## Output Format
 
 For each key conclusion in the deliverable, include a **Counter-Analysis** subsection:
@@ -59,3 +66,4 @@ If the counter-analysis reveals a risk rated **High**:
 - Mode B: At least 1 counter-argument per jurisdiction comparison point where jurisdictions diverge.
 - Mode C: At least 1 dissenting or minority view per enforcement trend.
 - Mode D: At least 1 counter-argument per article-level conclusion (detailed).
+- Mode D: 유사법령 혼동 위험이 식별되면, counter-analysis에 각 인용 문구의 정확한 소속을 확인하는 subsection-level verification note 포함 필수.

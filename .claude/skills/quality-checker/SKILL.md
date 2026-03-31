@@ -1,6 +1,6 @@
 ---
 name: quality-checker
-description: Run the 13-item legal research quality gate and decide pass/fail with remediation steps.
+description: Run the 14-item legal research quality gate and decide pass/fail with remediation steps.
 ---
 
 # Quality Checker
@@ -17,6 +17,7 @@ Before running the 13-item checklist, verify these prerequisites:
 4. Temporal status tags are applied inline (not only in summary)
 5. All `[Unverified]` tags are inline at specific findings
 6. **Source laundering check:** No conclusion relies solely on a secondary source cited as if it were primary authority. Every key conclusion's supporting citation chain must trace back to a directly-fetched primary source.
+7. **Similar-statute disambiguation:** claim registry에 `similar_statutes` 필드가 있는 `operative_language` 앵커가 있으면, Phase 3.3 교차검증이 완료되었고 모든 MISMATCH가 해소되었는지 확인.
 
 If any pre-flight check fails, remediate before proceeding to the checklist.
 
@@ -35,6 +36,7 @@ If any pre-flight check fails, remediate before proceeding to the checklist.
 11. Every key conclusion is supported by at least one Grade A or Grade B source (not only C/D).
 12. No `[Material Risk]` finding is omitted from the executive summary / conclusion summary.
 13. **No source laundering detected:** No secondary source is cited as if it were primary authority. All secondary source citations use transparent attribution (e.g., "According to [Source]'s analysis..."). No conclusion relies on a paraphrased interpretation of a primary source without the primary source itself having been directly fetched and verified. Any `laundering_risk: true` flag from Step 4/5 has been resolved or the claim has been re-attributed.
+14. **Quoted statutory text matches primary source verbatim:** 최종 output에 포함된 법문 직접 인용(인용부호 내 법문, 또는 operative text로 제시된 법령 문구)에 대해, 관할별 최소 1건을 Step 3에서 fetch한 1차 소스 텍스트와 word-level 대조. 인용 문구가 cited subsection에 존재하지 않으면 fail. claim registry에 status `Contradicted`인 `operative_language` 앵커가 있으면 이 항목은 자동 fail.
 
 ## Output Format
 
