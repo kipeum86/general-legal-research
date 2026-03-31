@@ -73,7 +73,7 @@ flowchart LR
     S0["0\nConfig\nLoading"] --> S1["1\nQuery\nInterpretation"]
     S1 --> S2["2\nJurisdiction\nMapping"]
     S2 --> S3["3\nSource\nCollection"]
-    S3 --> S35["3.5\nFact-Check &\nLaundering Detection"]
+    S3 --> S35["3.5\nFact-Check,\nCross-Check &\nLaundering"]
     S35 --> S4["4\nReliability\nScoring"]
     S4 --> S5["5\nAnalysis &\nStructuring"]
     S5 --> S6["6\nOutput\nGeneration"]
@@ -96,7 +96,7 @@ flowchart LR
 | **1** | Query Interpretation & Parameter Resolution | Structured parameters and assumptions |
 | **2** | Jurisdiction Mapping & Research Plan | Jurisdiction profile, domain checklist, search plan |
 | **3** | Source Collection | Raw sources with metadata (Korean law via korean-law MCP Server + Open Law API; PDF/DOCX via MarkItDown; HWP/HWPX via kordoc) |
-| **3.5** | Factual Claim Spot-Check & Source Laundering Detection | `claim-registry.json` — Verified / Unverified / Contradicted per anchor |
+| **3.5** | Factual Claim Spot-Check, Similar-Statute Cross-Check & Source Laundering Detection | `claim-registry.json` — Verified / Unverified / Contradicted per anchor, similar-statute disambiguation |
 | **4** | Source Reliability Scoring (A–D) | Graded source list with rationale |
 | **5** | Analysis & Issue Structuring | Issue tree, conflict report, glossary updates |
 | **6** | Output Generation (Mode A/B/C/D) | Inline preview, then file on confirmation |
@@ -314,11 +314,11 @@ graph TD
 | `query-interpreter` | 1 | Parse natural language into structured parameters |
 | `jurisdiction-mapper` | 2 | Map jurisdictions & build research plan |
 | `web-researcher` | 3 | Collect sources (Korean law via korean-law MCP + Open Law API; others via search/fetch) |
-| `fact-checker` | 3.5 | Verify claims & detect source laundering |
+| `fact-checker` | 3.5 | Verify claims, cross-check similar statutes & detect source laundering |
 | `source-scorer` | 4 | Grade sources A–D with rationale |
 | `conflict-detector` + `glossary-manager` | 5 | Analyze issues & manage legal terminology |
 | `output-generator` | 6 | Render deliverable in chosen format |
-| `quality-checker` | 7 | 13-item quality gate verification |
+| `quality-checker` | 7 | 14-item quality gate verification |
 
 ### Specialist Skills (routed by topic)
 

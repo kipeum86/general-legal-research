@@ -51,6 +51,9 @@ Scan Step 3 output and extract all **Factual Anchors** into a structured list.
 | `official_doc_title` | "Regulation (EU) 2016/679", "개인정보 보호법" | MEDIUM |
 | `regulatory_body_name` | "ICO", "EDPB", "금융위원회" | MEDIUM |
 | `penalty_figure` | "up to €20 million or 4% global turnover" | HIGH |
+| `operative_language` | "not encrypted or redacted", safe harbor 조건, 정의 조항의 핵심 문구를 법문에서 직접 인용한 경우 | HIGH |
+
+**`operative_language` 추출 조건:** Step 3 output이 특정 법문 문구를 직접 인용하거나 근접 패러프레이즈할 때만 추출한다. 법령 목적/효과의 일반 요약에는 적용하지 않는다. 대표적 추출 대상: safe harbor 조건, 적용 범위 단서, 정의 조항의 핵심 문구, operative verb ("shall notify", "is not required to"), threshold qualifier ("not encrypted", "exceeds 500 records").
 
 ### What is NOT an anchor (do not extract)
 
@@ -71,9 +74,27 @@ Scan Step 3 output and extract all **Factual Anchors** into a structured list.
       "source_code": "[P1]",
       "source_url": "https://eur-lex.europa.eu/...",
       "pre_verified": false
+    },
+    {
+      "id": "A008",
+      "type": "operative_language",
+      "claim": "Cal. Civ. Code §1798.82(h)(1) defines PI to include data 'not encrypted or redacted'",
+      "quoted_text": "not encrypted or redacted",
+      "parent_statute": "Cal. Civ. Code §1798.82(h)(1)",
+      "similar_statutes": ["Cal. Civ. Code §1798.81.5(d)(1)(A)"],
+      "jurisdiction": "US-CA",
+      "source_code": "[P3]",
+      "source_url": "https://leginfo.legislature.ca.gov/...",
+      "pre_verified": false
     }
   ]
 }
+```
+
+**`operative_language` 앵커 전용 필드:**
+- `quoted_text` — 인용된 정확한 문구 (Phase 3에서 word-level 대조의 대상)
+- `parent_statute` — 문구가 귀속된 법령 subsection
+- `similar_statutes` — 동일 주제의 유사 법령 목록 (Phase 3.3 교차검증 대상). 동일 code title 내 인접 조문, 동일 규제 주제의 별도 법령 등을 기재
 ```
 
 ---
@@ -136,6 +157,55 @@ When a source URL or file path points to a PDF or DOCX document:
 | `Verified` | Source text confirms the claim within acceptable paraphrase |
 | `Unverified` | Could not confirm within budget — not necessarily wrong |
 | `Contradicted` | Source text materially conflicts with the stated claim |
+
+---
+
+## Phase 3.3 — Similar-Statute Cross-Check (Operative Language)
+
+**Trigger:** `operative_language` 앵커가 1개 이상 존재하고, 해당 앵커의 `similar_statutes` 목록이 비어 있지 않을 때.
+
+### Procedure
+
+1. 각 `operative_language` 앵커에 대해:
+   a. `parent_statute`로 지정된 subsection 텍스트를 1차 소스에서 fetch (이미 Phase 3에서 fetch된 법령 텍스트 재사용 — 추가 API 호출 불필요)
+   b. `quoted_text`가 해당 subsection에 **verbatim으로** 존재하는지 word-level 대조 (trivial formatting variance — 공백, 구두점 — 는 허용)
+   c. 미발견 시:
+      - 동일 법령의 인접 subsection에서 검색
+      - `similar_statutes` 목록의 각 법령에서 검색
+      - 다른 위치에서 발견 → `Contradicted` + 정확한 출처 기록 (예: "quoted text found in §1798.81.5(d)(1)(A), not in §1798.82(h)(1)")
+      - 어디에서도 미발견 → `Contradicted — quoted language not located in primary source`
+   d. 이 검증은 per-jurisdiction token budget에 산입하지 않음
+
+2. **Similar-Statute Disambiguation Table** 작성 (내부 working note — claim registry에 첨부):
+
+| Quoted Phrase | Attributed To | Actually Found In | Match? |
+|---|---|---|---|
+| "not encrypted or redacted" | §1798.82(h)(1) | §1798.81.5(d)(1)(A) | MISMATCH |
+| "first name or first initial and last name" | §1798.82(h)(1) | §1798.82(h)(1) | OK |
+
+3. **MISMATCH 행이 있으면:**
+   - 해당 앵커를 자동 `Contradicted`로 설정
+   - 정확한 위치를 claim registry `note` 필드에 기록
+   - Step 3 Statute Boundary Table이 있으면 해당 표와 대조하여 일관성 확인
+
+### Phase 3.3 Output (claim registry에 추가)
+
+```json
+{
+  "similar_statute_check": {
+    "anchors_checked": 2,
+    "mismatches": [
+      {
+        "anchor_id": "A008",
+        "quoted_text": "not encrypted or redacted",
+        "attributed_to": "Cal. Civ. Code §1798.82(h)(1)",
+        "actually_found_in": "Cal. Civ. Code §1798.81.5(d)(1)(A)",
+        "status": "Contradicted"
+      }
+    ]
+  }
+}
+```
 
 ---
 
@@ -262,6 +332,7 @@ Registry: output/claim-registry.json
 ⚠ Contradicted (1): A003 — Schrems II case number corrected (C-312/18 → C-311/18)
 Unverified (2): A007 (US — CCPA §1798.100 text unconfirmed), A011 (JP — Act No. 57 date unconfirmed)
 ⚠ Laundering (1 unresolved): [S4] — 개인정보 보호법 제39조의3 interpretation from blog, primary not fetched
+Similar-statute cross-check: 2 anchors checked, 0 mismatches
 ```
 
 ---

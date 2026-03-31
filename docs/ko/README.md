@@ -73,7 +73,7 @@ flowchart LR
     S0["0\n설정\n로딩"] --> S1["1\n쿼리\n해석"]
     S1 --> S2["2\n관할\n매핑"]
     S2 --> S3["3\n소스\n수집"]
-    S3 --> S35["3.5\n팩트체크 &\n세탁 탐지"]
+    S3 --> S35["3.5\n팩트체크,\n교차검증 &\n세탁 탐지"]
     S35 --> S4["4\n신뢰도\n평가"]
     S4 --> S5["5\n분석 &\n구조화"]
     S5 --> S6["6\n결과물\n생성"]
@@ -96,7 +96,7 @@ flowchart LR
 | **1** | Query Interpretation & Parameter Resolution | 구조화된 파라미터와 가정 |
 | **2** | Jurisdiction Mapping & Research Plan | 관할 프로필, 쟁점 체크리스트, 검색 계획 |
 | **3** | Source Collection | 메타데이터가 포함된 원문 소스 수집 (한국법은 korean-law MCP Server + 열린법령 API 우선; PDF/DOCX는 MarkItDown, HWP/HWPX는 kordoc으로 자동 변환) |
-| **3.5** | Factual Claim Spot-Check & Source Laundering Detection | `claim-registry.json` — anchor별 Verified / Unverified / Contradicted + 소스 세탁 플래그 |
+| **3.5** | Factual Claim Spot-Check, Similar-Statute Cross-Check & Source Laundering Detection | `claim-registry.json` — anchor별 Verified / Unverified / Contradicted + 유사법령 교차검증 + 소스 세탁 플래그 |
 | **4** | Source Reliability Scoring (A–D) | 근거가 포함된 신뢰도 등급표 |
 | **5** | Analysis & Issue Structuring | 쟁점 트리, 충돌 리포트, 용어집 업데이트 |
 | **6** | Output Generation (Mode A/B/C/D) | 인라인 미리보기 후 확인 시 파일 생성 |
@@ -287,11 +287,11 @@ graph TD
 | `query-interpreter` | 1 | 자연어를 구조화된 파라미터로 변환 |
 | `jurisdiction-mapper` | 2 | 관할 매핑 & 리서치 계획 수립 |
 | `web-researcher` | 3 | 소스 수집 (한국법은 korean-law MCP + 열린법령 API 우선; 기타 관할은 검색/fetch) |
-| `fact-checker` | 3.5 | 사실 주장 검증 & 소스 세탁 탐지 |
+| `fact-checker` | 3.5 | 사실 주장 검증, 유사법령 교차검증 & 소스 세탁 탐지 |
 | `source-scorer` | 4 | 소스 신뢰도 A–D 등급 평가 |
 | `conflict-detector` + `glossary-manager` | 5 | 쟁점 분석 & 법률 용어 관리 |
 | `output-generator` | 6 | 선택한 포맷으로 결과물 렌더링 |
-| `quality-checker` | 7 | 13항목 품질 검증 게이트 |
+| `quality-checker` | 7 | 14항목 품질 검증 게이트 |
 
 ### Specialist Skills (주제별 라우팅)
 

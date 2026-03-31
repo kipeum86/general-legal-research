@@ -198,6 +198,15 @@ API 실패 시 fallback: tavily → brave → direct fetch from eur-lex.europa.e
 - `[Repealed — YYYY-MM-DD]` — statute or provision no longer in effect. Do not cite as current law.
 For Korean law, check law.go.kr "연혁" tab. For EU law, check EUR-Lex procedural status. For other jurisdictions, check the official portal's amendment/status indicators.
 
+**Similar-statute guard (mandatory when applicable):** 병렬 서브에이전트 또는 순차 수집에서 동일 관할 내 subject matter가 중복되는 2개 이상 법령을 발견하면 (예: Cal. Civ. Code §§1798.80-1798.84, 개인정보 보호법 vs. 신용정보법), findings 병합 전에 **Statute Boundary Table**을 작성:
+
+| Statute | Section | Subject | Key Operative Language | Safe Harbor / Exception |
+|---|---|---|---|---|
+| §1798.82 | (h)(1) | PI 정의 | "first name... not encrypted" | — |
+| §1798.81.5 | (d)(1)(A) | 합리적 보안 | "not encrypted or redacted" | Yes |
+
+이 표는 Step 4에 전달하여 `operative_language` 앵커 검증의 기초 자료로 사용. 표가 없으면 Step 4 Phase 3.3이 트리거되지 않을 수 있으므로, 유사 법령을 다룰 때는 반드시 작성.
+
 ### Step 4: Factual Claim Spot-Check
 
 Read `.claude/skills/fact-checker/SKILL.md` and follow it.
@@ -212,7 +221,7 @@ Read `.claude/skills/fact-checker/SKILL.md` and follow it.
 
 **Source laundering detection (Phase 3.5):** After anchor verification, scan all secondary/mixed sources for laundering patterns: (1) interpretation presented as fact without primary fetch, (2) phantom citations to unfetched primary sources, (3) paraphrasing primary sources without pinpoint citation. Any conclusion relying solely on a laundering-flagged source must be resolved (fetch primary, re-attribute to secondary, or mark `[Unverified]`) before proceeding to Step 5.
 
-Output: `output/claim-registry.json` with `Verified` / `Unverified` / `Contradicted` status per anchor, source laundering flags, plus inline summary.
+Output: `output/claim-registry.json` with `Verified` / `Unverified` / `Contradicted` status per anchor, source laundering flags, similar-statute disambiguation results (if applicable), plus inline summary.
 
 ### Step 5: Source Reliability Scoring
 
@@ -277,6 +286,8 @@ Rules:
   - [ ] 12. Verification guide separates primary and secondary sources
   - [ ] 13. No unresolved `laundering_risk: true` flags from Step 4/5
   - [ ] 14. No secondary source is presented as if it were the law itself
+  - [ ] 15. **Statute box verification:** 최종 output에 직접 인용된 법령 조항에 대해, 인용 문구를 Step 3에서 fetch한 1차 소스 텍스트와 word-for-word 대조. 불일치 시 1차 소스 URL로 재검증 후 수정.
+  - [ ] 16. **Similar-statute boundary check:** 유사 법령이 관련된 조사였다면, Step 3의 Statute Boundary Table을 참조하여 cross-statute language contamination이 없는지 확인.
   If any citation integrity check fails, remediate before proceeding to Step 8.
 - **Korean DOCX generation rules (MANDATORY for any KO `.docx` script):**
   1. Use the **Write tool** to write the Python file. Never use Bash shell or heredoc for Korean content — Windows cp949 terminal encoding corrupts Korean UTF-8 strings.
@@ -295,7 +306,7 @@ Rules:
 
 Read `.claude/skills/quality-checker/SKILL.md` and follow it.
 
-**13-item checklist** includes source laundering detection (item #13). A conclusion that cites a secondary source as if it were primary authority is a quality gate failure.
+**14-item checklist** includes source laundering detection (item #13) and quoted statutory text verbatim match (item #14). A conclusion that cites a secondary source as if it were primary authority, or quotes statutory language not found in the cited subsection, is a quality gate failure.
 
 If failed:
 1. Round 1: re-enter Step 3 only for failing items.
