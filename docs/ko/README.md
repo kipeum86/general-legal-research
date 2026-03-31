@@ -207,7 +207,13 @@ flowchart LR
 
 온디맨드 API 저장도 같은 `library/grade-a/`를 사용합니다. `open_law_api.py --save`, `eurlex_api.py --save`로 가져온 1차 법령 자료는 Markdown/JSON으로 로컬 캐시에 쌓이고 다음 세션에서 재사용할 수 있습니다. `korean-law` MCP 서버는 동일한 law.go.kr 데이터를 64개 도구로 실시간 접근하지만 인메모리 캐시를 사용합니다. 영구 파일 캐싱이 필요하면 Python 스크립트를 사용하세요.
 
-**자동 변환:** `python3 scripts/library-ingest.py`를 실행하면 `library/inbox/` 안의 PDF/DOCX/PPTX 파일을 검색 가능한 Markdown으로 변환하고, 등급별 폴더와 인덱스를 자동 갱신합니다.
+**자동 변환:** `python3 scripts/library-ingest.py`를 실행하면 `library/inbox/` 안의 지원 포맷을 검색 가능한 Markdown으로 변환하고, 등급별 폴더와 인덱스를 자동 갱신합니다.
+
+지원 인제스트 포맷:
+
+- `PDF`, `DOCX`, `PPTX`, `XLSX`, `HTML` → MarkItDown
+- `HWP`, `HWPX` → `kordoc`
+- `MD`, `TXT` → 원문 유지
 
 ```text
 library/
@@ -461,6 +467,9 @@ git clone <repo-url> && cd general-legal-research
 # 2. Python 환경 설정
 python3 -m venv .venv && source .venv/bin/activate
 pip install python-docx 'markitdown[pdf,docx]'
+# HWP/HWPX 인제스트를 쓰려면 Node.js 18+ 필요
+# library-ingest.py가 내부적으로
+# `npx -y -p kordoc -p pdfjs-dist kordoc`를 호출
 
 # 3. (선택) MCP 검색 설정
 cp .env.example .env   # API 키 추가

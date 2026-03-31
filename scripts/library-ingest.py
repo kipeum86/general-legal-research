@@ -1,6 +1,6 @@
 """
 Library ingestion pipeline: processes files from library/inbox/,
-converts PDF/DOCX/PPTX to Markdown, auto-classifies source grade (A/B/C),
+converts supported documents to Markdown, auto-classifies source grade (A/B/C),
 generates YAML frontmatter, places into library/grade-{a,b,c}/, and updates indexes.
 
 Usage:
@@ -9,21 +9,26 @@ Usage:
 
 Dependencies:
     pip install 'markitdown[pdf,docx]'
+Optional for HWP/HWPX:
+    Node.js 18+ with `npx -y -p kordoc -p pdfjs-dist kordoc`
 """
 from __future__ import annotations
 
 import argparse
 import json
 import re
+import shlex
 import shutil
+import subprocess
 import sys
 import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 
-SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".pptx", ".xlsx", ".html"}
+MARKITDOWN_EXTENSIONS = {".pdf", ".docx", ".pptx", ".xlsx", ".html"}
+KORDOC_EXTENSIONS = {".hwp", ".hwpx"}
+SUPPORTED_EXTENSIONS = MARKITDOWN_EXTENSIONS | KORDOC_EXTENSIONS
 PASSTHROUGH_EXTENSIONS = {".md", ".txt"}
-UNSUPPORTED_EXTENSIONS = {".hwp", ".hwpx"}
 CONVERTED_SUBDIR = "library-converted"
 
 # --- Grade classification signals ---
@@ -90,6 +95,11 @@ def _ensure_markitdown():
             file=sys.stderr,
         )
         sys.exit(1)
+
+
+def _yaml_quote(value: str) -> str:
+    """Serialize a scalar string safely for YAML frontmatter."""
+    return json.dumps(value or "", ensure_ascii=False)
 
 
 def _extract_title(md_text: str, fallback: str) -> str:
@@ -293,52 +303,177 @@ def _generate_frontmatter(
     jurisdiction: str,
     original_format: str,
     text: str,
+    parser_name: str,
+    parser_metadata: dict | None = None,
+    parser_warnings: list[dict] | None = None,
 ) -> str:
     """Generate YAML frontmatter for a converted document."""
     now = datetime.now(timezone.utc).isoformat()
-    date = _extract_date(text)
+    metadata = parser_metadata or {}
+    warnings = parser_warnings or []
+    date = _extract_date(text) or str(metadata.get("createdAt") or "")[:10]
     keywords = _extract_keywords(text)
     articles = _extract_cited_articles(text)
+    author = str(metadata.get("author") or "")
+    warning_codes = [
+        str(item.get("code"))
+        for item in warnings
+        if isinstance(item, dict) and item.get("code")
+    ]
 
     lines = [
         "---",
-        f'source_id: "{grade.lower()}-{doc_type}-{slug}"',
-        f'slug: "{slug}"',
-        f'title_kr: "{title}"',
+        f"source_id: {_yaml_quote(f'{grade.lower()}-{doc_type}-{slug}')}",
+        f"slug: {_yaml_quote(slug)}",
+        f"title_kr: {_yaml_quote(title)}",
         f'title_en: ""',
-        f'document_type: "{doc_type}"',
-        f'source_grade: "{grade}"',
+        f"document_type: {_yaml_quote(doc_type)}",
+        f"source_grade: {_yaml_quote(grade)}",
         f'publisher: ""',
-        f'author: ""',
-        f'published_date: "{date}"',
+        f"author: {_yaml_quote(author)}",
+        f"published_date: {_yaml_quote(date)}",
         f'source_url: ""',
-        f'original_format: "{original_format}"',
-        f'ingested_at: "{now}"',
-        f'jurisdiction: "{jurisdiction}"',
+        f"original_format: {_yaml_quote(original_format)}",
+        f"ingested_at: {_yaml_quote(now)}",
+        f"jurisdiction: {_yaml_quote(jurisdiction)}",
         f"keywords: {json.dumps(keywords, ensure_ascii=False)}",
         f"topics: []",
         f"cited_articles: {json.dumps(articles, ensure_ascii=False)}",
         f"char_count: {len(text)}",
         f'verification_status: "UNVERIFIED"',
-        f'grade_confidence: "{confidence}"',
+        f"grade_confidence: {_yaml_quote(confidence)}",
+        f"ingest_parser: {_yaml_quote(parser_name)}",
+        f"parser_warning_count: {len(warnings)}",
+        f"parser_warning_codes: {json.dumps(warning_codes, ensure_ascii=False)}",
         "---",
         "",
     ]
     return "\n".join(lines)
 
 
-def _convert_file(md_converter, src: Path) -> tuple[str, str]:
-    """Convert a file to Markdown text. Returns (text, status)."""
-    if src.suffix.lower() in PASSTHROUGH_EXTENSIONS:
-        return src.read_text(encoding="utf-8"), "ok"
+def _build_kordoc_command(kordoc_command: str, src: Path) -> list[str]:
+    """Build a kordoc CLI command for JSON output."""
+    return shlex.split(kordoc_command) + [str(src), "--format", "json", "--silent"]
 
+
+def _parse_kordoc_json(stdout: str, stderr: str, returncode: int) -> dict:
+    """Parse kordoc JSON output and raise a helpful error on failure."""
+    payload_text = stdout.strip()
+    if not payload_text:
+        detail = stderr.strip() or f"exit code {returncode}"
+        raise RuntimeError(f"kordoc produced no JSON output ({detail})")
+
+    try:
+        payload = json.loads(payload_text)
+    except json.JSONDecodeError as exc:
+        detail = stderr.strip() or payload_text[:200]
+        raise RuntimeError(f"kordoc returned invalid JSON ({detail})") from exc
+
+    if not isinstance(payload, dict):
+        raise RuntimeError("kordoc returned an unexpected JSON payload")
+
+    if not payload.get("success"):
+        code = payload.get("code")
+        error = payload.get("error") or stderr.strip() or "unknown parse failure"
+        detail = f"{code}: {error}" if code else str(error)
+        raise RuntimeError(f"kordoc parse failed ({detail})")
+
+    return payload
+
+
+def _build_parser_notes(parser_name: str, payload: dict | None = None) -> str:
+    """Render parser notes so warnings stay alongside converted Markdown."""
+    if parser_name != "kordoc":
+        return ""
+
+    payload = payload or {}
+    metadata = payload.get("metadata") or {}
+    warnings = payload.get("warnings") or []
+    file_type = payload.get("fileType") or "unknown"
+
+    lines = [
+        "## Parser Notes",
+        "",
+        f"- Parser: {parser_name}",
+        f"- Detected file type: {file_type}",
+    ]
+
+    if isinstance(metadata, dict):
+        creator = metadata.get("creator")
+        page_count = metadata.get("pageCount")
+        if creator:
+            lines.append(f"- Creator: {creator}")
+        if page_count:
+            lines.append(f"- Page count: {page_count}")
+
+    if isinstance(warnings, list) and warnings:
+        lines.append(f"- Warning count: {len(warnings)}")
+        for warning in warnings[:10]:
+            if not isinstance(warning, dict):
+                continue
+            code = warning.get("code") or "WARNING"
+            message = warning.get("message") or ""
+            page = warning.get("page")
+            location = f"page {page}, " if page is not None else ""
+            lines.append(f"- Warning [{code}]: {location}{message}")
+    else:
+        lines.append("- Warning count: 0")
+
+    return "\n".join(lines) + "\n\n"
+
+
+def _convert_with_markitdown(md_converter, src: Path) -> tuple[str, str, dict]:
+    """Convert a supported file to Markdown through MarkItDown."""
     result = md_converter.convert(str(src))
     text = result.text_content or ""
 
     if len(text.strip()) < 50:
-        return "", "failed"
+        return "", "failed", {"parser": "markitdown", "metadata": {}, "warnings": []}
 
-    return text, "ok"
+    return text, "ok", {"parser": "markitdown", "metadata": {}, "warnings": []}
+
+
+def _convert_with_kordoc(src: Path, kordoc_command: str) -> tuple[str, str, dict]:
+    """Convert HWP/HWPX files to Markdown through kordoc CLI."""
+    command = _build_kordoc_command(kordoc_command, src)
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError(
+            "kordoc command not found. Install Node.js 18+ and use "
+            "`npx -y kordoc`, or pass --kordoc-command with a working binary."
+        ) from exc
+
+    payload = _parse_kordoc_json(result.stdout, result.stderr, result.returncode)
+    text = str(payload.get("markdown") or "")
+    if len(text.strip()) < 50:
+        return "", "failed", {
+            "parser": "kordoc",
+            "metadata": payload.get("metadata") or {},
+            "warnings": payload.get("warnings") or [],
+            "payload": payload,
+        }
+
+    return text, "ok", {
+        "parser": "kordoc",
+        "metadata": payload.get("metadata") or {},
+        "warnings": payload.get("warnings") or [],
+        "payload": payload,
+    }
+
+
+def _convert_passthrough(src: Path) -> tuple[str, str, dict]:
+    """Use Markdown or text files without conversion."""
+    return src.read_text(encoding="utf-8"), "ok", {
+        "parser": "passthrough",
+        "metadata": {},
+        "warnings": [],
+    }
 
 
 def _update_index(library_dir: Path, all_entries: list[dict]) -> None:
@@ -403,6 +538,14 @@ def main() -> None:
         default=Path("knowledge"),
         help="Path to knowledge directory (default: knowledge/)",
     )
+    parser.add_argument(
+        "--kordoc-command",
+        default="npx -y -p kordoc -p pdfjs-dist kordoc",
+        help=(
+            "Command used for HWP/HWPX parsing "
+            "(default: 'npx -y -p kordoc -p pdfjs-dist kordoc')"
+        ),
+    )
     args = parser.parse_args()
 
     library_dir: Path = args.library_dir
@@ -429,7 +572,7 @@ def main() -> None:
         print("inbox is empty. Nothing to ingest.")
         sys.exit(0)
 
-    md_converter = _ensure_markitdown()
+    md_converter = None
     converted_dir = knowledge_dir / CONVERTED_SUBDIR
     converted_dir.mkdir(parents=True, exist_ok=True)
     processed_dir = inbox_dir / "_processed"
@@ -442,11 +585,6 @@ def main() -> None:
     results = []
     for src in sorted(source_files):
         ext = src.suffix.lower()
-
-        # Check unsupported
-        if ext in UNSUPPORTED_EXTENSIONS:
-            print(f"  SKIP (unsupported: {ext}): {src.name} — PDF/DOCX로 변환 후 다시 넣어주세요")
-            continue
 
         if ext not in SUPPORTED_EXTENSIONS and ext not in PASSTHROUGH_EXTENSIONS:
             print(f"  SKIP (unknown format: {ext}): {src.name}")
@@ -461,7 +599,18 @@ def main() -> None:
         print(f"  CONVERT: {src.name} ... ", end="", flush=True)
 
         try:
-            text, status = _convert_file(md_converter, src)
+            if ext in PASSTHROUGH_EXTENSIONS:
+                text, status, conversion = _convert_passthrough(src)
+            elif ext in MARKITDOWN_EXTENSIONS:
+                if md_converter is None:
+                    md_converter = _ensure_markitdown()
+                text, status, conversion = _convert_with_markitdown(md_converter, src)
+            elif ext in KORDOC_EXTENSIONS:
+                text, status, conversion = _convert_with_kordoc(src, args.kordoc_command)
+            else:
+                print(f"SKIP (unknown format: {ext})")
+                continue
+
             if status == "failed" or len(text.strip()) < 50:
                 print("FAILED (text too short)")
                 shutil.move(str(src), str(failed_dir / src.name))
@@ -484,15 +633,24 @@ def main() -> None:
 
             doc_type = _detect_document_type(text, grade)
             jurisdiction = _detect_jurisdiction(text)
-            title = _extract_title(text, src.stem)
+            parser_metadata = conversion.get("metadata") or {}
+            fallback_title = str(parser_metadata.get("title") or src.stem)
+            title = _extract_title(text, fallback_title)
             slug = _make_slug(title)
 
             # Generate frontmatter
             frontmatter = _generate_frontmatter(
                 title, slug, grade, confidence, doc_type, jurisdiction,
                 ext.lstrip("."), text,
+                conversion["parser"],
+                parser_metadata,
+                conversion.get("warnings") or [],
             )
-            full_content = frontmatter + text
+            parser_notes = _build_parser_notes(
+                str(conversion["parser"]),
+                conversion.get("payload"),
+            )
+            full_content = frontmatter + parser_notes + text
 
             # Determine destination
             subfolder = _grade_subfolder(grade, doc_type)
@@ -517,6 +675,7 @@ def main() -> None:
                 "status": "ok",
                 "grade": grade,
                 "confidence": confidence,
+                "parser": conversion["parser"],
                 "doc_type": doc_type,
                 "jurisdiction": jurisdiction,
                 "title": title,

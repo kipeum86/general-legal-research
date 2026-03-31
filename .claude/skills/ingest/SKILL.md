@@ -34,8 +34,7 @@ library/inbox/ 에 파일 드롭
 
 ```
 inbox/ 내 모든 파일을 Glob으로 탐색
-지원 포맷: .pdf, .docx, .pptx, .xlsx, .html, .md, .txt
-비지원: .hwp, .hwpx → 유저에게 "PDF/DOCX 변환 후 다시 넣어주세요" 안내
+지원 포맷: .pdf, .docx, .pptx, .xlsx, .html, .hwp, .hwpx, .md, .txt
 ```
 
 - 파일이 0개면 "inbox가 비어 있습니다" 안내 후 종료
@@ -49,9 +48,16 @@ inbox/ 내 모든 파일을 Glob으로 탐색
 | `.pdf` | `mcp__markitdown__convert_to_markdown` (uri: `file:///절대경로`) |
 | `.docx` | `mcp__markitdown__convert_to_markdown` |
 | `.pptx`, `.xlsx`, `.html` | `mcp__markitdown__convert_to_markdown` |
+| `.hwp`, `.hwpx` | `kordoc` CLI (`npx -y -p kordoc -p pdfjs-dist kordoc <file> --format json --silent`) |
 | `.md`, `.txt` | 변환 불필요, 그대로 사용 |
 
 **변환 실패 시:** 해당 파일을 `library/inbox/_failed/`로 이동 + 유저에게 실패 사유 안내
+
+**HWP/HWPX 참고:**
+- `kordoc`는 Node.js 18+ 환경이 필요하다.
+- `library-ingest.py`는 `--kordoc-command` 인자로 실행 명령을 override할 수 있다.
+- 기본 명령은 peer dependency 문제를 피하기 위해 `pdfjs-dist`까지 함께 설치한다.
+- 가능하면 `kordoc`의 parse warnings도 변환 Markdown과 함께 보존한다.
 
 ### Step 3: Grade 자동 판별
 
