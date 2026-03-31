@@ -48,12 +48,12 @@ Not recommended:
 - `.xlsx`
 - `.html`
 
-It explicitly marks the following as unsupported:
+It previously had no support for:
 
 - `.hwp`
 - `.hwpx`
 
-That means the current project can research Korean law well, but still has a weak path for ingesting many Korean source documents and annex materials that arrive as Hancom files.
+This gap has been addressed by Phase 1 (see above). The project can now ingest Hancom files alongside its existing research capabilities.
 
 ### 2. `kordoc` is broader than a simple format converter
 
@@ -95,7 +95,7 @@ In other words:
 
 ## Recommended Integration Shape
 
-### Phase 1
+### Phase 1 ✅ (completed 2026-03-31, commit `83384a8`)
 
 Add `kordoc` only for `.hwp` / `.hwpx` ingestion.
 
@@ -108,6 +108,14 @@ Behavior:
 - keep `MarkItDown` as the default path for current supported formats
 - route `.hwp` / `.hwpx` files through `kordoc`
 - store original file, converted Markdown, and parse warnings together where practical
+
+Implemented:
+
+- Lazy kordoc initialization (no Node.js required unless HWP/HWPX files are present)
+- `subprocess.run` with `timeout=120` and `TimeoutExpired` handling
+- kordoc metadata (`creator`, `pageCount`, `fileType`) preserved in frontmatter and parser notes
+- Parse warnings retained alongside converted Markdown
+- Tests added in `tests/test_library_ingest.py`
 
 ### Phase 2
 

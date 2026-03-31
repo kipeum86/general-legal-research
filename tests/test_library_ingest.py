@@ -70,15 +70,16 @@ def test_parse_kordoc_json_failure_surfaces_error_code():
 
 def test_build_parser_notes_includes_warning_summary():
     """kordoc parser notes should preserve warning details next to the Markdown."""
-    payload = {
-        "fileType": "hwpx",
+    conversion = {
+        "parser": "kordoc",
+        "file_type": "hwpx",
         "metadata": {"creator": "Hancom Office", "pageCount": 12},
         "warnings": [
             {"code": "SKIPPED_IMAGE", "message": "Image skipped", "page": 3},
         ],
     }
 
-    notes = library_ingest._build_parser_notes("kordoc", payload)
+    notes = library_ingest._build_parser_notes("kordoc", conversion)
 
     assert "Parser: kordoc" in notes
     assert "Detected file type: hwpx" in notes

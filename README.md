@@ -95,7 +95,7 @@ flowchart LR
 | **0** | User Config Loading | Loads `user-config.json`; auto-triggers `/onboard` if missing |
 | **1** | Query Interpretation & Parameter Resolution | Structured parameters and assumptions |
 | **2** | Jurisdiction Mapping & Research Plan | Jurisdiction profile, domain checklist, search plan |
-| **3** | Source Collection | Raw sources with metadata (Korean law via korean-law MCP Server + Open Law API; PDF/DOCX auto-converted via MarkItDown) |
+| **3** | Source Collection | Raw sources with metadata (Korean law via korean-law MCP Server + Open Law API; PDF/DOCX via MarkItDown; HWP/HWPX via kordoc) |
 | **3.5** | Factual Claim Spot-Check & Source Laundering Detection | `claim-registry.json` — Verified / Unverified / Contradicted per anchor |
 | **4** | Source Reliability Scoring (A–D) | Graded source list with rationale |
 | **5** | Analysis & Issue Structuring | Issue tree, conflict report, glossary updates |
@@ -232,7 +232,7 @@ library/
 1. Drop any file (PDF, DOCX, PPTX, etc.) into `library/inbox/`
 2. Tell the agent: `/ingest` or "자료 넣었어"
 3. The agent will automatically:
-   - Convert to structured Markdown (via MarkItDown)
+   - Convert to structured Markdown (PDF/DOCX/PPTX via MarkItDown; HWP/HWPX via kordoc)
    - Classify source grade (A/B/C) based on content signals
    - Generate YAML metadata (frontmatter)
    - Place in the appropriate `library/grade-{a,b,c}/` folder
@@ -485,6 +485,7 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |:------------|:--------|
 | **Claude Code** | [CLI](https://claude.ai/code) installed and authenticated |
 | **Python 3** | + `python-docx` for DOCX output, + `markitdown` for PDF/DOCX input conversion |
+| **Node.js 18+** *(optional)* | Required only for HWP/HWPX ingest — `npx` auto-installs `kordoc` on first run |
 | **MCP Keys** *(optional)* | See `.env.example` and [MCP Setup Guide](docs/en/mcp-setup-guide.md) |
 
 ### Quick Start
@@ -496,9 +497,8 @@ git clone <repo-url> && cd general-legal-research
 # 2. Set up Python environment
 python3 -m venv .venv && source .venv/bin/activate
 pip install python-docx 'markitdown[pdf,docx]'
-# Optional for HWP/HWPX ingest support
-# Requires Node.js 18+, then library-ingest.py uses:
-# npx -y -p kordoc -p pdfjs-dist kordoc
+# Optional: HWP/HWPX ingest support (requires Node.js 18+)
+# No manual install needed — npx auto-downloads kordoc on first run
 
 # 3. (Optional) Configure MCP search
 cp .env.example .env   # then add your API keys
@@ -558,7 +558,7 @@ satisfies Brazil LGPD Article 33 cross-border transfer requirements.
 
 | Mode | What Works | What Doesn't |
 |:-----|:-----------|:-------------|
-| **Local-only** | Open Law API for Korean statutes/cases/interpretations, direct URL fetch from whitelisted legal portals, skill dispatch, output generation, `library/` PDF ingestion via `markitdown` Python API | Keyword search (`tavily` / `brave`), korean-law MCP tools |
+| **Local-only** | Open Law API for Korean statutes/cases/interpretations, direct URL fetch from whitelisted legal portals, skill dispatch, output generation, `library/` ingestion (PDF via `markitdown`, HWP/HWPX via `kordoc`) | Keyword search (`tavily` / `brave`), korean-law MCP tools |
 | **MCP-connected** | Full workflow including korean-law MCP (64 tools for KR law), keyword search, PDF/DOCX URL conversion via `markitdown` MCP | Requires API keys in `.env` and Node.js for korean-law MCP |
 
 ---
