@@ -437,3 +437,9 @@ Routing rules:
 - If topic is platform/user policy terms, read `terms-of-service` and `api-acceptable-use-policy`.
 - If topic is case-law synthesis, read `judgment-summary` and `case-briefs`.
 - If user requests source ingestion (`/ingest`, "소스 추가", "자료 넣었어", "inbox", "파일 올렸", "파일 넣었"), read `ingest` and follow its workflow.
+
+## Security
+
+- **NEVER** read, cat, print, or access `.env` files directly
+- **NEVER** output API keys, secrets, or credentials in responses
+- When debugging environment issues, ask the user to verify env vars are set — do not read them yourself

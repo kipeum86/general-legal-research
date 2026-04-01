@@ -1,4 +1,31 @@
 {
+  "permissions": {
+    "deny": [
+      "Read(.env*)",
+      "Edit(.env*)",
+      "Write(.env*)",
+      "Bash(cat .env*)",
+      "Bash(less .env*)",
+      "Bash(more .env*)",
+      "Bash(head .env*)",
+      "Bash(tail .env*)"
+    ],
+    "allow": [
+      "Bash(grep -E \"\\\\.py$\")",
+      "Bash(npx --version)",
+      "Bash(npm info:*)",
+      "Bash(LAW_OC=kipeum86 npx -y korean-law-mcp@latest --help)",
+      "Bash(LAW_OC=kipeum86 npx -y korean-law-mcp@latest cli search_law --query \"개인정보보호법\")",
+      "Bash(LAW_OC=kipeum86 npx -y korean-law-mcp@latest)",
+      "Bash(find /Users/kpsfamily/코딩 프로젝트 -name *api* -o -name *law* -o -name *korean*)",
+      "Bash(find /Users/kpsfamily/코딩 프로젝트/contract-review-agent -name *.json -path */sources/* -o -name *.md -path */sources/*)",
+      "Bash(grep -r \"law\\\\.go\\\\.kr\\\\|한국법\\\\|API\\\\|statute\" /Users/kpsfamily/코딩 프로젝트/contract-review-agent/docs/ko/*.md)",
+      "Bash(npm search:*)",
+      "Edit(/.claude/skills/ingest/**)",
+      "Edit(/.claude/skills/fact-checker/**)",
+      "Edit(/.claude/skills/quality-checker/**)"
+    ]
+  },
   "hooks": {
     "UserPromptSubmit": [
       {
