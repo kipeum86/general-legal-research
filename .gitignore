@@ -33,5 +33,9 @@ knowledge/
 # Attorney materials library (confidential, local only)
 library/
 
+# Conversation logs (folder tracked, contents ignored)
+logs/*
+!logs/.gitkeep
+
 # Confidential client documents
 260317.Children's Content Engagement Platform Feasibility Analysis.pdf
