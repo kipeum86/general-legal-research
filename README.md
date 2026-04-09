@@ -4,7 +4,7 @@
 
 **Evidence-based international legal research workflow, powered by Claude Code.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Powered-blueviolet?logo=anthropic)](https://claude.ai/code)
 [![Python 3](https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Jurisdictions](https://img.shields.io/badge/Jurisdictions-17+-green)](#jurisdiction-coverage)
@@ -604,6 +604,6 @@ For legal decisions, consult qualified counsel in the relevant jurisdiction.
 
 ---
 
-**License:** [MIT](LICENSE)
+**License:** [Apache 2.0](LICENSE)
 
 </div>
