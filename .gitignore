@@ -39,3 +39,9 @@ logs/*
 
 # Confidential client documents
 260317.Children's Content Engagement Platform Feasibility Analysis.pdf
+
+# Internal planning / evaluation working docs
+/TODO.md
+/todo.md
+/TODOS.md
+/kordoc-integration-evaluation.md
