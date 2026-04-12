@@ -3,6 +3,7 @@ general-legal-research-agent-design.md
 
 # Generated report artifacts
 output/reports/
+output/*.docx
 
 # Session state & intermediate artifacts
 output/checkpoint.json
