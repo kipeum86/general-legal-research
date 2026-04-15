@@ -194,7 +194,7 @@ def setup(doc: Document):
     hp = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
     hp.text = ""
     hp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    hr = hp.add_run("LEGAL MEMORANDUM | CONFIDENTIAL — ATTORNEY WORK PRODUCT")
+    hr = hp.add_run("LEGAL MEMORANDUM | PRIVILEGED & CONFIDENTIAL")
     _font(hr, bold=True, size_pt=8, color=COLOR_MUTED)
 
     footer = sec.footer
@@ -211,7 +211,7 @@ def setup(doc: Document):
 def cover(doc: Document):
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    _font(p.add_run("CONFIDENTIAL — ATTORNEY WORK PRODUCT"), bold=True, size_pt=10, color=COLOR_ALERT)
+    _font(p.add_run("PRIVILEGED & CONFIDENTIAL"), bold=True, size_pt=10, color=COLOR_ALERT)
 
     for _ in range(3):
         doc.add_paragraph()
@@ -234,12 +234,12 @@ def cover(doc: Document):
     info.style = "Table Grid"
     info.autofit = True
     meta_rows = [
-        ("Prepared by", "Jinju Law Firm (법무법인 진주)"),
-        ("Attorney", "Kim Jaesik (김재식), Associate"),
+        ("Prepared by", "Jinju Legal Orchestrator"),
+        ("Research Specialist", "Kim Jaesik (김재식)"),
         ("As-of Date", "March 26, 2026"),
         ("Jurisdictions", "Republic of Korea, United States, European Union"),
         ("Expansion Markets", "Japan, Vietnam, Indonesia (overview)"),
-        ("Classification", "Attorney Work Product — Privileged and Confidential"),
+        ("Classification", "Privileged & Confidential — Internal Legal Workflow Draft"),
     ]
     for i, (k, v) in enumerate(meta_rows):
         lc = info.rows[i].cells[0]

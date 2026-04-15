@@ -29,11 +29,11 @@ The memo contains seven sections in order.
 Every page:
 
 ```
-ATTORNEY–CLIENT PRIVILEGED / ATTORNEY WORK PRODUCT
-Prepared at the direction of counsel to provide legal advice regarding
-antitrust compliance and potential exposure. Intended solely for [Company]
+PRIVILEGED & CONFIDENTIAL / INTERNAL LEGAL WORKFLOW DRAFT
+Prepared to support internal legal assessment regarding antitrust
+compliance and potential exposure. Intended solely for [Company]
 senior leadership and the Board of Directors. Do not forward outside
-those who need to know for purposes of receiving legal advice.
+those who need to know for internal legal review.
 ```
 
 ### 2. Executive Summary
@@ -138,5 +138,5 @@ Readiness checklist:
 - **US federal antitrust only** — flag state AG, private class action, and international (EU Art. 102, DMA, UK) exposure for specialist follow-up
 - Present risk in circuit-neutral terms unless circuit is specified and verified
 - Counsel represents the organization (Model Rule 1.13), not individuals
-- **Attorney must review all output** — this is a drafting aid, not legal advice
+- **A qualified legal reviewer must review all output** — this is a drafting aid, not legal advice
 - Do not input unnecessary personal data; follow organization's secure AI workflow

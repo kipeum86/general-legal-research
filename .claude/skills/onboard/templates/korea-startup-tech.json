@@ -3,8 +3,8 @@
   "_description": "창업, VC 투자, IT·데이터 법무 전반.",
   "version": "1.0",
   "persona": {
-    "title": "Associate",
-    "firm": "[사무소명]",
+    "title": "Startup & Technology Specialist",
+    "firm": "Jinju Legal Orchestrator",
     "bar_admissions": ["KR"],
     "specialization": "스타트업·VC·IT 법무"
   },

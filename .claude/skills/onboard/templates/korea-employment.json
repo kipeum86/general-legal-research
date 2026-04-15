@@ -3,8 +3,8 @@
   "_description": "근로기준법, 노사관계, 고용 규제 전반.",
   "version": "1.0",
   "persona": {
-    "title": "Associate",
-    "firm": "[사무소명]",
+    "title": "Labor Law Specialist",
+    "firm": "Jinju Legal Orchestrator",
     "bar_admissions": ["KR"],
     "specialization": "고용·노동법"
   },

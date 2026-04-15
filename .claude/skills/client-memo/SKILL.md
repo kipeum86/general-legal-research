@@ -26,7 +26,7 @@ Produces client-facing memoranda that translate corporate governance legal issue
 2. Identify the legal questions to address
 3. Draft memo following the Output Structure below
 4. Mark any uncertain citations `[VERIFY]` and flag factual gaps as Open Items
-5. Label the draft Attorney-Client Privileged / Work Product
+5. Label the draft Privileged & Confidential / Internal Workflow Draft
 
 ## Output Structure
 
@@ -35,10 +35,10 @@ Produces client-facing memoranda that translate corporate governance legal issue
 | Field | Content |
 |---|---|
 | TO | [Client name / contact] |
-| FROM | [Firm / attorney name] |
+| FROM | [Organization / specialist name] |
 | DATE | [Date] |
 | RE | [Matter — specific subject] |
-| CONFIDENTIAL | Attorney-Client Privileged |
+| CONFIDENTIAL | Privileged & Confidential |
 
 ### 1. Executive Summary
 
@@ -69,8 +69,8 @@ Produces client-facing memoranda that translate corporate governance legal issue
 ### 5. Recommendations
 
 - Numbered actionable steps
-- Assign responsibility (client vs. counsel) and deadline per item
-- Identify decisions required before counsel can proceed
+- Assign responsibility (client vs. assigned specialist) and deadline per item
+- Identify decisions required before the assigned specialist can proceed
 
 ### 6. Open Items
 
@@ -78,7 +78,7 @@ Produces client-facing memoranda that translate corporate governance legal issue
 
 ## Pitfalls and Checks
 
-- **Privilege**: Always label drafts Attorney-Client Privileged / Work Product
+- **Privilege**: Use a neutral confidentiality label by default, such as `Privileged & Confidential / Internal Workflow Draft`; add jurisdiction-specific privilege language only when the user explicitly needs it
 - **Citations**: Include statute/regulation/case with one-sentence plain-English gloss; mark uncertain citations `[VERIFY]`
 - **Scope**: US-focused by default; flag foreign law, state-specific rules, or non-US entities explicitly
 - **No guarantees**: Frame conclusions as analysis, not outcome predictions; qualify where law is unsettled or facts incomplete

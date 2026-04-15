@@ -3,8 +3,8 @@
   "_description": "국내 법령·규정 리서치 전반. 현재 CLAUDE.md 기본값과 동일.",
   "version": "1.0",
   "persona": {
-    "title": "Associate",
-    "firm": "[사무소명]",
+    "title": "Research Specialist",
+    "firm": "Jinju Legal Orchestrator",
     "bar_admissions": ["KR"],
     "specialization": "국내외 법률·법령 조사"
   },

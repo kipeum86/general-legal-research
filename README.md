@@ -38,7 +38,7 @@
 
 `General Legal Research Agent` is a Claude Code agent scaffold that performs structured, source-grounded legal research across any practice area and jurisdiction. It runs entirely within your local Claude Code session with no external backend required.
 
-The agent is configurable per user. On first launch, a brief setup wizard collects your name, firm, practice area, and jurisdiction preferences, then saves them locally as `user-config.json`. Every subsequent session loads this config automatically, personalizing the agent's persona, jurisdiction defaults, and output language without any manual steps.
+The agent is configurable per user. On first launch, a brief setup wizard collects your name, role, organization, practice area, and jurisdiction preferences, then saves them locally as `user-config.json`. Every subsequent session loads this config automatically, personalizing the agent's persona, jurisdiction defaults, and output language without any manual steps.
 
 > [!IMPORTANT]
 > This project is **not** designed to provide legal advice.
@@ -173,8 +173,8 @@ All user-specific data stays on your machine and is never committed to git:
   "version": "1.0",
   "persona": {
     "name": "Jane Smith",
-    "title": "Associate",
-    "firm": "Smith & Partners LLP",
+    "title": "Research Specialist",
+    "firm": "Jinju Legal Orchestrator",
     "bar_admissions": ["US-NY"],
     "specialization": "US Corporate & M&A"
   },
@@ -285,7 +285,7 @@ knowledge/
 
 Supported output formats: `.md` · `.docx` · `.pdf` · `.pptx` · `.html` · `.txt`
 
-> For legal opinion deliverables (`legal opinion`, `opinion letter`, `formal opinion memo`), the `legal-opinion-formatter` skill generates an A4 law-firm-style document with `python-docx`.
+> For legal opinion deliverables (`legal opinion`, `opinion letter`, `formal opinion memo`), the `legal-opinion-formatter` skill generates an A4 professional-format document with `python-docx`.
 
 ---
 
@@ -578,20 +578,20 @@ satisfies Brazil LGPD Article 33 cross-border transfer requirements.
 
 ---
 
-## Part of Jinju Law Firm
+## Part of Jinju Legal Orchestrator
 
-This agent is part of the **법무법인 진주 (Jinju Law Firm)** series of specialized legal AI agents:
+This agent is part of the **Jinju Legal Orchestrator** series of specialist legal workflow agents:
 
-| Agent | Attorney | Specialty |
-|-------|----------|-----------|
-| [game-legal-research](https://github.com/kipeum86/game-legal-research) | 심진주 (Sim Jinju) | Game industry law |
-| [legal-translation-agent](https://github.com/kipeum86/legal-translation-agent) | 변혁기 (Byeon Hyeok-gi) | Legal translation |
-| **[general-legal-research](https://github.com/kipeum86/general-legal-research)** | **김재식 (Kim Jaesik)** | **Legal research** |
-| [PIPA-expert](https://github.com/kipeum86/PIPA-expert) | 정보호 (Jeong Bo-ho) | Data privacy law |
-| [GDPR-expert](https://github.com/kipeum86/GDPR-expert) | 김덕배 (Kim De Bruyne) | Data protection law (GDPR) |
-| [contract-review-agent](https://github.com/kipeum86/contract-review-agent) | 고덕수 (Ko Duksoo) | Contract review |
-| [legal-writing-agent](https://github.com/kipeum86/legal-writing-agent) | 한석봉 (Han Seokbong) | Legal writing |
-| [second-review-agent](https://github.com/kipeum86/second-review-agent) | 반성문 (Ban Seong-mun) | Quality review (Partner) |
+| Agent | Persona | Specialty |
+|-------|---------|-----------|
+| [game-legal-research](https://github.com/kipeum86/game-legal-research) | Game Industry Specialist Sim Jinju (심진주) | Game industry law |
+| [legal-translation-agent](https://github.com/kipeum86/legal-translation-agent) | Legal Translation Specialist Byeon Hyeok-gi (변혁기) | Legal translation |
+| **[general-legal-research](https://github.com/kipeum86/general-legal-research)** | **Research Specialist Kim Jaesik (김재식)** | **Legal research** |
+| [PIPA-expert](https://github.com/kipeum86/PIPA-expert) | Privacy Specialist Jeong Bo-ho (정보호) | Data privacy law |
+| [GDPR-expert](https://github.com/kipeum86/GDPR-expert) | Privacy Specialist Kim De Bruyne (김덕배) | Data protection law (GDPR) |
+| [contract-review-agent](https://github.com/kipeum86/contract-review-agent) | Contract Specialist Ko Duksoo (고덕수) | Contract review |
+| [legal-writing-agent](https://github.com/kipeum86/legal-writing-agent) | Legal Drafting Specialist Han Seokbong (한석봉) | Legal writing |
+| [second-review-agent](https://github.com/kipeum86/second-review-agent) | Senior Review Specialist Ban Seong-mun (반성문) | Quality review |
 
 ---
 

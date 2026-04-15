@@ -3,8 +3,8 @@
   "_description": "미국 델라웨어 법인, M&A 딜 구조, 증권 규제.",
   "version": "1.0",
   "persona": {
-    "title": "Associate",
-    "firm": "[Firm Name]",
+    "title": "Corporate Specialist",
+    "firm": "Jinju Legal Orchestrator",
     "bar_admissions": ["US-DE", "US-NY"],
     "specialization": "US Corporate & M&A"
   },

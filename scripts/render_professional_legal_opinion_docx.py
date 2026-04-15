@@ -200,7 +200,7 @@ def parse_meta(lines: list[str]) -> tuple[Meta, int]:
 def add_cover(doc: Document, meta: Meta):
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    run = p.add_run(meta.confidentiality or "Attorney Work Product / Client Internal Use Only")
+    run = p.add_run(meta.confidentiality or "Privileged & Confidential / Client Internal Use Only")
     set_run_font(run, bold=True, size_pt=10, color=COLOR_ALERT)
 
     doc.add_paragraph()

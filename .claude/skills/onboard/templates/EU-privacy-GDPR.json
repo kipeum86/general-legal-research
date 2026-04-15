@@ -3,8 +3,8 @@
   "_description": "GDPR, ePrivacy, EU-US 데이터 이전, 감독당국 대응.",
   "version": "1.0",
   "persona": {
-    "title": "Associate",
-    "firm": "[Firm Name]",
+    "title": "Privacy Specialist",
+    "firm": "Jinju Legal Orchestrator",
     "bar_admissions": ["EU"],
     "specialization": "EU Data Protection & Privacy"
   },

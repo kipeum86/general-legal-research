@@ -12,7 +12,7 @@ description: 최초 1회 인터뷰를 통해 user-config.json을 생성하고 kn
 ## Purpose
 
 사용자의 practice area, jurisdiction, 출력 설정을 수집해 `user-config.json`을 생성하고,
-에이전트 KB(`knowledge/`)와 변호사 자료 라이브러리(`library/`) 디렉토리를 초기화한다.
+에이전트 KB(`knowledge/`)와 업무 자료 라이브러리(`library/`) 디렉토리를 초기화한다.
 
 ---
 
@@ -55,8 +55,8 @@ description: 최초 1회 인터뷰를 통해 user-config.json을 생성하고 kn
 아래 7문항을 순서대로 물어본다. 응답 누락 시 기본값을 적용하고 명시한다.
 
 1. **이름 / 직함 / 사무소명**
-   - 예: "홍길동 / Senior Associate / 법무법인 OO"
-   - 기본값: "Attorney / Associate / [사무소 미지정]"
+   - 예: "홍길동 / Senior Review Specialist / Jinju Legal Orchestrator"
+   - 기본값: "[이름 미지정] / Specialist / Jinju Legal Orchestrator"
 
 2. **주요 업무 분야**
    - 선택지: `corporate` / `IP` / `employment` / `regulatory` / `criminal` / `tax` / `other`
@@ -94,7 +94,7 @@ description: 최초 1회 인터뷰를 통해 user-config.json을 생성하고 kn
   "persona": {
     "name": "<이름>",
     "title": "<직함>",
-    "firm": "<사무소명>",
+    "firm": "Jinju Legal Orchestrator",
     "bar_admissions": ["<jurisdiction>"],
     "specialization": "<practice area 요약>"
   },

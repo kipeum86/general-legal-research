@@ -1,11 +1,11 @@
 ---
 name: legal-opinion-formatter
 description: >
-  Format legal opinions as professional law firm-quality Word documents (.docx).
+  Format legal opinions as professional-format Word documents (.docx).
   Use this skill whenever the user wants to generate, format, or export a legal opinion,
-  legal memorandum, legal advice letter, or attorney opinion letter as a Word document.
+  legal memorandum, legal advice letter, or formal analysis letter as a Word document.
   Triggers include: "법률의견서 작성", "legal opinion 생성", "legal opinion docx",
-  "의견서 포맷", "format as legal letter", "make it look like a law firm letter",
+  "의견서 포맷", "format as legal letter", "make it look like a professional legal letter",
   "export to Word", "docx로 변환", or any request to produce a professional legal
   document in .docx format. Also trigger when the user has already generated legal
   opinion text and wants it formatted professionally, or when creating legal documents
@@ -15,14 +15,14 @@ description: >
 
 # Legal Opinion Letter Formatter
 
-Generate professional law firm-quality legal opinion letters as .docx files using `python-docx`.
+Generate professional-format legal opinion letters as .docx files using `python-docx`.
 
 ## When to Activate
 
-- User requests a legal opinion, legal memo, or attorney letter as a .docx file
+- User requests a legal opinion, legal memo, or formal analysis letter as a .docx file
 - User has generated legal opinion text and wants professional formatting
 - User mentions "법률의견서", "법률검토보고서", "legal opinion letter", "legal memo"
-- User asks to "format this as a law firm letter" or similar
+- User asks to "format this as a professional legal letter" or similar
 - User wants to export legal analysis to a Word document
 
 ---
@@ -30,8 +30,8 @@ Generate professional law firm-quality legal opinion letters as .docx files usin
 ## Document Architecture
 
 A professional legal opinion letter follows a specific visual hierarchy. The formatter
-must produce documents that look like they came from a top-tier law firm — not a Word
-template with default styles.
+must produce documents that look like polished, audit-friendly legal memoranda — not a
+Word template with default styles.
 
 ### Visual Design Principles
 
@@ -62,16 +62,16 @@ opinion type and user instructions.
 The letterhead appears in the document header (first page only, or all pages).
 
 ```
-[FIRM NAME]                          ← Bold, 14-16pt, sans-serif, navy
-Attorneys at Law                     ← 9pt, italic or light weight
+Jinju Legal Orchestrator             ← Bold, 14-16pt, sans-serif, navy
+AI Legal Workflow System             ← 9pt, italic or light weight
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ← Thin horizontal rule (navy or gold)
 [Address Line 1]  |  Tel: [Phone]  |  [Email]  |  [Website]
 ```
 
-For Korean firms:
+For Korean-format outputs:
 ```
-[법무법인 이름]
-[FIRM NAME (English)]
+진주 리걸 오케스트레이터
+Jinju Legal Orchestrator
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 [주소]  |  전화: [번호]  |  [이메일]  |  [웹사이트]
 ```
@@ -88,12 +88,12 @@ If the opinion is privileged or confidential:
 
 ```
 PRIVILEGED & CONFIDENTIAL
-ATTORNEY-CLIENT PRIVILEGE / ATTORNEY WORK PRODUCT
+INTERNAL LEGAL WORKFLOW DRAFT
 ```
 
 Or in Korean:
 ```
-비밀유지 / 변호사-의뢰인 비밀특권
+비밀유지 / 내부 법률 워크플로 초안
 ```
 
 - Centered, bold, 9-10pt, all caps
@@ -221,26 +221,26 @@ Practical recommendations for the client based on the legal conclusions.
 ```
 Very truly yours,
 
-[FIRM NAME]
+[ORGANIZATION NAME]
 
 
 ____________________________
-[ATTORNEY NAME]
+[SPECIALIST NAME]
 [Title / Position]
-[Bar Number / Registration]
+[Reference / Registration]
 ```
 
 Korean:
 ```
 이상과 같이 의견을 드립니다.
 
-[법무법인 이름]
+[조직명]
 
 
 ____________________________
-[변호사 이름]
+[스페셜리스트 이름]
 [직위]
-[변호사 등록번호]
+[참조 번호 / 등록 정보]
 ```
 
 ### 16. Disclaimers / Notices (Optional)
@@ -318,7 +318,7 @@ def create_letterhead(doc, firm_info):
     # Firm name
     p_firm = header.paragraphs[0]
     p_firm.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    run = p_firm.add_run(firm_info.get('name', '[FIRM NAME]'))
+    run = p_firm.add_run(firm_info.get('name', 'Jinju Legal Orchestrator'))
     run.font.name = 'Arial'
     run.font.size = Pt(16)
     run.font.bold = True
@@ -368,7 +368,7 @@ def create_letterhead(doc, firm_info):
     header2 = section.header
     p2 = header2.paragraphs[0]
     p2.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    run2 = p2.add_run(firm_info.get('name', '[FIRM NAME]'))
+    run2 = p2.add_run(firm_info.get('name', 'Jinju Legal Orchestrator'))
     run2.font.name = 'Arial'
     run2.font.size = Pt(9)
     run2.font.color.rgb = RGBColor(0x99, 0x99, 0x99)
@@ -511,7 +511,7 @@ def create_footer(doc, confidential=False):
 ### Adding Content Sections
 
 ```python
-def add_confidential_marking(doc, text="PRIVILEGED & CONFIDENTIAL\nATTORNEY-CLIENT PRIVILEGE"):
+def add_confidential_marking(doc, text="PRIVILEGED & CONFIDENTIAL\nINTERNAL LEGAL WORKFLOW DRAFT"):
     """Add confidentiality marking at top of document."""
     for line in text.split('\n'):
         p = doc.add_paragraph(style='LOConfidential')
@@ -583,7 +583,7 @@ def add_signature_block(doc, firm_name, attorney_name, title, bar_number=None):
     p_space.paragraph_format.space_before = Pt(36)
     p_space.add_run("____________________________")
 
-    # Attorney info
+    # Signatory info
     p_name = doc.add_paragraph(style='LOSignature')
     run = p_name.add_run(attorney_name)
     run.bold = True
@@ -623,7 +623,7 @@ def add_signature_block_ko(doc, firm_name, attorney_name, title, bar_number=None
 
     if bar_number:
         p_bar = doc.add_paragraph(style='LOSignature')
-        p_bar.add_run(f"변호사 등록번호: {bar_number}")
+        p_bar.add_run(f"등록 정보: {bar_number}")
 ```
 
 ---
@@ -655,7 +655,7 @@ def generate_legal_opinion(content, config):
 
         config: dict with firm info
             - firm_name: str
-            - firm_subtitle: str (e.g., "Attorneys at Law")
+            - firm_subtitle: str (e.g., "AI Legal Workflow System")
             - address: str
             - phone: str
             - email: str
@@ -672,8 +672,8 @@ def generate_legal_opinion(content, config):
 
     # Firm info with defaults
     firm_info = {
-        'name': config.get('firm_name', '[FIRM NAME]'),
-        'subtitle': config.get('firm_subtitle', 'Attorneys at Law'),
+        'name': config.get('firm_name', 'Jinju Legal Orchestrator'),
+        'subtitle': config.get('firm_subtitle', 'AI Legal Workflow System'),
         'address': config.get('address', '[ADDRESS]'),
         'phone': config.get('phone', '[PHONE]'),
         'email': config.get('email', '[EMAIL]'),
@@ -686,7 +686,7 @@ def generate_legal_opinion(content, config):
     # Confidential marking
     if content.get('confidential', False):
         if content.get('language') == 'ko':
-            add_confidential_marking(doc, "비밀유지\n변호사-의뢰인 비밀특권")
+            add_confidential_marking(doc, "비밀유지\n내부 법률 워크플로 초안")
         else:
             add_confidential_marking(doc)
 
@@ -796,16 +796,16 @@ def generate_legal_opinion(content, config):
     if content.get('language') == 'ko':
         add_signature_block_ko(
             doc,
-            config.get('firm_name', '[법무법인 이름]'),
-            config.get('attorney_name', '[변호사 이름]'),
+            config.get('firm_name', 'Jinju Legal Orchestrator'),
+            config.get('attorney_name', '[스페셜리스트 이름]'),
             config.get('attorney_title', '[직위]'),
             config.get('bar_number'),
         )
     else:
         add_signature_block(
             doc,
-            config.get('firm_name', '[FIRM NAME]'),
-            config.get('attorney_name', '[ATTORNEY NAME]'),
+            config.get('firm_name', 'Jinju Legal Orchestrator'),
+            config.get('attorney_name', '[SPECIALIST NAME]'),
             config.get('attorney_title', '[TITLE]'),
             config.get('bar_number'),
         )
@@ -859,7 +859,7 @@ Before saving the final .docx, verify:
 - [ ] **Confidential marking**: Present if applicable
 - [ ] **No orphan headings**: `keep_with_next` set on all heading styles
 - [ ] **Korean font fallback**: 맑은 고딕 set for East Asian text
-- [ ] **Placeholders**: All firm-specific placeholders clearly marked with `[BRACKETS]`
+- [ ] **Placeholders**: All organization-specific placeholders clearly marked with `[BRACKETS]`
 
 ---
 

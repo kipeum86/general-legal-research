@@ -1,6 +1,6 @@
 ---
 name: legal-opinion-formatter
-description: Format legal research output into a law-firm-grade formal opinion style, with clear issue framing, conclusions, risk grading, and citation-ready references.
+description: Format legal research output into a professional-format formal opinion style, with clear issue framing, conclusions, risk grading, and citation-ready references.
 ---
 
 # Legal Opinion Formatter
@@ -8,7 +8,7 @@ description: Format legal research output into a law-firm-grade formal opinion s
 Use this skill during Step 7 (Output Generation) when the user asks for:
 - "legal opinion"
 - "formal opinion"
-- "law-firm style"
+- "professional memo style"
 - polished DOCX memo/opinion formatting
 
 ## Inputs
@@ -34,7 +34,7 @@ For full python-docx implementation details, also read `legal-opinion-formatter-
 
 ## Page Size
 
-Default: **A4** (210mm × 297mm) — Korean law firm standard.
+Default: **A4** (210mm × 297mm) — Korean professional memorandum standard.
 Use US Letter only when the user explicitly requests it or the matter is US-domestic.
 
 ## Style Rules

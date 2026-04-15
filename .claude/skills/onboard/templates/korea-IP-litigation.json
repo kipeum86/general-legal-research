@@ -3,8 +3,8 @@
   "_description": "특허, 상표, 저작권, 영업비밀 분쟁 및 라이선스.",
   "version": "1.0",
   "persona": {
-    "title": "Associate",
-    "firm": "[사무소명]",
+    "title": "IP Dispute Specialist",
+    "firm": "Jinju Legal Orchestrator",
     "bar_admissions": ["KR"],
     "specialization": "지식재산권 소송·라이선스"
   },
