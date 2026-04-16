@@ -2,7 +2,7 @@
 
 # General Legal Research Agent
 
-**Claude Code 기반의 증거 중심 국제 법률 리서치 워크플로**
+**Claude Code 기반의 증거 중심 해외 법령 리서치 워크플로우**
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](../../LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Powered-blueviolet?logo=anthropic)](https://claude.ai/code)
@@ -47,7 +47,6 @@
 
 | 예시 | 설명 |
 |:-----|:-----|
-| [한국어 결과물](https://docs.google.com/document/d/1KBaSeJXEXWDNKoxS2yt0kE6XXjuw5JWw/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) | 딥페이크 규제 5개국 비교 분석 (KR, EU, US, JP, UK) |
 | [English output](https://docs.google.com/document/d/1HTXCMYERDhHlm40_zSqMrIWATJPTBPOW/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) | Deepfake regulation across five jurisdictions (KR, EU, US, JP, UK) |
 
 ---
