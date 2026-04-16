@@ -15,6 +15,7 @@ Optional for HWP/HWPX:
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import shlex
@@ -24,6 +25,35 @@ import sys
 import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
+
+
+# --- Prompt-injection filter (shared trust-boundary module) ---
+
+_FILTER_PATH = Path(__file__).resolve().parent / "prompt_injection_filter.py"
+if "prompt_injection_filter" in sys.modules:
+    _pif = sys.modules["prompt_injection_filter"]
+else:
+    _FILTER_SPEC = importlib.util.spec_from_file_location(
+        "prompt_injection_filter", _FILTER_PATH
+    )
+    if _FILTER_SPEC is None or _FILTER_SPEC.loader is None:  # pragma: no cover
+        raise RuntimeError("prompt_injection_filter.py not found next to library-ingest.py")
+    _pif = importlib.util.module_from_spec(_FILTER_SPEC)
+    # Register before exec so @dataclasses.dataclass can look up the module.
+    sys.modules["prompt_injection_filter"] = _pif
+    _FILTER_SPEC.loader.exec_module(_pif)
+
+
+def _apply_injection_filter(text: str) -> tuple[str, str, list[str]]:
+    """Trust-boundary hook: sanitize text, return (clean_text, risk_level, codes).
+
+    Every byte read from inbox is untrusted. This hook is the single point
+    where prompt-injection patterns are detected and redacted before the
+    ingest pipeline touches the content.
+    """
+    sanitized, report = _pif.sanitize(text)
+    codes = sorted({f.code for f in report.findings})
+    return sanitized, report.risk_level, codes
 
 MARKITDOWN_EXTENSIONS = {".pdf", ".docx", ".pptx", ".xlsx", ".html"}
 KORDOC_EXTENSIONS = {".hwp", ".hwpx"}
@@ -306,6 +336,8 @@ def _generate_frontmatter(
     parser_name: str,
     parser_metadata: dict | None = None,
     parser_warnings: list[dict] | None = None,
+    injection_risk: str = "low",
+    injection_codes: list[str] | None = None,
 ) -> str:
     """Generate YAML frontmatter for a converted document."""
     now = datetime.now(timezone.utc).isoformat()
@@ -321,6 +353,7 @@ def _generate_frontmatter(
         if isinstance(item, dict) and item.get("code")
     ]
 
+    codes = injection_codes or []
     lines = [
         "---",
         f"source_id: {_yaml_quote(f'{grade.lower()}-{doc_type}-{slug}')}",
@@ -345,6 +378,8 @@ def _generate_frontmatter(
         f"ingest_parser: {_yaml_quote(parser_name)}",
         f"parser_warning_count: {len(warnings)}",
         f"parser_warning_codes: {json.dumps(warning_codes, ensure_ascii=False)}",
+        f"prompt_injection_risk: {_yaml_quote(injection_risk)}",
+        f"prompt_injection_findings: {json.dumps(codes, ensure_ascii=False)}",
         "---",
         "",
     ]
@@ -568,7 +603,11 @@ def main() -> None:
         if not f.is_file():
             continue
         rel_to_inbox = str(f.relative_to(inbox_dir))
-        if rel_to_inbox.startswith("_processed") or rel_to_inbox.startswith("_failed"):
+        if (
+            rel_to_inbox.startswith("_processed")
+            or rel_to_inbox.startswith("_failed")
+            or rel_to_inbox.startswith("_quarantine")
+        ):
             continue
         if f.name.startswith("."):
             continue
@@ -585,6 +624,8 @@ def main() -> None:
     processed_dir.mkdir(exist_ok=True)
     failed_dir = inbox_dir / "_failed"
     failed_dir.mkdir(exist_ok=True)
+    quarantine_dir = inbox_dir / "_quarantine"
+    quarantine_dir.mkdir(exist_ok=True)
 
     print(f"Found {len(source_files)} file(s) in inbox.")
 
@@ -623,6 +664,25 @@ def main() -> None:
                 results.append({"source": src.name, "status": "failed", "reason": "text too short"})
                 continue
 
+            # Trust boundary: sanitize untrusted text BEFORE classification or
+            # any downstream processing. See CLAUDE.md § 1a) Trust Boundary.
+            sanitized_text, injection_risk, injection_codes = _apply_injection_filter(text)
+
+            if injection_risk == "high":
+                print(f"QUARANTINED (prompt-injection risk: high; codes={injection_codes})")
+                shutil.move(str(src), str(quarantine_dir / src.name))
+                results.append({
+                    "source": src.name,
+                    "status": "quarantined",
+                    "reason": "prompt_injection_risk=high",
+                    "injection_codes": injection_codes,
+                })
+                continue
+
+            # Downstream stages read the sanitized text — the original payload
+            # never reaches library/grade-* or knowledge/library-converted/.
+            text = sanitized_text
+
             # Classify
             grade, confidence = _classify_grade(text)
 
@@ -651,6 +711,8 @@ def main() -> None:
                 conversion["parser"],
                 parser_metadata,
                 conversion.get("warnings") or [],
+                injection_risk=injection_risk,
+                injection_codes=injection_codes,
             )
             parser_notes = _build_parser_notes(
                 str(conversion["parser"]),
@@ -701,15 +763,22 @@ def main() -> None:
     ok = [r for r in results if r["status"] == "ok"]
     failed = [r for r in results if r["status"] == "failed"]
     rejected = [r for r in results if r["status"] == "rejected"]
+    quarantined = [r for r in results if r["status"] == "quarantined"]
 
     print(f"\n{'='*50}")
-    print(f"Ingest complete: {len(ok)} ok, {len(failed)} failed, {len(rejected)} rejected")
+    print(
+        f"Ingest complete: {len(ok)} ok, {len(failed)} failed, "
+        f"{len(rejected)} rejected, {len(quarantined)} quarantined"
+    )
     for r in ok:
         print(f"  ✅ Grade {r['grade']}: {r['source']} → {r['destination']}")
     for r in failed:
         print(f"  ❌ Failed: {r['source']} ({r.get('reason', 'unknown')})")
     for r in rejected:
         print(f"  🚫 Rejected: {r['source']} (Grade D)")
+    for r in quarantined:
+        codes = ", ".join(r.get("injection_codes") or [])
+        print(f"  🛑 Quarantined (prompt injection): {r['source']} [{codes}]")
 
     print(json.dumps({"results": results}, ensure_ascii=False, indent=2))
 

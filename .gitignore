@@ -1,6 +1,3 @@
-# Design document (internal blueprint)
-general-legal-research-agent-design.md
-
 # Generated report artifacts
 output/reports/
 output/*.docx
@@ -38,13 +35,18 @@ library/
 logs/*
 !logs/.gitkeep
 
-# Confidential client documents
-260317.Children's Content Engagement Platform Feasibility Analysis.pdf
+# macOS metadata
+.DS_Store
 
-# Internal planning / evaluation working docs
+# Quarantined ingest artifacts (may contain prompt-injection payloads)
+library/inbox/_quarantine/
+
+# Local-only TODO notes (generic pattern; specific filenames live in .git/info/exclude)
 /TODO.md
 /todo.md
 /TODOS.md
-/kordoc-integration-evaluation.md
-/docs/notes/naming-transition-guide.md
-/references/ko-legal-opinion-style-guide.md
+
+# NOTE: Do not list specific confidential filenames here. Public .gitignore
+# entries leak the existence and naming of sensitive artifacts.
+# Put per-file ignores for confidential matters in .git/info/exclude
+# (see docs/security.md — trust boundaries).
