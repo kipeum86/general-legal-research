@@ -50,3 +50,4 @@ library/inbox/_quarantine/
 # entries leak the existence and naming of sensitive artifacts.
 # Put per-file ignores for confidential matters in .git/info/exclude
 # (see docs/security.md — trust boundaries).
+.claude/settings.local.json
