@@ -315,12 +315,12 @@ def _add_cover(doc):
     # Firm name
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    r = p.add_run("진주 리걸 오케스트레이터")
+    r = p.add_run("KP 리걸 오케스트레이터")
     _set_run_font(r, font=FONT_HEADER, size=Pt(22), bold=True, color=COLOR_NAVY)
 
     p2 = doc.add_paragraph()
     p2.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    r2 = p2.add_run("Jinju Legal Orchestrator")
+    r2 = p2.add_run("KP Legal Orchestrator")
     _set_run_font(r2, font=FONT_HEADER, size=Pt(11), bold=False, color=COLOR_MUTED)
     _add_border_bottom(p2, color_hex="8B7355", sz="10")
 
@@ -363,7 +363,7 @@ def _add_cover(doc):
         ("한국법 상태", "국회 의결 (2026.1.29.) / 미시행 (공포 후 1년)"),
         ("미국법 상태", "현행법 (Common Law + FRE)"),
         ("출력 모드", "B (Comparative Matrix) + D (Black-letter & Commentary)"),
-        ("작성자", "리서치 스페셜리스트 김재식 (Kim Jaesik)"),
+        ("작성자", "리서치 스페셜리스트"),
     ]
     tbl = doc.add_table(rows=len(meta_items), cols=2)
     tbl.style = "Table Grid"
@@ -874,7 +874,7 @@ def _add_unverified_summary(doc):
 def build():
     doc = Document()
     _setup_page(doc)
-    _setup_header_footer(doc, "비밀유지특권 비교 분석  |  Jinju Legal Orchestrator  |  CONFIDENTIAL")
+    _setup_header_footer(doc, "비밀유지특권 비교 분석  |  KP Legal Orchestrator  |  CONFIDENTIAL")
     _add_cover(doc)
     _add_toc(doc)
     _add_scope(doc)

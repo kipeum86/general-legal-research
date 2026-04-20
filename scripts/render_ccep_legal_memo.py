@@ -234,8 +234,8 @@ def cover(doc: Document):
     info.style = "Table Grid"
     info.autofit = True
     meta_rows = [
-        ("Prepared by", "Jinju Legal Orchestrator"),
-        ("Research Specialist", "Kim Jaesik (김재식)"),
+        ("Prepared by", "KP Legal Orchestrator"),
+        ("Research Specialist", "Legal Research Specialist"),
         ("As-of Date", "March 26, 2026"),
         ("Jurisdictions", "Republic of Korea, United States, European Union"),
         ("Expansion Markets", "Japan, Vietnam, Indonesia (overview)"),
