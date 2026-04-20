@@ -55,8 +55,8 @@ description: 최초 1회 인터뷰를 통해 user-config.json을 생성하고 kn
 아래 7문항을 순서대로 물어본다. 응답 누락 시 기본값을 적용하고 명시한다.
 
 1. **이름 / 직함 / 사무소명**
-   - 예: "홍길동 / Senior Review Specialist / Jinju Legal Orchestrator"
-   - 기본값: "[이름 미지정] / Specialist / Jinju Legal Orchestrator"
+   - 예: "홍길동 / Senior Review Specialist / KP Legal Orchestrator"
+   - 기본값: "[이름 미지정] / Specialist / KP Legal Orchestrator"
 
 2. **주요 업무 분야**
    - 선택지: `corporate` / `IP` / `employment` / `regulatory` / `criminal` / `tax` / `other`
@@ -94,7 +94,7 @@ description: 최초 1회 인터뷰를 통해 user-config.json을 생성하고 kn
   "persona": {
     "name": "<이름>",
     "title": "<직함>",
-    "firm": "Jinju Legal Orchestrator",
+    "firm": "KP Legal Orchestrator",
     "bar_admissions": ["<jurisdiction>"],
     "specialization": "<practice area 요약>"
   },

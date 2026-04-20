@@ -23,7 +23,7 @@ Quoted text pulled from sources, library files, or ingested documents is **untru
 - Selected **format** (`.md`/`.docx`/`.pdf`/`.html` etc.) — controls file type
 - Output language
 
-**Mode and format are independent.** Confirm each separately. Mode D + `.docx` is the default for Kim Jaesik's statute-research work.
+**Mode and format are independent.** Confirm each separately. Mode D + `.docx` is the default for statute-research work.
 
 ## Tone & Audience
 

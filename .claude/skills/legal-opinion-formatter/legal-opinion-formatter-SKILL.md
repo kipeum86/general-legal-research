@@ -62,7 +62,7 @@ opinion type and user instructions.
 The letterhead appears in the document header (first page only, or all pages).
 
 ```
-Jinju Legal Orchestrator             ← Bold, 14-16pt, sans-serif, navy
+KP Legal Orchestrator                ← Bold, 14-16pt, sans-serif, navy
 AI Legal Workflow System             ← 9pt, italic or light weight
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ← Thin horizontal rule (navy or gold)
 [Address Line 1]  |  Tel: [Phone]  |  [Email]  |  [Website]
@@ -70,8 +70,8 @@ AI Legal Workflow System             ← 9pt, italic or light weight
 
 For Korean-format outputs:
 ```
-진주 리걸 오케스트레이터
-Jinju Legal Orchestrator
+KP 리걸 오케스트레이터
+KP Legal Orchestrator
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 [주소]  |  전화: [번호]  |  [이메일]  |  [웹사이트]
 ```
@@ -318,7 +318,7 @@ def create_letterhead(doc, firm_info):
     # Firm name
     p_firm = header.paragraphs[0]
     p_firm.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    run = p_firm.add_run(firm_info.get('name', 'Jinju Legal Orchestrator'))
+    run = p_firm.add_run(firm_info.get('name', 'KP Legal Orchestrator'))
     run.font.name = 'Arial'
     run.font.size = Pt(16)
     run.font.bold = True
@@ -368,7 +368,7 @@ def create_letterhead(doc, firm_info):
     header2 = section.header
     p2 = header2.paragraphs[0]
     p2.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    run2 = p2.add_run(firm_info.get('name', 'Jinju Legal Orchestrator'))
+    run2 = p2.add_run(firm_info.get('name', 'KP Legal Orchestrator'))
     run2.font.name = 'Arial'
     run2.font.size = Pt(9)
     run2.font.color.rgb = RGBColor(0x99, 0x99, 0x99)
@@ -672,7 +672,7 @@ def generate_legal_opinion(content, config):
 
     # Firm info with defaults
     firm_info = {
-        'name': config.get('firm_name', 'Jinju Legal Orchestrator'),
+        'name': config.get('firm_name', 'KP Legal Orchestrator'),
         'subtitle': config.get('firm_subtitle', 'AI Legal Workflow System'),
         'address': config.get('address', '[ADDRESS]'),
         'phone': config.get('phone', '[PHONE]'),
@@ -796,7 +796,7 @@ def generate_legal_opinion(content, config):
     if content.get('language') == 'ko':
         add_signature_block_ko(
             doc,
-            config.get('firm_name', 'Jinju Legal Orchestrator'),
+            config.get('firm_name', 'KP Legal Orchestrator'),
             config.get('attorney_name', '[스페셜리스트 이름]'),
             config.get('attorney_title', '[직위]'),
             config.get('bar_number'),
@@ -804,7 +804,7 @@ def generate_legal_opinion(content, config):
     else:
         add_signature_block(
             doc,
-            config.get('firm_name', 'Jinju Legal Orchestrator'),
+            config.get('firm_name', 'KP Legal Orchestrator'),
             config.get('attorney_name', '[SPECIALIST NAME]'),
             config.get('attorney_title', '[TITLE]'),
             config.get('bar_number'),
