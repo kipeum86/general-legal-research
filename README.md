@@ -173,7 +173,7 @@ All user-specific data stays on your machine and is never committed to git:
   "persona": {
     "name": "Jane Smith",
     "title": "Research Specialist",
-    "firm": "Jinju Legal Orchestrator",
+    "firm": "KP Legal Orchestrator",
     "bar_admissions": ["US-NY"],
     "specialization": "US Corporate & M&A"
   },
@@ -577,20 +577,20 @@ satisfies Brazil LGPD Article 33 cross-border transfer requirements.
 
 ---
 
-## Part of Jinju Legal Orchestrator
+## Part of KP Legal Orchestrator
 
-This agent is part of the **Jinju Legal Orchestrator** series of specialist legal workflow agents:
+This agent is part of the **KP Legal Orchestrator** series of specialist legal workflow agents:
 
-| Agent | Persona | Specialty |
-|-------|---------|-----------|
-| [game-legal-research](https://github.com/kipeum86/game-legal-research) | Game Industry Specialist Sim Jinju (심진주) | Game industry law |
-| [legal-translation-agent](https://github.com/kipeum86/legal-translation-agent) | Legal Translation Specialist Byeon Hyeok-gi (변혁기) | Legal translation |
-| **[general-legal-research](https://github.com/kipeum86/general-legal-research)** | **Research Specialist Kim Jaesik (김재식)** | **Legal research** |
-| [PIPA-expert](https://github.com/kipeum86/PIPA-expert) | Privacy Specialist Jeong Bo-ho (정보호) | Data privacy law |
-| [GDPR-expert](https://github.com/kipeum86/GDPR-expert) | Privacy Specialist Kim De Bruyne (김덕배) | Data protection law (GDPR) |
-| [contract-review-agent](https://github.com/kipeum86/contract-review-agent) | Contract Specialist Ko Duksoo (고덕수) | Contract review |
-| [legal-writing-agent](https://github.com/kipeum86/legal-writing-agent) | Legal Drafting Specialist Han Seokbong (한석봉) | Legal writing |
-| [second-review-agent](https://github.com/kipeum86/second-review-agent) | Senior Review Specialist Ban Seong-mun (반성문) | Quality review |
+| Agent | Role | Specialty |
+|-------|------|-----------|
+| [game-legal-research](https://github.com/kipeum86/game-legal-research) | Game Industry Specialist | Game industry law |
+| [legal-translation-agent](https://github.com/kipeum86/legal-translation-agent) | Legal Translation Specialist | Legal translation |
+| **[general-legal-research](https://github.com/kipeum86/general-legal-research)** | **Legal Research Specialist** | **Legal research** |
+| [PIPA-expert](https://github.com/kipeum86/PIPA-expert) | Privacy Specialist (Korea) | Data privacy law |
+| [GDPR-expert](https://github.com/kipeum86/GDPR-expert) | Privacy Specialist (EU) | Data protection law (GDPR) |
+| [contract-review-agent](https://github.com/kipeum86/contract-review-agent) | Contract Specialist | Contract review |
+| [legal-writing-agent](https://github.com/kipeum86/legal-writing-agent) | Legal Drafting Specialist | Legal writing |
+| [second-review-agent](https://github.com/kipeum86/second-review-agent) | Senior Review Specialist | Quality review |
 
 ---
 
