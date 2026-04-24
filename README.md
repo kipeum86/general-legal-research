@@ -490,6 +490,7 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |   |-- packs/
 |   |   |-- antitrust-investigation-summary.md # Antitrust investigation memo rules
 |   |   |-- api-acceptable-use-policy.md # API AUP drafting tables and template
+|   |   |-- cyber-law-compliance-summary.md # Cyber/privacy compliance memo tables
 |   |   |-- fact-checker.md            # Step 4 detailed verification reference pack
 |   |   |-- ingest.md                  # /ingest conversion, grading, and placement rules
 |   |   |-- ip-infringement-analysis.md # IP infringement frameworks and remedy tables

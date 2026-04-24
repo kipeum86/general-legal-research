@@ -111,3 +111,18 @@ def test_antitrust_investigation_summary_uses_reference_pack() -> None:
     assert "## Drafting Rules" in pack_text
     assert "### Anti-Hallucination" in pack_text
     assert "## Scope and Ethics" in pack_text
+
+
+def test_cyber_law_compliance_summary_uses_reference_pack() -> None:
+    skill_path = ROOT / ".claude" / "skills" / "cyber-law-compliance-summary" / "SKILL.md"
+    pack_path = ROOT / "references" / "packs" / "cyber-law-compliance-summary.md"
+
+    skill_text = skill_path.read_text(encoding="utf-8")
+    pack_text = pack_path.read_text(encoding="utf-8")
+
+    assert "references/packs/cyber-law-compliance-summary.md" in skill_text
+    assert len(skill_text.splitlines()) <= 80
+    assert "## Section 2 — Compliance Sections" in pack_text
+    assert "## Section 3 — Jurisdiction Comparison Table" in pack_text
+    assert "## Section 4 — Sensitive Data Categories" in pack_text
+    assert "## Pitfalls and Checks" in pack_text
