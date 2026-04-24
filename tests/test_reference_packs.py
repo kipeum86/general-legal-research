@@ -46,3 +46,19 @@ def test_onboard_uses_reference_pack() -> None:
     assert "## Custom Interview" in pack_text
     assert "## user-config.json Schema" in pack_text
     assert "## Directory Initialization" in pack_text
+
+
+def test_web_researcher_uses_reference_pack() -> None:
+    skill_path = ROOT / ".claude" / "skills" / "web-researcher" / "SKILL.md"
+    pack_path = ROOT / "references" / "packs" / "web-researcher.md"
+
+    skill_text = skill_path.read_text(encoding="utf-8")
+    pack_text = pack_path.read_text(encoding="utf-8")
+
+    assert "references/packs/web-researcher.md" in skill_text
+    assert len(skill_text.splitlines()) <= 105
+    assert "## Fallback Chain" in pack_text
+    assert "### Korean Law" in pack_text
+    assert "### EU Law" in pack_text
+    assert "## PDF/DOCX Source Handling" in pack_text
+    assert "## Deterministic Search Executor" in pack_text
