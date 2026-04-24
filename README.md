@@ -580,6 +580,8 @@ The citation-auditor runs in two distinct contexts:
 
 Both contexts share the same verifier plugin family (`.claude/skills/verifiers/`) and aggregation pipeline. Forecasts, opinions, and rumors are intentionally skipped — the auditor only checks verifiable factual and citation claims.
 
+For Korean-law citation auditing, `korean-law-mcp` is strongly recommended. Without it, Korean statute and case verifier results may remain `unknown`.
+
 ### Local-Only vs MCP-Connected
 
 | Mode | What Works | What Doesn't |
