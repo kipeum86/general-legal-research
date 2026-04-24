@@ -487,6 +487,8 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |   `-- docx_citation_appendix.py        # Step 9 consumer adapter — folds citation audit into DOCX
 |-- references/
 |   |-- korean-law-reference.md        # Korean law research guide
+|   |-- packs/
+|   |   `-- fact-checker.md            # Step 4 detailed verification reference pack
 |   `-- source-payload-contract.md     # sanitized retrieval envelope
 |-- docs/
 |   |-- citation-audit.md              # canonical citation audit spec

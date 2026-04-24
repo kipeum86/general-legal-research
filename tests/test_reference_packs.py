@@ -1,0 +1,18 @@
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_fact_checker_uses_reference_pack() -> None:
+    skill_path = ROOT / ".claude" / "skills" / "fact-checker" / "SKILL.md"
+    pack_path = ROOT / "references" / "packs" / "fact-checker.md"
+
+    skill_text = skill_path.read_text(encoding="utf-8")
+    pack_text = pack_path.read_text(encoding="utf-8")
+
+    assert "references/packs/fact-checker.md" in skill_text
+    assert len(skill_text.splitlines()) <= 130
+    assert "## Phase 3.5 — Source Laundering Detection" in pack_text
+    assert "## Phase 3.3 — Similar-Statute Cross-Check" in pack_text
+    assert "## Phase 4 — Claim Registry Output" in pack_text
