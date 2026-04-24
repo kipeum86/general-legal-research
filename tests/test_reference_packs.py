@@ -126,3 +126,18 @@ def test_cyber_law_compliance_summary_uses_reference_pack() -> None:
     assert "## Section 3 — Jurisdiction Comparison Table" in pack_text
     assert "## Section 4 — Sensitive Data Categories" in pack_text
     assert "## Pitfalls and Checks" in pack_text
+
+
+def test_output_generator_uses_reference_pack() -> None:
+    skill_path = ROOT / ".claude" / "skills" / "output-generator" / "SKILL.md"
+    pack_path = ROOT / "references" / "packs" / "output-generator.md"
+
+    skill_text = skill_path.read_text(encoding="utf-8")
+    pack_text = pack_path.read_text(encoding="utf-8")
+
+    assert "references/packs/output-generator.md" in skill_text
+    assert len(skill_text.splitlines()) <= 80
+    assert "## Trust Boundary" in pack_text
+    assert "## Mandatory Sections" in pack_text
+    assert "## Citation Integrity Rules" in pack_text
+    assert "## Format and Save Rules" in pack_text
