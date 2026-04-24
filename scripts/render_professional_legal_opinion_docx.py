@@ -1,5 +1,6 @@
 ﻿from __future__ import annotations
 
+import argparse
 import pathlib
 import re
 import sys
@@ -21,12 +22,19 @@ try:
     from docx_citation_appendix import (
         append_citation_audit_log,
         inject_unverified_tags,
+        inject_unverified_tags_with_report,
         load_aggregated,
     )
 except ImportError:
     append_citation_audit_log = None
     inject_unverified_tags = None
+    inject_unverified_tags_with_report = None
     load_aggregated = None
+
+try:
+    from citation_audit_artifacts import resolve_audit_artifact
+except ImportError:
+    resolve_audit_artifact = None
 
 
 FONT_NAME = "Batang"
@@ -409,16 +417,38 @@ def render_body(doc: Document, lines: list[str], start_idx: int):
         i += 1
 
 
-def build_professional_docx(md_path: Path, docx_path: Path):
+def build_professional_docx(
+    md_path: Path,
+    docx_path: Path,
+    *,
+    audit_json: Path | None = None,
+    session_id: str | None = None,
+    output_dir: Path | None = None,
+):
     body_md = md_path.read_text(encoding="utf-8")
 
     # Step 9 citation-audit hook: fold failing-claim tags into the markdown
-    # when an aggregated verdict JSON exists; otherwise preserve baseline output.
-    _AUDIT_JSON = _HERE.parent / "output" / "citation-audit-latest.json"
+    # when an aggregated verdict JSON exists; otherwise preserve baseline output
+    # unless the caller explicitly requested an audit artifact.
     _aggregated = None
-    if load_aggregated is not None and inject_unverified_tags is not None and _AUDIT_JSON.exists():
-        _aggregated = load_aggregated(_AUDIT_JSON)
-        body_md = inject_unverified_tags(body_md, _aggregated)
+    _audit_resolution = None
+    _insertion_report = None
+    _audit_requested = audit_json is not None or session_id is not None
+    if output_dir is None:
+        output_dir = _HERE.parent / "output"
+    if resolve_audit_artifact is not None:
+        _audit_resolution = resolve_audit_artifact(output_dir, session_id=session_id, explicit_path=audit_json)
+    if (
+        _audit_resolution is not None
+        and _audit_resolution.found
+        and load_aggregated is not None
+        and (inject_unverified_tags_with_report is not None or inject_unverified_tags is not None)
+    ):
+        _aggregated = load_aggregated(_audit_resolution.path)
+        if inject_unverified_tags_with_report is not None:
+            body_md, _insertion_report = inject_unverified_tags_with_report(body_md, _aggregated)
+        elif inject_unverified_tags is not None:
+            body_md = inject_unverified_tags(body_md, _aggregated)
 
     lines = body_md.splitlines()
     meta, body_start_idx = parse_meta(lines)
@@ -433,16 +463,44 @@ def build_professional_docx(md_path: Path, docx_path: Path):
     # Step 9 citation-audit hook: append the audit log only when the JSON
     # artifact was present and the optional helper loaded successfully.
     if _aggregated is not None and append_citation_audit_log is not None:
-        append_citation_audit_log(doc, _aggregated)
+        append_citation_audit_log(
+            doc,
+            _aggregated,
+            audit_status="complete",
+            artifact_path=_audit_resolution.path if _audit_resolution is not None else None,
+            resolution_message=_audit_resolution.message if _audit_resolution is not None else None,
+            insertion_report=_insertion_report,
+        )
+    elif _audit_requested and append_citation_audit_log is not None:
+        append_citation_audit_log(
+            doc,
+            {"aggregated": []},
+            audit_status="skipped",
+            resolution_message=_audit_resolution.message if _audit_resolution is not None else "Citation audit helper unavailable.",
+        )
 
     doc.save(docx_path)
 
 
-def main():
+def main(argv: list[str] | None = None):
     root = Path(__file__).resolve().parents[1]
-    md_path = root / "output" / "reports" / "brazil_eca_digital_formal_legal_opinion_ko_2026-03-05.md"
-    docx_path = root / "output" / "reports" / "brazil_eca_digital_formal_legal_opinion_ko_2026-03-05.docx"
-    build_professional_docx(md_path, docx_path)
+    parser = argparse.ArgumentParser(description="Render a professional Korean legal opinion DOCX from Markdown.")
+    parser.add_argument("input_md", nargs="?", type=Path, help="Input Markdown file.")
+    parser.add_argument("output_docx", nargs="?", type=Path, help="Output DOCX file.")
+    parser.add_argument("--audit-json", type=Path, help="Aggregated citation-audit JSON to fold into the DOCX.")
+    parser.add_argument("--session-id", help="Session id for output/citation-audit-{session_id}.json resolution.")
+    parser.add_argument("--output-dir", type=Path, default=root / "output", help="Directory containing citation audit artifacts.")
+    args = parser.parse_args(argv)
+
+    md_path = args.input_md or root / "output" / "reports" / "brazil_eca_digital_formal_legal_opinion_ko_2026-03-05.md"
+    docx_path = args.output_docx or md_path.with_suffix(".docx")
+    build_professional_docx(
+        md_path,
+        docx_path,
+        audit_json=args.audit_json,
+        session_id=args.session_id,
+        output_dir=args.output_dir,
+    )
     print(docx_path)
 
 

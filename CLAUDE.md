@@ -330,20 +330,22 @@ Rules:
 - Default page size for DOCX: **A4** (210mm × 297mm). Korean professional memorandum standard — do not use US Letter unless user requests it.
 - **Citation audit integration (when Step 9 will fire):** If the output format is `.docx` and Step 9 trigger conditions are met (Mode B/C/D or memo/opinion request), Step 7 must consume the citation audit artifact rather than emitting an unaudited DOCX. Procedure:
   1. Step 9 writes the aggregated verdict to `output/citation-audit-{session_id}.json` (see Step 9 for the exact trigger and file path). Step 7 must defer the final DOCX save until this file exists when Step 9 is applicable.
-  2. In the DOCX render script, import the helper module:
+  2. Invoke the DOCX render script with either `--audit-json output/citation-audit-{session_id}.json` or `--session-id {session_id}`. The renderer resolves artifacts in this order: explicit `--audit-json`, then `output/citation-audit-{session_id}.json`, then deprecated `output/citation-audit-latest.json` fallback.
+  3. In custom DOCX render scripts, import the helper modules:
      ```python
      import sys, pathlib
      sys.path.insert(0, str(pathlib.Path(__file__).parent))
      from docx_citation_appendix import (
          load_aggregated,
-         inject_unverified_tags,
+         inject_unverified_tags_with_report,
          append_citation_audit_log,
      )
+     from citation_audit_artifacts import resolve_audit_artifact
      ```
-  3. Before embedding any body markdown as Python string literals, run it through `inject_unverified_tags(body_md, aggregated)` so `[Unverified]` / `[Partially Unverified]` tags appear at the end of each failing claim's sentence.
-  4. After all body content (including the Verification guide section) has been rendered into the `Document`, and **before** `doc.save(...)`, call `append_citation_audit_log(doc, aggregated)` once to emit the 부록: 검증 로그 (Citation Audit Log) heading + table + disclaimer.
-  5. If the aggregated file is missing (audit skipped, verifiers unavailable, or Step 9 not applicable), skip steps (3)–(4) silently. The rest of the render must not depend on audit state.
-  6. Do not hand-roll an audit table in the DOCX script. Use the helper so CJK font conventions and layout stay consistent across deliverables.
+  4. Before embedding any body markdown as Python string literals, run it through `inject_unverified_tags_with_report(body_md, aggregated)` so `[Unverified]` / `[Partially Unverified]` tags appear at validated claim positions. If span validation fails, the helper must skip inline insertion and leave a warning for the appendix rather than inserting at a guessed location.
+  5. After all body content (including the Verification guide section) has been rendered into the `Document`, and **before** `doc.save(...)`, call `append_citation_audit_log(doc, aggregated, audit_status="complete", artifact_path=..., insertion_report=...)` once to emit the 부록: 검증 로그 (Citation Audit Log) heading + status block + table + disclaimer.
+  6. If Step 9 was applicable but the aggregated file is missing, append an audit status block with `audit_status="skipped"` and the artifact resolution reason. If Step 9 was not applicable, preserve baseline output.
+  7. Do not hand-roll an audit table in the DOCX script. Use the helper so CJK font conventions and layout stay consistent across deliverables.
 - **Citation audit integration — `.md` output:** No DOCX adapter needed. Step 9 handles append-mode markdown rendering directly (see Step 9).
 
 ### Step 8: Quality Gate
@@ -378,7 +380,7 @@ If failed:
    - **`.md` output:** Run `python3 -m citation_auditor render <draft.md> <aggregated.json> --mode=append` and replace the Step 7 draft with the audited markdown. This folds the `[Unverified]` tags and the 검증 로그 appendix directly into the final file.
    - **`.docx` output:** Do **not** attempt to modify the DOCX directly. Instead:
      - Write the aggregated verdict JSON to `output/citation-audit-{session_id}.json` (use the session identifier from `output/checkpoint.json`; fall back to a timestamp if absent).
-     - Return control to the Step 7 DOCX render script, which must import `scripts/docx_citation_appendix.py` and call `inject_unverified_tags` + `append_citation_audit_log` to fold the audit into the final `.docx`. See Step 7 "Citation audit integration" for the exact wiring.
+     - Return control to the Step 7 DOCX render script, passing `--audit-json output/citation-audit-{session_id}.json` or `--session-id {session_id}`. The script must import `scripts/docx_citation_appendix.py` and `scripts/citation_audit_artifacts.py`, call `inject_unverified_tags_with_report` + `append_citation_audit_log`, and fold the audit into the final `.docx`. See Step 7 "Citation audit integration" for the exact wiring.
      - Step 9 itself does not emit a `.docx` file; the DOCX render remains Step 7's responsibility.
    - **Other formats (`.pdf`, `.pptx`, `.html`, `.txt`):** Currently unsupported by direct integration. Fall back to writing `output/citation-audit-{session_id}.json` **and** producing a sidecar `.md` appendix at `output/citation-audit-{session_id}.md` (append-mode render), and notify the user that the audit log is delivered alongside the primary artifact rather than folded in.
 4. Appendix shape (whatever the format path): table with columns `#`, `클레임 (Claim)`, `판정 (Verdict)`, `Verifier`, `근거 (Evidence)`, plus a one-line disclaimer noting that automated audit does not replace human review. The `docx_citation_appendix` helper and `citation_auditor render --mode=append` both emit this shape — do not hand-roll a different layout.
