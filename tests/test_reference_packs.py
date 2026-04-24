@@ -31,3 +31,18 @@ def test_ingest_uses_reference_pack() -> None:
     assert "## Step 3 — Grade Classification" in pack_text
     assert "## Step 4 — Frontmatter Generation" in pack_text
     assert "## Step 6 — Index Update" in pack_text
+
+
+def test_onboard_uses_reference_pack() -> None:
+    skill_path = ROOT / ".claude" / "skills" / "onboard" / "SKILL.md"
+    pack_path = ROOT / "references" / "packs" / "onboard.md"
+
+    skill_text = skill_path.read_text(encoding="utf-8")
+    pack_text = pack_path.read_text(encoding="utf-8")
+
+    assert "references/packs/onboard.md" in skill_text
+    assert len(skill_text.splitlines()) <= 110
+    assert "## Starter Templates" in pack_text
+    assert "## Custom Interview" in pack_text
+    assert "## user-config.json Schema" in pack_text
+    assert "## Directory Initialization" in pack_text
