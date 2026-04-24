@@ -7,7 +7,7 @@
 ## Prerequisites
 
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
-- Python 3 + `python-docx` (for DOCX output): `pip install python-docx`
+- Python 3 dependencies: `pip install -r requirements.txt`
 - Optional MCP server API keys for enhanced web research. See the [MCP Setup Guide](mcp-setup-guide.md)
 
 ## Quick Start
@@ -24,7 +24,7 @@
    - "Summarize US federal AI liability frameworks currently in effect or under active rulemaking."
    - "Draft a formal opinion letter on the scope of Brazil LGPD and its cross-border transfer framework."
 
-4. The agent automatically executes the following 8-step workflow:
+4. The agent automatically executes the following 8-step workflow (plus a conditional Step 9 for memo/opinion deliverables):
 
    | Step | What happens |
    |------|--------------|
@@ -36,6 +36,7 @@
    | 6 | Analyzes issues, detects conflicts, and updates the glossary |
    | 7 | Generates your deliverable with an inline preview |
    | 8 | Runs a final quality gate with up to two remediation rounds |
+   | 9 | *(Conditional)* Citation audit for memo/opinion deliverables — folds a 검증 로그 (Citation Audit Log) appendix into the final artifact |
 
 5. Choose your preferred output format when prompted: `.md`, `.pdf`, `.docx`, `.pptx`, `.html`, `.txt`
 
@@ -56,7 +57,20 @@ For simple, single-jurisdiction factual lookups, the agent automatically applies
 
 - Runs Steps 1 -> 3 -> 7 -> 8 only, skipping Steps 2, 4, 5, and 6
 - States `[Quick Mode: single-issue lookup]` at the start of the response
-- Falls back to the full 8-step workflow if the answer cannot be confirmed from 1-2 sources
+- Falls back to the standard workflow if the answer cannot be confirmed from 1-2 sources
+
+## Citation Audit
+
+Citation auditing runs in two ways:
+
+- **Automatic (Step 9)** — for Mode B/C/D or memo/opinion deliverables, the agent automatically runs a citation audit after Step 8 and folds the audit results into the final saved artifact as a 검증 로그 (Citation Audit Log) appendix. No extra command needed.
+- **Manual (`/audit`)** — run a citation audit on any existing markdown file (including documents from other sources):
+  ```bash
+  /audit path/to/deliverable.md
+  ```
+  Returns annotated markdown with inline per-claim verdicts.
+
+Both paths use the same per-jurisdiction verifiers (`korean-law`, `us-law`, `eu-law`, `uk-law`, `scholarly`, `wikipedia`, `general-web`). Forecasts, opinions, and rumors are intentionally skipped — the auditor only checks verifiable factual and citation claims.
 
 ## Resuming Interrupted Sessions
 

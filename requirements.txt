@@ -1,0 +1,15 @@
+# Core dependency for DOCX generation
+python-docx>=1.1.0
+
+# Document-to-Markdown conversion (PDF, DOCX, PPTX, XLSX, etc.)
+markitdown[all]>=0.1.0
+
+# Citation-auditor pipeline (Step 9 / /audit slash command)
+pydantic>=2.0
+
+# Optional: richer PDF rendering engines
+# weasyprint>=62.0
+# fpdf2>=2.8.0
+
+# Optional: richer PPTX authoring stack
+# python-pptx>=1.0.0

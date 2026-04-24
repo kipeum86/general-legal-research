@@ -261,8 +261,8 @@ Optional: Document reference number, "CONFIDENTIAL" marking
 
 ### Required Setup
 
-```python
-pip install python-docx
+```bash
+pip install -r requirements.txt
 ```
 
 ### Core Imports

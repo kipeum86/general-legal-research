@@ -79,11 +79,11 @@ Persist these session fields:
 - State: `[Quick Mode: single-issue lookup]` at the start of the response.
 - If the answer cannot be confirmed from 1–2 sources, fall back to full 8-step mode.
 
-## 5) Workflow Orchestration (8 Steps)
+## 5) Workflow Orchestration (8 Steps + conditional Step 9)
 
 At every step start, print progress:
 
-`[Step X/8 — <Step Name>]`
+`[Step X/N — <Step Name>]` where `N` is `8` when Step 9 will not run and `9` when Step 9 will run (see Step 9 trigger conditions below).
 
 Update `output/checkpoint.json` at the END of **every** step (not only Step 3).
 
@@ -290,8 +290,8 @@ Rules:
 - If user requests a legal opinion deliverable (`법률 의견서`, `opinion letter`, `legal opinion`, `formal opinion`, `opinion memo`), you MUST read ALL THREE:
   1. `.claude/skills/legal-opinion-formatter/SKILL.md` (routing overview)
   2. `.claude/skills/legal-opinion-formatter/legal-opinion-formatter-SKILL.md` (full python-docx implementation guide)
-  3. `references/legal-opinion-style-guide.md` (bilingual EN/KO legal opinion style guide — document architecture, tone/register, citation format, defined terms, certainty language scale, numbering, generic disclaimer, typography)
-  Apply all three in Step 7. When generating Korean-language opinions, the style guide takes precedence for tone, structure, and formatting conventions.
+  3. `references/legal-writing-formatting-guide.md` (bilingual EN/KO legal writing formatting guide — document architecture, tone/register, citation format, defined terms, certainty language scale, numbering, generic disclaimer, typography)
+  Apply all three in Step 7. When generating Korean-language opinions, the formatting guide takes precedence for tone, structure, and formatting conventions.
 - First query in session: ask preferred file format.
 - Later queries: confirm previous format (`same as before?`).
 - **Pre-save checklist (MANDATORY before writing any DOCX script):**
@@ -328,6 +328,23 @@ Rules:
 - Render inline preview before file save.
 - Save only after explicit user confirmation.
 - Default page size for DOCX: **A4** (210mm × 297mm). Korean professional memorandum standard — do not use US Letter unless user requests it.
+- **Citation audit integration (when Step 9 will fire):** If the output format is `.docx` and Step 9 trigger conditions are met (Mode B/C/D or memo/opinion request), Step 7 must consume the citation audit artifact rather than emitting an unaudited DOCX. Procedure:
+  1. Step 9 writes the aggregated verdict to `output/citation-audit-{session_id}.json` (see Step 9 for the exact trigger and file path). Step 7 must defer the final DOCX save until this file exists when Step 9 is applicable.
+  2. In the DOCX render script, import the helper module:
+     ```python
+     import sys, pathlib
+     sys.path.insert(0, str(pathlib.Path(__file__).parent))
+     from docx_citation_appendix import (
+         load_aggregated,
+         inject_unverified_tags,
+         append_citation_audit_log,
+     )
+     ```
+  3. Before embedding any body markdown as Python string literals, run it through `inject_unverified_tags(body_md, aggregated)` so `[Unverified]` / `[Partially Unverified]` tags appear at the end of each failing claim's sentence.
+  4. After all body content (including the Verification guide section) has been rendered into the `Document`, and **before** `doc.save(...)`, call `append_citation_audit_log(doc, aggregated)` once to emit the 부록: 검증 로그 (Citation Audit Log) heading + table + disclaimer.
+  5. If the aggregated file is missing (audit skipped, verifiers unavailable, or Step 9 not applicable), skip steps (3)–(4) silently. The rest of the render must not depend on audit state.
+  6. Do not hand-roll an audit table in the DOCX script. Use the helper so CJK font conventions and layout stay consistent across deliverables.
+- **Citation audit integration — `.md` output:** No DOCX adapter needed. Step 9 handles append-mode markdown rendering directly (see Step 9).
 
 ### Step 8: Quality Gate
 
@@ -340,6 +357,46 @@ If failed:
 2. Round 2: patch failing items only.
 3. If still failing, deliver with `[Unverified]`.
 4. **Block delivery** if any `Contradicted` anchor remains uncorrected, or if any conclusion relies on a `laundering_risk: true` source without resolution.
+
+### Step 9: Citation Audit (conditional — memo/opinion deliverables)
+
+**When this step runs:** Step 9 is **automatic** and runs immediately after Step 8 when **any** of the following holds:
+- Output mode is B (Comparative Matrix), C (Enforcement & Case Law), or D (Black-letter & Commentary).
+- `legal-opinion-formatter` was invoked during Step 7 (i.e., user requested `법률 의견서`, `opinion letter`, `legal opinion`, `formal opinion`, or `opinion memo`).
+- User explicitly requested a memo or opinion deliverable regardless of mode.
+
+**When this step is skipped:** Mode A (Executive Brief) with no memo/opinion request. Skipping is silent — do not prompt the user.
+
+**Relation to Step 8 and `/audit`:** Step 8 is an internal self-check. Step 9 is an **external verification** pass that dispatches per-jurisdiction verifier subagents. Step 9 uses the same `citation-auditor` pipeline as the standalone `/audit` command, but in **append mode** (body preserved + appendix) rather than inline-annotation mode.
+
+**Inputs:** The markdown draft produced by Step 7 (the pre-save inline preview, or the saved artifact path if already written).
+
+**Procedure:**
+1. Read `.claude/skills/citation-auditor/SKILL.md` and follow it. Use the Step 7 markdown draft as the input file. Always produce the aggregated verdict JSON (`python3 -m citation_auditor aggregate`), regardless of final output format.
+2. Parse the aggregated verdict output locally (do not require user to see intermediate JSON).
+3. **Output format branching.** Step 9 behaviour depends on the format confirmed in Step 7:
+   - **`.md` output:** Run `python3 -m citation_auditor render <draft.md> <aggregated.json> --mode=append` and replace the Step 7 draft with the audited markdown. This folds the `[Unverified]` tags and the 검증 로그 appendix directly into the final file.
+   - **`.docx` output:** Do **not** attempt to modify the DOCX directly. Instead:
+     - Write the aggregated verdict JSON to `output/citation-audit-{session_id}.json` (use the session identifier from `output/checkpoint.json`; fall back to a timestamp if absent).
+     - Return control to the Step 7 DOCX render script, which must import `scripts/docx_citation_appendix.py` and call `inject_unverified_tags` + `append_citation_audit_log` to fold the audit into the final `.docx`. See Step 7 "Citation audit integration" for the exact wiring.
+     - Step 9 itself does not emit a `.docx` file; the DOCX render remains Step 7's responsibility.
+   - **Other formats (`.pdf`, `.pptx`, `.html`, `.txt`):** Currently unsupported by direct integration. Fall back to writing `output/citation-audit-{session_id}.json` **and** producing a sidecar `.md` appendix at `output/citation-audit-{session_id}.md` (append-mode render), and notify the user that the audit log is delivered alongside the primary artifact rather than folded in.
+4. Appendix shape (whatever the format path): table with columns `#`, `클레임 (Claim)`, `판정 (Verdict)`, `Verifier`, `근거 (Evidence)`, plus a one-line disclaimer noting that automated audit does not replace human review. The `docx_citation_appendix` helper and `citation_auditor render --mode=append` both emit this shape — do not hand-roll a different layout.
+5. Replace the Step 7 draft only for the `.md` path. For `.docx` and fallback paths, Step 7 produces the final artifact.
+
+**Failure handling:**
+- If the `citation-auditor` skill cannot extract any claims from the draft (e.g., very short Mode A brief that slipped through the trigger), log a note and skip silently.
+- If all verifier subagents fail (e.g., MCP servers all down), record `[Citation Audit Skipped — verifiers unavailable]` at the top of the appendix and attach no table. Proceed with save.
+- If a specific verifier fails but others succeed, drop that verifier's candidates (per `citation-auditor` SKILL.md rule 16).
+- Do **not** loop back to Step 3 or Step 8 on Step 9 failures. Step 9 is verification, not remediation.
+
+**Output artifacts:**
+- The saved deliverable includes the audit appendix (folded in for `.md`/`.docx`, sidecar for unsupported formats). Record the primary artifact path in `checkpoint.artifacts` as normal.
+- Always write the raw aggregated verdict JSON to `output/citation-audit-{session_id}.json` for traceability. For `.docx` this file is the hand-off between Step 9 and the Step 7 DOCX render; for `.md` it is informational but still written.
+
+On completion, update `output/checkpoint.json`. Record `citation_audit_fired: true` and summary counts `{verified, contradicted, unknown}` alongside `artifacts`.
+
+**Progress banner:** Use `[Step 9/9 — Citation Audit]`.
 
 ## 6) Skill Dispatch Mechanism
 
@@ -436,6 +493,9 @@ The following externally sourced skills are installed under `.claude/skills/` an
 
 - `ingest` ← `/ingest` 또는 inbox 관련 키워드 시 트리거
 - `fact-checker` ← Step 4 (built-in workflow step, always dispatched per trigger conditions)
+- `citation-auditor` ← dispatches per-jurisdiction verifier subagents under `.claude/skills/verifiers/` (korean-law, us-law, eu-law, uk-law, scholarly, wikipedia, general-web) via the `citation_auditor` Python package.
+  - **Workflow Step 9 (automatic)**: runs after Step 8 for Mode B/C/D or memo/opinion deliverables; uses `render --mode=append` so the audit appendix is folded into the final saved artifact. See §5 Step 9 for full rules.
+  - **Standalone `/audit <file.md>` (manual)**: runs on any existing markdown file outside the workflow; uses inline-annotation mode. Does not touch `output/checkpoint.json`. Route the user here when they ask to verify or second-review an already-generated deliverable (or a document produced outside this agent) without starting new research.
 - `legal-opinion-formatter`
 - `legal-research`
 - `legal-research-summary`

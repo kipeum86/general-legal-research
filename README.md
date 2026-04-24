@@ -15,6 +15,8 @@
 
 </div>
 
+> Latest release: **[v1.0.0 — Citation Audit: Standalone + Memo/Opinion Workflow (2026-04-24)](docs/releases/v1.0.0.md)**
+
 ---
 
 ## Table of Contents
@@ -65,28 +67,30 @@ The agent is configurable per user. On first launch, a brief setup wizard collec
 
 ## Workflow
 
-### Standard Mode — 9 Steps
+### Standard Mode — 8 Steps + conditional Step 9
 
 ```mermaid
 flowchart LR
     S0["0\nConfig\nLoading"] --> S1["1\nQuery\nInterpretation"]
     S1 --> S2["2\nJurisdiction\nMapping"]
     S2 --> S3["3\nSource\nCollection"]
-    S3 --> S35["3.5\nFact-Check,\nCross-Check &\nLaundering"]
-    S35 --> S4["4\nReliability\nScoring"]
-    S4 --> S5["5\nAnalysis &\nStructuring"]
-    S5 --> S6["6\nOutput\nGeneration"]
-    S6 --> S7["7\nQuality\nGate"]
+    S3 --> S4["4\nFact-Check,\nCross-Check &\nLaundering"]
+    S4 --> S5["5\nReliability\nScoring"]
+    S5 --> S6["6\nAnalysis &\nStructuring"]
+    S6 --> S7["7\nOutput\nGeneration"]
+    S7 --> S8["8\nQuality\nGate"]
+    S8 -.memo/opinion.-> S9["9\nCitation\nAudit"]
 
     style S0 fill:#e8f5e9,stroke:#4caf50,color:#1b5e20
     style S1 fill:#e3f2fd,stroke:#2196f3,color:#0d47a1
     style S2 fill:#e3f2fd,stroke:#2196f3,color:#0d47a1
     style S3 fill:#fff3e0,stroke:#ff9800,color:#e65100
-    style S35 fill:#fce4ec,stroke:#e91e63,color:#880e4f
-    style S4 fill:#fff3e0,stroke:#ff9800,color:#e65100
-    style S5 fill:#f3e5f5,stroke:#9c27b0,color:#4a148c
-    style S6 fill:#e0f2f1,stroke:#009688,color:#004d40
-    style S7 fill:#e8eaf6,stroke:#3f51b5,color:#1a237e
+    style S4 fill:#fce4ec,stroke:#e91e63,color:#880e4f
+    style S5 fill:#fff3e0,stroke:#ff9800,color:#e65100
+    style S6 fill:#f3e5f5,stroke:#9c27b0,color:#4a148c
+    style S7 fill:#e0f2f1,stroke:#009688,color:#004d40
+    style S8 fill:#e8eaf6,stroke:#3f51b5,color:#1a237e
+    style S9 fill:#fff8e1,stroke:#fbc02d,color:#f57f17
 ```
 
 | Step | Name | Output |
@@ -95,11 +99,12 @@ flowchart LR
 | **1** | Query Interpretation & Parameter Resolution | Structured parameters and assumptions |
 | **2** | Jurisdiction Mapping & Research Plan | Jurisdiction profile, domain checklist, search plan |
 | **3** | Source Collection | Raw sources with metadata (Korean law via korean-law MCP Server + Open Law API; PDF/DOCX via MarkItDown; HWP/HWPX via kordoc) |
-| **3.5** | Factual Claim Spot-Check, Similar-Statute Cross-Check & Source Laundering Detection | `claim-registry.json` — Verified / Unverified / Contradicted per anchor, similar-statute disambiguation |
-| **4** | Source Reliability Scoring (A–D) | Graded source list with rationale |
-| **5** | Analysis & Issue Structuring | Issue tree, conflict report, glossary updates |
-| **6** | Output Generation (Mode A/B/C/D) | Inline preview, then file on confirmation |
-| **7** | Quality-Gate Self-Verification | Pass/fail plus remediation instructions |
+| **4** | Factual Claim Spot-Check, Similar-Statute Cross-Check & Source Laundering Detection | `claim-registry.json` — Verified / Unverified / Contradicted per anchor, similar-statute disambiguation |
+| **5** | Source Reliability Scoring (A–D) | Graded source list with rationale |
+| **6** | Analysis & Issue Structuring | Issue tree, conflict report, glossary updates |
+| **7** | Output Generation (Mode A/B/C/D) | Inline preview, then file on confirmation |
+| **8** | Quality-Gate Self-Verification | Pass/fail plus remediation instructions |
+| **9** | Citation Audit *(conditional)* | Auto-runs for Mode B/C/D or memo/opinion deliverables; dispatches per-jurisdiction verifiers and folds a **검증 로그 (Citation Audit Log)** appendix into the final artifact. Skipped for Mode A briefs. |
 
 ### Quick Mode — 4 Steps
 
@@ -108,13 +113,13 @@ flowchart LR
 ```mermaid
 flowchart LR
     Q1["1\nQuery\nInterpretation"] --> Q3["3\nSource\nCollection"]
-    Q3 --> Q6["6\nOutput\nGeneration"]
-    Q6 --> Q7["7\nQuality\nGate"]
+    Q3 --> Q7["7\nOutput\nGeneration"]
+    Q7 --> Q8["8\nQuality\nGate"]
 
     style Q1 fill:#e3f2fd,stroke:#2196f3,color:#0d47a1
     style Q3 fill:#fff3e0,stroke:#ff9800,color:#e65100
-    style Q6 fill:#e0f2f1,stroke:#009688,color:#004d40
-    style Q7 fill:#e8eaf6,stroke:#3f51b5,color:#1a237e
+    style Q7 fill:#e0f2f1,stroke:#009688,color:#004d40
+    style Q8 fill:#e8eaf6,stroke:#3f51b5,color:#1a237e
 ```
 
 > [!TIP]
@@ -292,7 +297,7 @@ Supported output formats: `.md` · `.docx` · `.pdf` · `.pptx` · `.html` · `.
 
 ```mermaid
 graph TD
-    A["Main Agent\n(CLAUDE.md Orchestrator)"] --> B["Core Skills\n8 workflow steps"]
+    A["Main Agent\n(CLAUDE.md Orchestrator)"] --> B["Core Skills\n9 workflow steps\n(Step 9 conditional)"]
     A --> C["Specialist Skills\n15 topic-routed"]
     A --> D["deep-researcher\nSub-agent"]
 
@@ -305,7 +310,7 @@ graph TD
     style E fill:#fff8e1,stroke:#ffc107,color:#f57f17
 ```
 
-### Core Skills (Steps 0–7)
+### Core Skills (Steps 0–8 + conditional Step 9)
 
 | Skill | Step | Role |
 |:------|:----:|:-----|
@@ -313,11 +318,12 @@ graph TD
 | `query-interpreter` | 1 | Parse natural language into structured parameters |
 | `jurisdiction-mapper` | 2 | Map jurisdictions & build research plan |
 | `web-researcher` | 3 | Collect sources (Korean law via korean-law MCP + Open Law API; others via search/fetch) |
-| `fact-checker` | 3.5 | Verify claims, cross-check similar statutes & detect source laundering |
-| `source-scorer` | 4 | Grade sources A–D with rationale |
-| `conflict-detector` + `glossary-manager` | 5 | Analyze issues & manage legal terminology |
-| `output-generator` | 6 | Render deliverable in chosen format |
-| `quality-checker` | 7 | 14-item quality gate verification |
+| `fact-checker` | 4 | Verify claims, cross-check similar statutes & detect source laundering |
+| `source-scorer` | 5 | Grade sources A–D with rationale |
+| `conflict-detector` + `glossary-manager` | 6 | Analyze issues & manage legal terminology |
+| `output-generator` | 7 | Render deliverable in chosen format |
+| `quality-checker` | 8 | 14-item quality gate verification |
+| `citation-auditor` | 9 *(conditional)* | Dispatches per-jurisdiction verifier subagents; folds a 검증 로그 appendix into memo/opinion deliverables |
 
 ### Specialist Skills (routed by topic)
 
@@ -410,6 +416,8 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |-- .claude/
 |   |-- settings.json                  # auto-ingest hook
 |   |-- settings.local.json            # WebFetch domain allowlist
+|   |-- commands/
+|   |   `-- audit.md                   # /audit slash command entry point
 |   |-- agents/
 |   |   `-- deep-researcher/AGENT.md
 |   `-- skills/
@@ -424,7 +432,10 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |       |-- output-generator/
 |       |-- quality-checker/
 |       |-- legal-opinion-formatter/   # includes python-docx generator
+|       |-- citation-auditor/          # /audit skill; also workflow Step 9
+|       |-- verifiers/                 # per-jurisdiction verifier plugins (kr/us/eu/uk/scholarly/wikipedia/general-web)
 |       `-- [15 specialist skills]/
+|-- citation_auditor/                  # Python package backing citation-auditor (chunking, aggregation, render)
 |-- knowledge/                         # gitignored; agent-generated KB
 |   |-- _index.md
 |   |-- statutes/
@@ -450,7 +461,8 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |   |-- install-agentskills-set.ps1
 |   |-- library-ingest.py                # inbox → grade classification + Markdown conversion
 |   |-- render_professional_legal_opinion_docx.py
-|   `-- render_acp_comparison_docx.py
+|   |-- render_acp_comparison_docx.py
+|   `-- docx_citation_appendix.py        # Step 9 consumer adapter — folds citation audit into DOCX
 |-- references/
 |   `-- korean-law-reference.md        # Korean law research guide
 |-- output/
@@ -495,7 +507,7 @@ git clone <repo-url> && cd general-legal-research
 
 # 2. Set up Python environment
 python3 -m venv .venv && source .venv/bin/activate
-pip install python-docx 'markitdown[pdf,docx]'
+pip install -r requirements.txt
 # Optional: HWP/HWPX ingest support (requires Node.js 18+)
 # No manual install needed — npx auto-downloads kordoc on first run
 
@@ -552,6 +564,21 @@ via share purchase. Flag any CFIUS or FKFTC notification thresholds.
 Draft a formal opinion letter on whether our SaaS platform's data localization architecture
 satisfies Brazil LGPD Article 33 cross-border transfer requirements.
 ```
+
+### Citation Audit — Two Invocation Contexts
+
+The citation-auditor runs in two distinct contexts:
+
+**1. Workflow Step 9 (automatic)** — for memo/opinion deliverables, Step 9 runs after Step 8 and **folds a 검증 로그 (Citation Audit Log) appendix into the final saved artifact**. No separate file, no extra command. Triggers on Mode B/C/D or any `법률 의견서` / legal opinion request. See [CLAUDE.md §5 Step 9](CLAUDE.md) for full rules.
+
+**2. Standalone `/audit` (manual)** — run a citation audit on any existing markdown file outside the workflow, including documents produced earlier or by other tools. Returns annotated markdown with inline per-claim badges and a per-claim audit report.
+
+```bash
+# Standalone audit (inline annotations)
+/audit output/reports/my-opinion.md
+```
+
+Both contexts share the same verifier plugin family (`.claude/skills/verifiers/`) and aggregation pipeline. Forecasts, opinions, and rumors are intentionally skipped — the auditor only checks verifiable factual and citation claims.
 
 ### Local-Only vs MCP-Connected
 
