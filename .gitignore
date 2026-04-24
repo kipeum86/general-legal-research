@@ -46,6 +46,9 @@ library/inbox/_quarantine/
 /todo.md
 /TODOS.md
 
+# Local implementation/cache planning notes
+docs/superpowers/plans/
+
 # NOTE: Do not list specific confidential filenames here. Public .gitignore
 # entries leak the existence and naming of sensitive artifacts.
 # Put per-file ignores for confidential matters in .git/info/exclude
