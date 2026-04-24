@@ -76,7 +76,7 @@ Last Updated:
 - Always prefer primary over secondary sources.
 - Never omit negative treatment — identify and distinguish unfavorable authority.
 - If jurisdiction is unclear, treat as multi-jurisdiction and flag the ambiguity.
-- Mark any uncertain citation or rule with [VERIFY].
+- Mark any uncertain citation or rule with [Unverified].
 - Do not rely on Google Scholar alone for final verification.
 - Keep a dated research trail suitable for disclosure or handoff.
 

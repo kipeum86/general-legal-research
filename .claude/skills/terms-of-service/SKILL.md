@@ -15,7 +15,7 @@ Gather before drafting:
 |---|---|---|
 | Company legal name, address, contact email | Yes | Contracting entity |
 | Service name and URL/app identifiers | Yes | Defines "Service" |
-| Eligibility/age minimum | Yes | COPPA if under 13 [VERIFY] |
+| Eligibility/age minimum | Yes | COPPA if under 13 [Unverified] |
 | Countries/states served | Yes | Triggers GDPR/CCPA/other |
 | Payment terms | If paid | Auto-renew, cancellation, refunds |
 | IP assets | Yes | Trademarks, content ownership |
@@ -93,7 +93,7 @@ Limitation. TO THE MAXIMUM EXTENT PERMITTED BY LAW, COMPANY SHALL NOT BE LIABLE 
 - Incorporate Privacy Policy by reference
 - Specify data processing roles (controller/processor)
 - Reference security measures at high level only — do not promise beyond actual controls
-- Address cross-border transfers if applicable (EU SCCs [VERIFY])
+- Address cross-border transfers if applicable (EU SCCs [Unverified])
 
 ## Final QC Checklist
 
@@ -106,8 +106,8 @@ Limitation. TO THE MAXIMUM EXTENT PERMITTED BY LAW, COMPANY SHALL NOT BE LIABLE 
 ## Pitfalls
 
 - **Browsewrap is weak** — prefer clickwrap acceptance; browsewrap risks unenforceability.
-- **EU/UK users** — include GDPR-consistent rights hooks and consumer protections; avoid overbroad waivers. [VERIFY]
-- **California residents** — include CCPA/CPRA notice hooks and no-sale/share language. [VERIFY]
-- **UGC services** — must include DMCA agent designation and takedown procedure. [VERIFY]
+- **EU/UK users** — include GDPR-consistent rights hooks and consumer protections; avoid overbroad waivers. [Unverified]
+- **California residents** — include CCPA/CPRA notice hooks and no-sale/share language. [Unverified]
+- **UGC services** — must include DMCA agent designation and takedown procedure. [Unverified]
 - **Unconscionability risk** — keep liability caps and waivers reasonable for consumer users.
 - **Regulated industries** (health, finance, telecom) — flag for additional statutory modules.

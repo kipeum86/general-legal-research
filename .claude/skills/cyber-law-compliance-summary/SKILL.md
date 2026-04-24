@@ -56,7 +56,7 @@ Sections to cover:
 | # | Topic | Key Authorities |
 |---|---|---|
 | 1 | Data Collection & Processing | GDPR Arts. 5–6, 13–14; CCPA §1798.100; state equivalents |
-| 2 | Security & Breach Notification | GDPR Arts. 32–33; Cal. Civ. Code §1798.82; NIST CSF `[VERIFY]` |
+| 2 | Security & Breach Notification | GDPR Arts. 32–33; Cal. Civ. Code §1798.82; NIST CSF `[Unverified]` |
 | 3 | Consumer Rights & Transparency | GDPR Arts. 15–22; CCPA §§1798.110–.125; CAN-SPAM; COPPA |
 | 4 | Cross-Border Data Transfers | GDPR Arts. 44–49; SCCs (2021); EU-U.S. Data Privacy Framework |
 | 5 | Online Conduct Standards | FTC Act §5; TCPA; state consumer protection statutes |
@@ -98,7 +98,7 @@ When multiple jurisdictions apply, produce side-by-side:
 
 ## Pitfalls and Checks
 
-- Cite every legal requirement in Bluebook format; mark uncertain citations `[VERIFY]`
+- Cite every legal requirement in Bluebook format; mark uncertain citations `[Unverified]`
 - Distinguish **mandatory** requirements from **recommended best practices**
 - Flag unsettled areas where regulatory guidance is evolving
 - Tailor for industry — healthcare tech, fintech, e-commerce, SaaS face different obligations; note sector-specific rules

@@ -68,14 +68,14 @@ Per theme, include:
 - [ ] Each theme ties to facts and authority
 - [ ] Counterarguments included with strength assessment
 - [ ] Gaps and pending changes noted
-- [ ] Bluebook citations verified or flagged [VERIFY]
+- [ ] Bluebook citations verified or flagged [Unverified]
 ```
 
 ## Rules
 
 - Maintain neutrality — present competing views weighted by authority; do not advocate
 - Distinguish binding vs. persuasive authority in every section
-- Tag any unverified citation with `[VERIFY]`
+- Tag any unverified citation with `[Unverified]`
 - Note effective dates and amendments for all statutes/regulations
 - Summarize holdings; quote only when specific language is dispositive
 

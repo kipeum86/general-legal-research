@@ -99,7 +99,7 @@ Title, jurisdiction(s), effective date range, prepared date, audience.
 
 ### Citation & Disclaimer
 
-- Bluebook format; hyperlink official sources; mark uncertain items `[VERIFY]`
+- Bluebook format; hyperlink official sources; mark uncertain items `[Unverified]`
 - Disclaimer: gambling law changes rapidly; summary is informational, not legal advice
 
 ## Pitfalls

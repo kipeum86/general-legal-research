@@ -90,7 +90,7 @@ Target length: 1,500–3,000 words unless the decision is unusually short.
 - **Holdings vs. dicta**: Distinguish explicitly; never elevate dicta to holding status.
 - **Neutral tone**: No advocacy or editorial framing.
 - **Court terminology**: Preserve the court's exact language for standards and tests.
-- **Uncertain citations**: Mark with `[VERIFY]`.
+- **Uncertain citations**: Mark with `[Unverified]`.
 - **No inference**: Do not infer facts or procedural steps absent from the opinion.
 - **Non-U.S. courts**: Note deviations from U.S. practice in the Synopsis.
 - **Pinpoint cites required**: Every holding and every court-labeled material fact needs one.

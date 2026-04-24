@@ -70,7 +70,7 @@ Cover only topics with material developments:
 
 - **Jurisdiction-first organization** — cross-reference in cross-cutting section; never repeat the same development twice
 - **Cite primary sources** — statute sections, regulation articles, case names, DPA decisions
-- **Mark unverified citations** with `[VERIFY]`
+- **Mark unverified citations** with `[Unverified]`
 - **Distinguish enacted law from proposals** — clearly label pending/proposed items
 - **Flag jurisdictional conflicts** where requirements create operational tension
 - **Include enforcement amounts** — fines contextualize regulatory seriousness

@@ -25,7 +25,7 @@ Produces client-facing memoranda that translate corporate governance legal issue
 1. Gather matter details and supporting documents from the user
 2. Identify the legal questions to address
 3. Draft memo following the Output Structure below
-4. Mark any uncertain citations `[VERIFY]` and flag factual gaps as Open Items
+4. Mark any uncertain citations `[Unverified]` and flag factual gaps as Open Items
 5. Label the draft Privileged & Confidential / Internal Workflow Draft
 
 ## Output Structure
@@ -79,7 +79,7 @@ Produces client-facing memoranda that translate corporate governance legal issue
 ## Pitfalls and Checks
 
 - **Privilege**: Use a neutral confidentiality label by default, such as `Privileged & Confidential / Internal Workflow Draft`; add jurisdiction-specific privilege language only when the user explicitly needs it
-- **Citations**: Include statute/regulation/case with one-sentence plain-English gloss; mark uncertain citations `[VERIFY]`
+- **Citations**: Include statute/regulation/case with one-sentence plain-English gloss; mark uncertain citations `[Unverified]`
 - **Scope**: US-focused by default; flag foreign law, state-specific rules, or non-US entities explicitly
 - **No guarantees**: Frame conclusions as analysis, not outcome predictions; qualify where law is unsettled or facts incomplete
 - **Tone**: Professional and direct; avoid legalese but keep precision on operative legal terms

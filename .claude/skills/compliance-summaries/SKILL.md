@@ -75,7 +75,7 @@ Rank remediation by: (1) regulatory deadline, (2) risk severity, (3) resource av
 
 ## Checks
 
-- **Cite precisely** — include CFR sections, statute numbers, and agency guidance identifiers; flag uncertain citations with `[VERIFY]`
+- **Cite precisely** — include CFR sections, statute numbers, and agency guidance identifiers; flag uncertain citations with `[Unverified]`
 - **Distinguish evidence quality** — separate documented compliance from self-reported or assumed compliance
 - **Flag gray areas** — note regulatory interpretive uncertainty; recommend regulator engagement or outside counsel review where applicable
 - **Emerging regulations** — flag anticipated regulatory changes requiring future program modification
