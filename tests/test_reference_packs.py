@@ -77,3 +77,20 @@ def test_api_acceptable_use_policy_uses_reference_pack() -> None:
     assert "## Prohibited Use Matrix" in pack_text
     assert "## Publication-Ready AUP Template" in pack_text
     assert "## Pitfalls" in pack_text
+
+
+def test_ip_infringement_analysis_uses_reference_pack() -> None:
+    skill_path = ROOT / ".claude" / "skills" / "ip-infringement-analysis" / "SKILL.md"
+    pack_path = ROOT / "references" / "packs" / "ip-infringement-analysis.md"
+
+    skill_text = skill_path.read_text(encoding="utf-8")
+    pack_text = pack_path.read_text(encoding="utf-8")
+
+    assert "references/packs/ip-infringement-analysis.md" in skill_text
+    assert len(skill_text.splitlines()) <= 95
+    assert "[VERIFY]" not in skill_text
+    assert "[VERIFY]" not in pack_text
+    assert "### Patent Infringement" in pack_text
+    assert "### Trademark Infringement" in pack_text
+    assert "### Copyright Infringement" in pack_text
+    assert "### Trade Secret Misappropriation" in pack_text

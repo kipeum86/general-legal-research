@@ -491,6 +491,7 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |   |   |-- api-acceptable-use-policy.md # API AUP drafting tables and template
 |   |   |-- fact-checker.md            # Step 4 detailed verification reference pack
 |   |   |-- ingest.md                  # /ingest conversion, grading, and placement rules
+|   |   |-- ip-infringement-analysis.md # IP infringement frameworks and remedy tables
 |   |   |-- onboard.md                 # /onboard templates, interview, and initialization rules
 |   |   `-- web-researcher.md          # Step 3 source collection, fallback, and PDF/DOCX rules
 |   `-- source-payload-contract.md     # sanitized retrieval envelope
