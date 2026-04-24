@@ -62,3 +62,18 @@ def test_web_researcher_uses_reference_pack() -> None:
     assert "### EU Law" in pack_text
     assert "## PDF/DOCX Source Handling" in pack_text
     assert "## Deterministic Search Executor" in pack_text
+
+
+def test_api_acceptable_use_policy_uses_reference_pack() -> None:
+    skill_path = ROOT / ".claude" / "skills" / "api-acceptable-use-policy" / "SKILL.md"
+    pack_path = ROOT / "references" / "packs" / "api-acceptable-use-policy.md"
+
+    skill_text = skill_path.read_text(encoding="utf-8")
+    pack_text = pack_path.read_text(encoding="utf-8")
+
+    assert "references/packs/api-acceptable-use-policy.md" in skill_text
+    assert len(skill_text.splitlines()) <= 115
+    assert "## AUP-to-License Allocation" in pack_text
+    assert "## Prohibited Use Matrix" in pack_text
+    assert "## Publication-Ready AUP Template" in pack_text
+    assert "## Pitfalls" in pack_text
