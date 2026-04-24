@@ -49,12 +49,15 @@ python3 scripts/prompt_injection_filter.py scan --path FILE --json
 2. Collect at least one primary source per core issue.
 3. Record complete metadata.
 4. Retry up to 3 rounds with materially different keywords.
+5. Use `legal_sources.yaml` as the canonical source-priority registry. If priority is unclear, run `python3 scripts/legal_source_registry.py show <JURISDICTION>`.
 
 ## Fallback Chain
 
+The authoritative source/fallback order lives in `legal_sources.yaml`.
+
 ### Korean Law (KR jurisdiction) — API-first
 
-For Korean statute, case law, and interpretation queries, **always use the Open Law API first**:
+For Korean statute, case law, and interpretation queries, follow the registry order. With Korean-law MCP available, use `korean-law-mcp` first; without it, fall back to the persistent Open Law API:
 
 1. **`scripts/open_law_api.py`** — on-demand API calls to law.go.kr DRF
    - `search-law` → 법령 키워드 검색 (returns law ID, MST, enforcement date, ministry)

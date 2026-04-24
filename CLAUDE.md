@@ -148,6 +148,7 @@ Write search plan to `output/research-plan.json`.
 
 Read `.claude/skills/web-researcher/SKILL.md` and follow it.
 Apply `references/source-payload-contract.md`: pass downstream only metadata, summary, pinpoints, and relevant sanitized passages; keep full text behind file/cache references unless a tool explicitly needs it.
+Use `legal_sources.yaml` as the canonical source-priority registry. When source priority or fallback is unclear, run `python3 scripts/legal_source_registry.py show <JURISDICTION>` and follow its ordered `primary_sources` and `fallback_order`.
 
 **Cache-first check (MANDATORY before any API call):**
 Before calling any API, check the local cache:

@@ -88,6 +88,19 @@ The project-owned backend normalizes vendored verdict output into these statuses
 
 Checkpoint summaries should use the full metadata `metrics` object, not only `{verified, contradicted, unknown}`.
 
+The metadata metrics object includes:
+
+- `total_claims`
+- `audited_claims`
+- `verified`
+- `contradicted`
+- `unsupported`
+- `source_unavailable`
+- `verifier_unavailable`
+- `unknown`
+- `tool_failures`
+- `coverage_ratio`
+
 ---
 
 ## 6. Korean-Law MCP Degradation

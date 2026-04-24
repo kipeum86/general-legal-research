@@ -1,0 +1,100 @@
+{
+  "schema_version": "legal-source-registry/v1",
+  "jurisdictions": {
+    "KR": {
+      "label": "Korea",
+      "primary_sources": [
+        {
+          "id": "korean-law-mcp",
+          "kind": "mcp",
+          "authority": "primary",
+          "grade": "A",
+          "requires_mcp": true,
+          "description": "korean-law-mcp tools for law.go.kr statutes, precedents, interpretations, tribunals, annexes, and chain research."
+        },
+        {
+          "id": "open_law_api",
+          "kind": "script",
+          "authority": "primary",
+          "grade": "A",
+          "command": "python3 scripts/open_law_api.py",
+          "description": "Persistent file-cache wrapper for law.go.kr Open Law API."
+        },
+        {
+          "id": "law_go_kr",
+          "kind": "portal",
+          "authority": "primary",
+          "grade": "A",
+          "url": "https://www.law.go.kr/"
+        }
+      ],
+      "secondary_sources": [
+        {
+          "id": "klri_translation",
+          "kind": "portal",
+          "authority": "secondary",
+          "grade": "B",
+          "url": "https://elaw.klri.re.kr/",
+          "note": "Unofficial translations are capped at Grade B and require original Korean text verification."
+        }
+      ],
+      "fallback_order": ["korean-law-mcp", "open_law_api", "law_go_kr", "curated_urls", "web_search"]
+    },
+    "EU": {
+      "label": "European Union",
+      "primary_sources": [
+        {
+          "id": "eurlex_api",
+          "kind": "script",
+          "authority": "primary",
+          "grade": "A",
+          "command": "python3 scripts/eurlex_api.py",
+          "description": "Structured EUR-Lex API access for CELEX documents."
+        },
+        {
+          "id": "eur_lex",
+          "kind": "portal",
+          "authority": "primary",
+          "grade": "A",
+          "url": "https://eur-lex.europa.eu/"
+        },
+        {
+          "id": "curia",
+          "kind": "portal",
+          "authority": "primary",
+          "grade": "A",
+          "url": "https://curia.europa.eu/"
+        }
+      ],
+      "secondary_sources": [],
+      "fallback_order": ["eurlex_api", "eur_lex", "curia", "curated_urls", "web_search"]
+    },
+    "US": {
+      "label": "United States",
+      "primary_sources": [
+        {"id": "congress", "kind": "portal", "authority": "primary", "grade": "A", "url": "https://www.congress.gov/"},
+        {"id": "ecfr", "kind": "portal", "authority": "primary", "grade": "A", "url": "https://www.ecfr.gov/"},
+        {"id": "federal_register", "kind": "portal", "authority": "primary", "grade": "A", "url": "https://www.federalregister.gov/"}
+      ],
+      "secondary_sources": [],
+      "fallback_order": ["congress", "ecfr", "federal_register", "curated_urls", "web_search"]
+    },
+    "UK": {
+      "label": "United Kingdom",
+      "primary_sources": [
+        {"id": "legislation_gov_uk", "kind": "portal", "authority": "primary", "grade": "A", "url": "https://www.legislation.gov.uk/"},
+        {"id": "bailii", "kind": "portal", "authority": "primary", "grade": "B", "url": "https://www.bailii.org/"}
+      ],
+      "secondary_sources": [],
+      "fallback_order": ["legislation_gov_uk", "bailii", "curated_urls", "web_search"]
+    },
+    "DEFAULT": {
+      "label": "Default jurisdiction",
+      "primary_sources": [
+        {"id": "official_portal", "kind": "portal", "authority": "primary", "grade": "A", "description": "Official statute, regulator, court, or treaty portal for the jurisdiction."}
+      ],
+      "secondary_sources": [],
+      "fallback_order": ["official_portal", "curated_urls", "web_search"]
+    }
+  }
+}
