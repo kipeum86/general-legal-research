@@ -492,6 +492,7 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |   |   |-- api-acceptable-use-policy.md # API AUP drafting tables and template
 |   |   |-- cyber-law-compliance-summary.md # Cyber/privacy compliance memo tables
 |   |   |-- fact-checker.md            # Step 4 detailed verification reference pack
+|   |   |-- gambling-law-summary.md    # Gambling-law status, licensing, tax, and reform tables
 |   |   |-- ingest.md                  # /ingest conversion, grading, and placement rules
 |   |   |-- ip-infringement-analysis.md # IP infringement frameworks and remedy tables
 |   |   |-- onboard.md                 # /onboard templates, interview, and initialization rules

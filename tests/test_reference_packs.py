@@ -156,3 +156,18 @@ def test_terms_of_service_uses_reference_pack() -> None:
     assert "## Clause Selection" in pack_text
     assert "## Sample Clauses" in pack_text
     assert "## Final QC Checklist" in pack_text
+
+
+def test_gambling_law_summary_uses_reference_pack() -> None:
+    skill_path = ROOT / ".claude" / "skills" / "gambling-law-summary" / "SKILL.md"
+    pack_path = ROOT / "references" / "packs" / "gambling-law-summary.md"
+
+    skill_text = skill_path.read_text(encoding="utf-8")
+    pack_text = pack_path.read_text(encoding="utf-8")
+
+    assert "references/packs/gambling-law-summary.md" in skill_text
+    assert len(skill_text.splitlines()) <= 80
+    assert "## Output Template" in pack_text
+    assert "### Licensing and Suitability" in pack_text
+    assert "### Taxes and Fees" in pack_text
+    assert "## Pitfalls" in pack_text

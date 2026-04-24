@@ -11,7 +11,11 @@ description: >-
 
 Generates an executive-ready memorandum on gambling regulation for a specific jurisdiction, with compliance and risk highlights.
 
-## Quick Start
+## Runtime Rule
+
+Use this file as the compact drafting checklist. Load `references/packs/gambling-law-summary.md` when drafting, tailoring, or QC'ing a gambling-law regulatory summary, or when output templates, licensing tables, tax/fee tables, reform tracking, citation rules, or pitfalls are needed.
+
+## Intake Checklist
 
 Gather before drafting:
 
@@ -23,90 +27,43 @@ Gather before drafting:
 
 If jurisdiction is not specified, ask before proceeding.
 
-## Output Template
+## Drafting Checklist
 
-### Header
+1. Load the reference pack before drafting or reviewing the memorandum.
+2. Separate every authority layer: federal, state, tribal, compact, municipal, and regulator guidance.
+3. State legal status by vertical, not as a single blended conclusion.
+4. Identify primary and secondary regulators, market-entry barriers, and license categories.
+5. Cover suitability, ownership thresholds, fees, renewal cadence, and denial/suspension/revocation grounds.
+6. Include operational restrictions: responsible gaming, AML/KYC, age verification, advertising, game integrity, geolocation/server rules, payment limits, and audit duties.
+7. Include tax and fee exposure with triggers, rates/methods, and local assessments where available.
+8. Cover enforcement, penalties, recent trends, pending reforms, and transition/grandfathering rules if in scope.
+9. Use primary sources or regulator guidance for legal status assertions; mark uncertain items `[Unverified]`.
 
-Title, jurisdiction(s), effective date range, prepared date, audience.
+## Output Sections
 
-### Executive Summary (5–12 bullets)
+Draft in this order unless the user requests another structure:
 
-- Legal status by vertical
-- Primary regulator(s) and market entry barriers
-- High-risk compliance obligations and tax/fee exposure
-- Active enforcement priorities and pending reforms
+1. Header with title, jurisdiction(s), effective date range, prepared date, and audience.
+2. Executive summary with 5-12 bullets.
+3. Scope table.
+4. Legal status and authority.
+5. Regulatory bodies.
+6. Licensing and suitability.
+7. Operational restrictions.
+8. Taxes and fees.
+9. Enforcement and penalties.
+10. Pending reforms.
+11. Risk and compliance recommendations.
+12. Citations and disclaimer.
 
-### Scope Table
+## Blocking Rules
 
-| Item | Detail |
-|---|---|
-| Jurisdiction level | Federal / State / Tribal / Local |
-| Legal authority | Constitution, statute, regulation, compact |
-| Gaming verticals | Included and excluded |
-| Regulator(s) | Agency names and jurisdiction |
-| Sources | Statutes, regs, agency guidance, case law |
+- Do not blend federal, state, tribal, compact, and local regimes into one undifferentiated answer.
+- Do not assert legal status without a primary legal source or regulator guidance.
+- Do not omit effective dates or amendment history for cited authorities.
+- Do not speculate about pending reforms; label uncertainty explicitly.
+- Do not skip IGRA, compact, or federal preemption analysis when tribal gaming is relevant.
 
-### Legal Status & Authority
+## Reference Pack
 
-- Permitted, prohibited, and restricted categories with statutory basis
-- Preemption hierarchy; tribal framework and compact status if applicable
-
-### Regulatory Bodies
-
-- Primary and secondary regulators; licensing board composition and powers
-
-### Licensing & Suitability
-
-| License Type | Who Needs It | Key Requirements | Term | Transferable? |
-|---|---|---|---|---|
-| Operator | | | | |
-| Vendor | | | | |
-| Key employee | | | | |
-| Manufacturer | | | | |
-
-- Eligibility, background checks, financial suitability, ownership thresholds
-- Fees, renewal cadence, grounds for denial/suspension/revocation
-
-### Operational Restrictions
-
-- Responsible gaming, AML/KYC, age verification, advertising limits
-- Game integrity testing, technical standards, audit requirements
-- Geolocation/server rules (online), payment restrictions, betting limits
-
-### Taxes & Fees
-
-| Category | Rate/Method | Trigger | Notes |
-|---|---|---|---|
-| GGR tax | | | |
-| License fees | | | |
-| Regulatory assessments | | | |
-| Local taxes | | | |
-
-### Enforcement & Penalties
-
-- Administrative, civil, and criminal sanctions
-- Recent enforcement trends and exemplar actions
-
-### Pending Reforms
-
-- Bill/rule ID, status, expected effective date
-- Transition/grandfathering rules and operational impact
-
-### Risk & Compliance Recommendations
-
-- Top 5 compliance priorities by vertical
-- Immediate action items and monitoring plan
-
-### Citation & Disclaimer
-
-- Bluebook format; hyperlink official sources; mark uncertain items `[Unverified]`
-- Disclaimer: gambling law changes rapidly; summary is informational, not legal advice
-
-## Pitfalls
-
-- Never blend federal, state, and tribal regimes — separate each authority clearly
-- Always flag IGRA, compacts, or federal preemption issues when relevant
-- Use only primary sources or regulator guidance for legal status assertions
-- Include effective dates and amendment history for all cited authorities
-- Label uncertainty explicitly — avoid speculative conclusions
-- Keep tone executive-ready and compliance-focused
+- `references/packs/gambling-law-summary.md` - output template, scope/licensing/tax tables, operational restrictions, reform tracking, citation rules, and pitfalls.
