@@ -94,3 +94,20 @@ def test_ip_infringement_analysis_uses_reference_pack() -> None:
     assert "### Trademark Infringement" in pack_text
     assert "### Copyright Infringement" in pack_text
     assert "### Trade Secret Misappropriation" in pack_text
+
+
+def test_antitrust_investigation_summary_uses_reference_pack() -> None:
+    skill_path = ROOT / ".claude" / "skills" / "antitrust-investigation-summary" / "SKILL.md"
+    pack_path = ROOT / "references" / "packs" / "antitrust-investigation-summary.md"
+
+    skill_text = skill_path.read_text(encoding="utf-8")
+    pack_text = pack_path.read_text(encoding="utf-8")
+
+    assert "references/packs/antitrust-investigation-summary.md" in skill_text
+    assert len(skill_text.splitlines()) <= 85
+    assert "[VERIFY]" not in skill_text
+    assert "[VERIFY]" not in pack_text
+    assert "## Section 4 — Key Findings" in pack_text
+    assert "## Drafting Rules" in pack_text
+    assert "### Anti-Hallucination" in pack_text
+    assert "## Scope and Ethics" in pack_text

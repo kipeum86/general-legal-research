@@ -5,138 +5,64 @@ description: Drafts privilege-protective, board-ready executive summary memorand
 
 # Antitrust Internal Investigation Summary
 
-Produces a privilege-protective, board-ready memo synthesizing internal antitrust investigation findings for technology platform companies under US federal law.
+## Runtime Rule
 
-## Quick Start
+Use this file as the compact antitrust investigation memo checklist. Load
+`references/packs/antitrust-investigation-summary.md` only when preparing an
+internal antitrust investigation summary, board competition-risk memo, or internal
+compliance investigation report.
 
-Before drafting, collect:
+## Scope
 
-- **Investigation charter** — directing authority, investigators, dates, privilege posture
-- **Factual record** — triggering complaint, implicated contracts, internal comms, product decision docs, regulator correspondence
-- **Interview materials** — Upjohn-warned summaries (role, topics, key assertions)
-- **Market context** — products, monetization, rivals, switching costs, network effects, prior assessments
-- **Remediation status** — stop-gap steps, policy updates, product/contract changes
-- **Procedural posture** — anticipated litigation, M&A, preservation holds
+US federal antitrust only. Flag state AG, private class action, EU Article 102,
+DMA, UK, or other international exposure for specialist follow-up.
 
-If critical inputs are missing, request them: "To provide a competent risk assessment, I require [specific items]."
+## Inputs
 
-## Output Structure
+Ask for missing critical inputs instead of assuming:
 
-The memo contains seven sections in order.
+- investigation charter and privilege posture
+- factual record and triggering complaint
+- implicated contracts, internal communications, product decisions, and regulator correspondence
+- Upjohn-warned interview summaries
+- market context, rivals, switching costs, network effects, and prior assessments
+- remediation status
+- procedural posture, preservation holds, anticipated litigation, or M&A context
 
-### 1. Privilege Header
+## Execution Checklist
 
-Every page:
+Read `references/packs/antitrust-investigation-summary.md` and apply its detailed
+privilege header, output structure, issue checklists, drafting rules, and ethics
+guidance.
 
-```
-PRIVILEGED & CONFIDENTIAL / INTERNAL LEGAL WORKFLOW DRAFT
-Prepared to support internal legal assessment regarding antitrust
-compliance and potential exposure. Intended solely for [Company]
-senior leadership and the Board of Directors. Do not forward outside
-those who need to know for internal legal review.
-```
+1. Use privilege-protective advisory language throughout.
+2. Structure findings by issue, not by witness or chronology.
+3. Separate facts, legal assessment, and recommendations.
+4. Map each finding to legal theory, evidence, procompetitive rationale, contrary evidence, and uncertainty.
+5. Assess risk across legal, factual, enforcement, regulatory, and reputational dimensions.
+6. Frame remediation as strategic risk mitigation, not admission.
+7. Include regulatory readiness and preservation status.
+8. Mark unconfirmed citations or doctrinal statements `[Unverified]`.
 
-### 2. Executive Summary
+## Output Contract
 
-BLUF format. Frame each finding as: **Issue → Key Facts → Legal Significance → Risk Level → Recommended Action**
+The memo must contain seven sections in order:
 
-Anchor three risk pillars:
+1. Privilege Header
+2. Executive Summary
+3. Investigation Scope and Methodology
+4. Key Findings
+5. Risk Assessment
+6. Remediation Recommendations
+7. Regulatory Exposure and Readiness
 
-- **Legal Liability** — strength of potential claims
-- **Regulatory Scrutiny** — DOJ/FTC enforcement probability
-- **Reputational Impact** — downstream effects on partners, developers, public
+## Quality Checklist
 
-### 3. Investigation Scope & Methodology
-
-Cover: triggering event, time period, products/units, conduct categories, document sources, custodian/interview counts, analyses performed, known gaps. Be specific without creating a discovery roadmap.
-
-### 4. Key Findings
-
-Organize by **issue**, not witness or chronology. Map each finding to:
-
-| Theory | Statute | Key Elements |
-|---|---|---|
-| Monopolization | Sherman Act § 2 | Monopoly power + willful acquisition/maintenance [VERIFY citations] |
-| Vertical restraints | Sherman Act § 1 | Agreement + unreasonable restraint (rule of reason) |
-| Acquisitions | Clayton Act § 7 | May substantially lessen competition [VERIFY current Merger Guidelines] |
-| Unfair methods | FTC Act § 5 | Broader than Sherman/Clayton; reaches gatekeeping conduct [VERIFY citations] |
-
-**Tech-platform issue checklist:**
-
-- [ ] Self-preferencing (ranking, defaults, API access)
-- [ ] Tying / bundling
-- [ ] De facto exclusivity (rebates, defaults)
-- [ ] Anti-steering provisions
-- [ ] Interoperability / API restrictions
-- [ ] MFN / parity clauses
-- [ ] Killer acquisitions
-- [ ] Ecosystem lock-in / switching cost manipulation
-
-For each finding: (1) conduct, (2) record evidence including hot documents, (3) procompetitive rationale, (4) contrary evidence, (5) uncertainties.
-
-### 5. Risk Assessment
-
-Three layers:
-
-| Layer | Question |
-|---|---|
-| **Legal** | Plausible statutory theory? |
-| **Factual** | Evidence strength? Discovery exposure? |
-| **Enforcement** | DOJ/FTC likely to prioritize? [VERIFY current posture] |
-
-Also address: relevant market definition, key pivots, counterfactual analysis. Avoid pseudo-quantification ("70% chance") — use risk drivers.
-
-### 6. Remediation Recommendations
-
-Frame as **strategic risk mitigation**, not admission. Three tiers:
-
-| Tier | Timeframe | Examples |
-|---|---|---|
-| Immediate | 0–30 days | Stop-gap changes, messaging |
-| Structural | 1–6 months | Policy/contract revisions, approval pathways |
-| Monitoring | Ongoing | Audits, training, metrics |
-
-Tie each to a finding. Assign ownership and timeline. Use advisory language: "revise provisions that could be characterized as conditioning" not "cease illegal tying."
-
-### 7. Regulatory Exposure & Readiness
-
-Cover: pending inquiries, likely theories mapped to facts [VERIFY agency priorities], key risk documents/witnesses, preparedness status, strategic options.
-
-Readiness checklist:
-
-- [ ] Preservation holds functioning
-- [ ] External counsel retained
-- [ ] Response protocol for CIDs/subpoenas
-- [ ] Messaging guidelines updated
-- [ ] HSR considerations (if M&A dimension)
-
-## Drafting Rules
-
-**Privilege-protective:**
-
-- Advisory language throughout ("evidence could be interpreted as…" not "the company fixed prices")
-- Separate facts from analysis from recommendations
-- Never make conclusory admissions — use "potential theories," "enforcement risk," "facts that could be argued to support"
-- Privilege framework: *Upjohn*, *Hickman v. Taylor*, Fed. R. Civ. P. 26(b)(3), Fed. R. Evid. 501 [VERIFY citations]
-
-**Adversarial resilience:**
-
-- Draft as if a regulator will read despite privilege claims
-- Test every sentence: quoted out of context in a complaint, would it be damaging?
-- Address hot documents directly — acknowledge, contextualize, assess
-- Balance exclusionary findings against procompetitive benefits
-
-**Anti-hallucination (non-negotiable):**
-
-- Every citation and doctrinal statement must be verified or marked `[VERIFY]`
-- Every factual assertion traceable to a document, interview, or dataset
-- Separate verified facts from counsel's assessment
-- Confirm the record supports characterizations like "systematic" or "widespread"
-
-## Scope and Ethics
-
-- **US federal antitrust only** — flag state AG, private class action, and international (EU Art. 102, DMA, UK) exposure for specialist follow-up
-- Present risk in circuit-neutral terms unless circuit is specified and verified
-- Counsel represents the organization (Model Rule 1.13), not individuals
-- **A qualified legal reviewer must review all output** — this is a drafting aid, not legal advice
-- Do not input unnecessary personal data; follow organization's secure AI workflow
+- [ ] Privilege header and draft-work-product notation included.
+- [ ] No conclusory admissions.
+- [ ] Hot documents are acknowledged and contextualized.
+- [ ] Procompetitive benefits are balanced against exclusionary-risk evidence.
+- [ ] Every factual assertion traces to a document, interview, or dataset.
+- [ ] Every unconfirmed citation or doctrine is marked `[Unverified]`.
+- [ ] Counsel represents the organization, not individuals.
+- [ ] Qualified legal reviewer requirement is included.

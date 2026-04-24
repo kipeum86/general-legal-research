@@ -488,6 +488,7 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |-- references/
 |   |-- korean-law-reference.md        # Korean law research guide
 |   |-- packs/
+|   |   |-- antitrust-investigation-summary.md # Antitrust investigation memo rules
 |   |   |-- api-acceptable-use-policy.md # API AUP drafting tables and template
 |   |   |-- fact-checker.md            # Step 4 detailed verification reference pack
 |   |   |-- ingest.md                  # /ingest conversion, grading, and placement rules
