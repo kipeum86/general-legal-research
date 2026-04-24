@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Jinju Legal Orchestrator Workflow State",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "first_response_done": { "type": "boolean" },
+    "preferred_output_format": { "type": "string" },
+    "last_mode": { "type": ["string", "null"] },
+    "last_completed_step": { "type": ["integer", "string", "null"] },
+    "current_step": { "type": ["integer", "string", "null"] },
+    "resolved_parameters": { "type": "object" },
+    "artifacts": {
+      "oneOf": [
+        { "type": "array" },
+        { "type": "object" }
+      ]
+    },
+    "citation_audit": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "status": { "enum": ["complete", "partial", "skipped", "failed"] },
+        "artifact": { "type": "string" },
+        "json": { "type": "string" },
+        "reason": { "type": "string" },
+        "summary": { "type": "object" }
+      }
+    },
+    "citation_audit_fired": { "type": "boolean" },
+    "citation_audit_summary": { "type": "object" },
+    "citation_audit_json": { "type": "string" },
+    "citation_audit_required": { "type": "boolean" }
+  }
+}

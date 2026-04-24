@@ -47,6 +47,7 @@ TABLE_HEADER_FILL = "E7EEF8"
 
 @dataclass
 class Meta:
+    title: str = ""
     confidentiality: str = ""
     client: str = ""
     matter: str = ""
@@ -195,7 +196,9 @@ def parse_meta(lines: list[str]) -> tuple[Meta, int]:
     meta = Meta()
     start = 0
     for i, line in enumerate(lines):
-        if line.strip().startswith("# Formal Legal Opinion Letter"):
+        stripped = line.strip()
+        if stripped.startswith("# "):
+            meta.title = stripped[2:].strip()
             start = i + 1
             break
     mapping = {
@@ -231,12 +234,12 @@ def add_cover(doc: Document, meta: Meta):
     doc.add_paragraph()
     title = doc.add_paragraph()
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    t_run = title.add_run("FORMAL LEGAL OPINION LETTER")
+    t_run = title.add_run((meta.title or "Formal Legal Opinion Letter").upper())
     set_run_font(t_run, bold=True, size_pt=10, color=COLOR_TITLE)
 
     subtitle = doc.add_paragraph()
     subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    s_run = subtitle.add_run("Brazil ECA Digital (Lei no. 15.211/2025) Impact Assessment")
+    s_run = subtitle.add_run(meta.matter or "Legal Impact Assessment")
     set_run_font(s_run, size_pt=10, color=COLOR_MUTED)
     set_paragraph_border_bottom(subtitle, color_hex="B7C6E6", size="8")
 
@@ -424,6 +427,8 @@ def build_professional_docx(
     audit_json: Path | None = None,
     session_id: str | None = None,
     output_dir: Path | None = None,
+    audit_enabled: bool = True,
+    use_latest_audit: bool = False,
 ):
     body_md = md_path.read_text(encoding="utf-8")
 
@@ -433,11 +438,16 @@ def build_professional_docx(
     _aggregated = None
     _audit_resolution = None
     _insertion_report = None
-    _audit_requested = audit_json is not None or session_id is not None
+    _audit_requested = audit_enabled and (audit_json is not None or session_id is not None or use_latest_audit)
     if output_dir is None:
         output_dir = _HERE.parent / "output"
-    if resolve_audit_artifact is not None:
-        _audit_resolution = resolve_audit_artifact(output_dir, session_id=session_id, explicit_path=audit_json)
+    if _audit_requested and resolve_audit_artifact is not None:
+        _audit_resolution = resolve_audit_artifact(
+            output_dir,
+            session_id=session_id,
+            explicit_path=audit_json,
+            allow_latest=use_latest_audit,
+        )
     if (
         _audit_resolution is not None
         and _audit_resolution.found
@@ -487,19 +497,30 @@ def main(argv: list[str] | None = None):
     parser = argparse.ArgumentParser(description="Render a professional Korean legal opinion DOCX from Markdown.")
     parser.add_argument("input_md", nargs="?", type=Path, help="Input Markdown file.")
     parser.add_argument("output_docx", nargs="?", type=Path, help="Output DOCX file.")
+    parser.add_argument("--input", dest="input_md_option", type=Path, help="Input Markdown file.")
+    parser.add_argument("--output", dest="output_docx_option", type=Path, help="Output DOCX file.")
     parser.add_argument("--audit-json", type=Path, help="Aggregated citation-audit JSON to fold into the DOCX.")
     parser.add_argument("--session-id", help="Session id for output/citation-audit-{session_id}.json resolution.")
     parser.add_argument("--output-dir", type=Path, default=root / "output", help="Directory containing citation audit artifacts.")
+    parser.add_argument("--style-profile", choices=["formal-opinion"], default="formal-opinion", help="DOCX style profile.")
+    parser.add_argument("--no-audit", action="store_true", help="Render without citation-audit appendix or inline tags.")
+    parser.add_argument(
+        "--use-latest-audit",
+        action="store_true",
+        help="Allow deprecated output/citation-audit-latest.json fallback when no explicit audit JSON is provided.",
+    )
     args = parser.parse_args(argv)
 
-    md_path = args.input_md or root / "output" / "reports" / "brazil_eca_digital_formal_legal_opinion_ko_2026-03-05.md"
-    docx_path = args.output_docx or md_path.with_suffix(".docx")
+    md_path = args.input_md_option or args.input_md or root / "output" / "reports" / "brazil_eca_digital_formal_legal_opinion_ko_2026-03-05.md"
+    docx_path = args.output_docx_option or args.output_docx or md_path.with_suffix(".docx")
     build_professional_docx(
         md_path,
         docx_path,
         audit_json=args.audit_json,
         session_id=args.session_id,
         output_dir=args.output_dir,
+        audit_enabled=not args.no_audit,
+        use_latest_audit=args.use_latest_audit,
     )
     print(docx_path)
 

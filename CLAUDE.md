@@ -86,6 +86,7 @@ At every step start, print progress:
 `[Step X/N — <Step Name>]` where `N` is `8` when Step 9 will not run and `9` when Step 9 will run (see Step 9 trigger conditions below).
 
 Update `output/checkpoint.json` at the END of **every** step (not only Step 3).
+After updating it, run `python3 scripts/workflow_state.py validate --state output/checkpoint.json --step <N>` when a checkpoint exists. Treat validation failures as workflow-state errors to fix before moving to the next step.
 
 ### Step 0: User Config Loading
 
@@ -330,7 +331,7 @@ Rules:
 - Default page size for DOCX: **A4** (210mm × 297mm). Korean professional memorandum standard — do not use US Letter unless user requests it.
 - **Citation audit integration (when Step 9 will fire):** If the output format is `.docx` and Step 9 trigger conditions are met (Mode B/C/D or memo/opinion request), Step 7 must consume the citation audit artifact rather than emitting an unaudited DOCX. Procedure:
   1. Step 9 writes the aggregated verdict to `output/citation-audit-{session_id}.json` (see Step 9 for the exact trigger and file path). Step 7 must defer the final DOCX save until this file exists when Step 9 is applicable.
-  2. Invoke the DOCX render script with either `--audit-json output/citation-audit-{session_id}.json` or `--session-id {session_id}`. The renderer resolves artifacts in this order: explicit `--audit-json`, then `output/citation-audit-{session_id}.json`, then deprecated `output/citation-audit-latest.json` fallback.
+  2. Invoke the DOCX render script with either `--audit-json output/citation-audit-{session_id}.json` or `--session-id {session_id}`. The renderer resolves artifacts in this order: explicit `--audit-json`, then `output/citation-audit-{session_id}.json`. The deprecated `output/citation-audit-latest.json` fallback is allowed only when the script is invoked with `--use-latest-audit`.
   3. In custom DOCX render scripts, import the helper modules:
      ```python
      import sys, pathlib
@@ -351,6 +352,12 @@ Rules:
 ### Step 8: Quality Gate
 
 Read `.claude/skills/quality-checker/SKILL.md` and follow it.
+
+For legal opinion or formal memo deliverables, first run:
+
+`python3 scripts/validate_legal_opinion.py <draft.md> --json`
+
+If Step 9 has already produced an audited markdown appendix, add `--require-audit`. Treat validator failure as a Step 8 quality gate failure and remediate before final save.
 
 **14-item checklist** includes source laundering detection (item #13) and quoted statutory text verbatim match (item #14). A conclusion that cites a secondary source as if it were primary authority, or quotes statutory language not found in the cited subsection, is a quality gate failure.
 

@@ -11,6 +11,7 @@ Use this skill at Step 8 before delivery.
 
 Before running the 13-item checklist, verify these prerequisites:
 
+0. For legal opinion or formal memo deliverables, `python3 scripts/validate_legal_opinion.py <draft.md> --json` passes. If an audited markdown appendix has already been produced, run it with `--require-audit`.
 1. All 8 mandatory output sections are present (Scope, Conclusion, Issue tree, Analysis, Counter-analysis, Practical implications, Bibliography, Verification guide)
 2. `output/claim-registry.json` exists and `contradicted_count == 0`
 3. Citation numbering follows grade-priority order (A sources get lowest numbers)
