@@ -10,6 +10,7 @@
 [![Jurisdictions](https://img.shields.io/badge/Jurisdictions-17+-green)](#jurisdiction-coverage)
 
 **[How to Use](docs/en/how-to-use.md)** · **[Disclaimer](docs/en/disclaimer.md)** · **[MCP Setup Guide](docs/en/mcp-setup-guide.md)**
+· **[Citation Audit Spec](docs/citation-audit.md)**
 
 **Language:** [**English**](README.md) | [한국어](docs/ko/README.md)
 
@@ -29,6 +30,7 @@
 - [Output Modes](#output-modes)
 - [Architecture](#architecture)
 - [Source Reliability & Citation Model](#source-reliability--citation-model)
+- [Citation Audit](#citation-audit--two-invocation-contexts)
 - [Jurisdiction Coverage](#jurisdiction-coverage)
 - [Repository Structure](#repository-structure)
 - [How to Use](#how-to-use)
@@ -416,6 +418,7 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |-- .claude/
 |   |-- settings.json                  # auto-ingest hook
 |   |-- settings.local.json            # WebFetch domain allowlist
+|   |-- routing/skills.yaml            # compact skill routing table
 |   |-- commands/
 |   |   `-- audit.md                   # /audit slash command entry point
 |   |-- agents/
@@ -458,13 +461,17 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |   |-- legal_store.py                   # atomic law cache persistence + lookup/index sync
 |   |-- open_law_api.py                  # Korean Open Law API CLI wrapper (on-demand)
 |   |-- eurlex_api.py                    # EUR-Lex SOAP API CLI wrapper (on-demand)
+|   |-- citation_audit_backend.py        # Step 9 registry/metadata enrichment
 |   |-- install-agentskills-set.ps1
 |   |-- library-ingest.py                # inbox → grade classification + Markdown conversion
 |   |-- render_professional_legal_opinion_docx.py
 |   |-- render_acp_comparison_docx.py
 |   `-- docx_citation_appendix.py        # Step 9 consumer adapter — folds citation audit into DOCX
 |-- references/
-|   `-- korean-law-reference.md        # Korean law research guide
+|   |-- korean-law-reference.md        # Korean law research guide
+|   `-- source-payload-contract.md     # sanitized retrieval envelope
+|-- docs/
+|   `-- citation-audit.md              # canonical citation audit spec
 |-- output/
 |   |-- glossary/glossary-global.json
 |   `-- reports/                       # generated output files (gitignored)
@@ -569,7 +576,7 @@ satisfies Brazil LGPD Article 33 cross-border transfer requirements.
 
 The citation-auditor runs in two distinct contexts:
 
-**1. Workflow Step 9 (automatic)** — for memo/opinion deliverables, Step 9 runs after Step 8 and **folds a 검증 로그 (Citation Audit Log) appendix into the final saved artifact**. No separate file, no extra command. Triggers on Mode B/C/D or any `법률 의견서` / legal opinion request. See [CLAUDE.md §5 Step 9](CLAUDE.md) for full rules.
+**1. Workflow Step 9 (automatic)** — for memo/opinion deliverables, Step 9 runs after Step 8 and **folds a 검증 로그 (Citation Audit Log) appendix into the final saved artifact**. Triggers on Mode B/C/D or any `법률 의견서` / legal opinion request.
 
 **2. Standalone `/audit` (manual)** — run a citation audit on any existing markdown file outside the workflow, including documents produced earlier or by other tools. Returns annotated markdown with inline per-claim badges and a per-claim audit report.
 
@@ -578,9 +585,9 @@ The citation-auditor runs in two distinct contexts:
 /audit output/reports/my-opinion.md
 ```
 
-Both contexts share the same verifier plugin family (`.claude/skills/verifiers/`) and aggregation pipeline. Step 9 also writes `output/claim-registry.json` and `output/citation-audit-{session_id}.metadata.json` with verifier routing, detailed verdict status, coverage metrics, and source-degradation notes. Forecasts, opinions, and rumors are intentionally skipped — the auditor only checks verifiable factual and citation claims.
+Both contexts share the same verifier plugin family (`.claude/skills/verifiers/`) and aggregation pipeline. Forecasts, opinions, and rumors are intentionally skipped — the auditor only checks verifiable factual and citation claims.
 
-For Korean-law citation auditing, `korean-law-mcp` is strongly recommended. Without it, Korean statute and case verifier results may be marked as degraded (`source_unavailable` / `verifier_unavailable`) in the audit metadata.
+For artifacts, detailed statuses, supported output formats, and Korean-law MCP degradation behavior, see the canonical [Citation Audit Spec](docs/citation-audit.md).
 
 ### Local-Only vs MCP-Connected
 

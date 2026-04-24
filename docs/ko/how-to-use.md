@@ -61,8 +61,6 @@ Mode D가 기본값입니다. 이 에이전트가 법령과 규정 조사에 특
 
 ## Citation Audit
 
-Citation audit는 두 가지 방식으로 작동합니다.
-
 - **자동 (Step 9)** — Mode B/C/D 또는 memo/opinion 결과물의 경우, Step 8 이후 citation audit이 자동 실행되어 최종 저장된 산출물에 **검증 로그 (Citation Audit Log)** appendix가 자동 포함됩니다. 별도 명령 불필요.
 - **수동 (`/audit`)** — 외부에서 생성된 문서를 포함, 기존 markdown 파일에 대한 citation audit을 실행합니다.
   ```bash
@@ -70,9 +68,7 @@ Citation audit는 두 가지 방식으로 작동합니다.
   ```
   클레임별 inline 판정이 주석으로 달린 annotated markdown을 반환합니다.
 
-두 경로 모두 동일한 관할별 verifier(`korean-law`, `us-law`, `eu-law`, `uk-law`, `scholarly`, `wikipedia`, `general-web`)를 사용합니다. Step 9는 verifier routing, 상세 판정 상태, coverage metrics, source degradation note를 담은 `output/claim-registry.json`과 `output/citation-audit-{session_id}.metadata.json`도 함께 생성합니다. 예측·의견·루머는 의도적으로 제외되며, 검증 가능한 사실/인용 클레임만 대상으로 합니다.
-
-한국법 인용 감사에는 `korean-law-mcp` 사용을 강력 권장합니다. 없으면 한국 법령·판례 verifier 결과가 audit metadata에서 degraded 상태(`source_unavailable` / `verifier_unavailable`)로 표시될 수 있습니다.
+산출물, 상세 판정 상태, 지원 포맷, Korean-law MCP degradation 규칙은 canonical [Citation Audit Spec](../citation-audit.md)을 참고합니다.
 
 ## Resuming Interrupted Sessions
 

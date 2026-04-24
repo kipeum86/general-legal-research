@@ -61,8 +61,6 @@ For simple, single-jurisdiction factual lookups, the agent automatically applies
 
 ## Citation Audit
 
-Citation auditing runs in two ways:
-
 - **Automatic (Step 9)** — for Mode B/C/D or memo/opinion deliverables, the agent automatically runs a citation audit after Step 8 and folds the audit results into the final saved artifact as a 검증 로그 (Citation Audit Log) appendix. No extra command needed.
 - **Manual (`/audit`)** — run a citation audit on any existing markdown file (including documents from other sources):
   ```bash
@@ -70,9 +68,7 @@ Citation auditing runs in two ways:
   ```
   Returns annotated markdown with inline per-claim verdicts.
 
-Both paths use the same per-jurisdiction verifiers (`korean-law`, `us-law`, `eu-law`, `uk-law`, `scholarly`, `wikipedia`, `general-web`). Step 9 also writes `output/claim-registry.json` and `output/citation-audit-{session_id}.metadata.json` with verifier routing, detailed verdict status, coverage metrics, and source-degradation notes. Forecasts, opinions, and rumors are intentionally skipped — the auditor only checks verifiable factual and citation claims.
-
-For Korean-law citation auditing, `korean-law-mcp` is strongly recommended. Without it, Korean statute and case verifier results may be marked as degraded (`source_unavailable` / `verifier_unavailable`) in the audit metadata.
+For artifacts, detailed statuses, supported output formats, and Korean-law MCP degradation behavior, see the canonical [Citation Audit Spec](../citation-audit.md).
 
 ## Resuming Interrupted Sessions
 
