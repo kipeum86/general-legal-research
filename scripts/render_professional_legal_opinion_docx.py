@@ -1,6 +1,8 @@
 ﻿from __future__ import annotations
 
+import pathlib
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -10,6 +12,21 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
+
+
+# Step 9 citation-audit hook: optional helper import; no-ops if unavailable.
+_HERE = pathlib.Path(__file__).parent
+sys.path.insert(0, str(_HERE))
+try:
+    from docx_citation_appendix import (
+        append_citation_audit_log,
+        inject_unverified_tags,
+        load_aggregated,
+    )
+except ImportError:
+    append_citation_audit_log = None
+    inject_unverified_tags = None
+    load_aggregated = None
 
 
 FONT_NAME = "Batang"
@@ -393,7 +410,17 @@ def render_body(doc: Document, lines: list[str], start_idx: int):
 
 
 def build_professional_docx(md_path: Path, docx_path: Path):
-    lines = md_path.read_text(encoding="utf-8").splitlines()
+    body_md = md_path.read_text(encoding="utf-8")
+
+    # Step 9 citation-audit hook: fold failing-claim tags into the markdown
+    # when an aggregated verdict JSON exists; otherwise preserve baseline output.
+    _AUDIT_JSON = _HERE.parent / "output" / "citation-audit-latest.json"
+    _aggregated = None
+    if load_aggregated is not None and inject_unverified_tags is not None and _AUDIT_JSON.exists():
+        _aggregated = load_aggregated(_AUDIT_JSON)
+        body_md = inject_unverified_tags(body_md, _aggregated)
+
+    lines = body_md.splitlines()
     meta, body_start_idx = parse_meta(lines)
 
     doc = Document()
@@ -402,6 +429,12 @@ def build_professional_docx(md_path: Path, docx_path: Path):
     add_cover(doc, meta)
     add_toc(doc)
     render_body(doc, lines, body_start_idx)
+
+    # Step 9 citation-audit hook: append the audit log only when the JSON
+    # artifact was present and the optional helper loaded successfully.
+    if _aggregated is not None and append_citation_audit_log is not None:
+        append_citation_audit_log(doc, _aggregated)
+
     doc.save(docx_path)
 
 
