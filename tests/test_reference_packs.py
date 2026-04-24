@@ -16,3 +16,18 @@ def test_fact_checker_uses_reference_pack() -> None:
     assert "## Phase 3.5 — Source Laundering Detection" in pack_text
     assert "## Phase 3.3 — Similar-Statute Cross-Check" in pack_text
     assert "## Phase 4 — Claim Registry Output" in pack_text
+
+
+def test_ingest_uses_reference_pack() -> None:
+    skill_path = ROOT / ".claude" / "skills" / "ingest" / "SKILL.md"
+    pack_path = ROOT / "references" / "packs" / "ingest.md"
+
+    skill_text = skill_path.read_text(encoding="utf-8")
+    pack_text = pack_path.read_text(encoding="utf-8")
+
+    assert "references/packs/ingest.md" in skill_text
+    assert len(skill_text.splitlines()) <= 125
+    assert "## Step 2 — Markdown Conversion" in pack_text
+    assert "## Step 3 — Grade Classification" in pack_text
+    assert "## Step 4 — Frontmatter Generation" in pack_text
+    assert "## Step 6 — Index Update" in pack_text

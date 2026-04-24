@@ -488,7 +488,8 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |-- references/
 |   |-- korean-law-reference.md        # Korean law research guide
 |   |-- packs/
-|   |   `-- fact-checker.md            # Step 4 detailed verification reference pack
+|   |   |-- fact-checker.md            # Step 4 detailed verification reference pack
+|   |   `-- ingest.md                  # /ingest conversion, grading, and placement rules
 |   `-- source-payload-contract.md     # sanitized retrieval envelope
 |-- docs/
 |   |-- citation-audit.md              # canonical citation audit spec
