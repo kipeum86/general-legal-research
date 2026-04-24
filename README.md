@@ -15,7 +15,7 @@
 
 </div>
 
-> Latest release: **[v1.0.0 — Citation Audit: Standalone + Memo/Opinion Workflow (2026-04-24)](docs/releases/v1.0.0.md)**
+> Latest release: **[v1.1.0 — Citation Audit: Standalone + Memo/Opinion Workflow (2026-04-24)](docs/releases/v1.1.0.md)**
 
 ---
 
