@@ -344,7 +344,7 @@ Rules:
      from citation_audit_artifacts import resolve_audit_artifact
      ```
   4. Before embedding any body markdown as Python string literals, run it through `inject_unverified_tags_with_report(body_md, aggregated)` so `[Unverified]` / `[Partially Unverified]` tags appear at validated claim positions. If span validation fails, the helper must skip inline insertion and leave a warning for the appendix rather than inserting at a guessed location.
-  5. After all body content (including the Verification guide section) has been rendered into the `Document`, and **before** `doc.save(...)`, call `append_citation_audit_log(doc, aggregated, audit_status="complete", artifact_path=..., insertion_report=...)` once to emit the 부록: 검증 로그 (Citation Audit Log) heading + status block + table + disclaimer.
+  5. After all body content (including the Verification guide section) has been rendered into the `Document`, and **before** `doc.save(...)`, call `append_citation_audit_log(doc, aggregated, audit_status=..., artifact_path=..., insertion_report=..., audit_metadata=...)` once to emit the 부록: 검증 로그 (Citation Audit Log) heading + status block + table + disclaimer. The renderer derives `audit_metadata` through `scripts/citation_audit_backend.py` when available, including detailed metrics and Korean-law MCP degradation.
   6. If Step 9 was applicable but the aggregated file is missing, append an audit status block with `audit_status="skipped"` and the artifact resolution reason. If Step 9 was not applicable, preserve baseline output.
   7. Do not hand-roll an audit table in the DOCX script. Use the helper so CJK font conventions and layout stay consistent across deliverables.
 - **Citation audit integration — `.md` output:** No DOCX adapter needed. Step 9 handles append-mode markdown rendering directly (see Step 9).
@@ -381,17 +381,20 @@ If failed:
 **Inputs:** The markdown draft produced by Step 7 (the pre-save inline preview, or the saved artifact path if already written).
 
 **Procedure:**
-1. Read `.claude/skills/citation-auditor/SKILL.md` and follow it. Use the Step 7 markdown draft as the input file. Always produce the aggregated verdict JSON (`python3 -m citation_auditor aggregate`), regardless of final output format.
-2. Parse the aggregated verdict output locally (do not require user to see intermediate JSON).
-3. **Output format branching.** Step 9 behaviour depends on the format confirmed in Step 7:
+1. Read `.claude/skills/citation-auditor/SKILL.md` and follow it. Use the Step 7 markdown draft as the input file. Always produce the aggregated verdict JSON (`python3 -m citation_auditor aggregate`) at `output/citation-audit-{session_id}.json`, regardless of final output format.
+2. Immediately enrich and validate the aggregated JSON through the project-owned backend:
+   `python3 scripts/citation_audit_backend.py enrich output/citation-audit-{session_id}.json --registry-out output/claim-registry.json --metadata-out output/citation-audit-{session_id}.metadata.json --project-root . --korean-law-mcp-available auto`
+   This produces a stable claim registry, verifier routing reasons, detailed status metrics, and Korean-law MCP availability/degradation metadata. If this command rejects the aggregate shape, record Step 9 as `failed` or `partial`; do not mark the audit as complete.
+3. Parse the aggregated verdict output and metadata locally (do not require user to see intermediate JSON).
+4. **Output format branching.** Step 9 behaviour depends on the format confirmed in Step 7:
    - **`.md` output:** Run `python3 -m citation_auditor render <draft.md> <aggregated.json> --mode=append` and replace the Step 7 draft with the audited markdown. This folds the `[Unverified]` tags and the 검증 로그 appendix directly into the final file.
    - **`.docx` output:** Do **not** attempt to modify the DOCX directly. Instead:
      - Write the aggregated verdict JSON to `output/citation-audit-{session_id}.json` (use the session identifier from `output/checkpoint.json`; fall back to a timestamp if absent).
      - Return control to the Step 7 DOCX render script, passing `--audit-json output/citation-audit-{session_id}.json` or `--session-id {session_id}`. The script must import `scripts/docx_citation_appendix.py` and `scripts/citation_audit_artifacts.py`, call `inject_unverified_tags_with_report` + `append_citation_audit_log`, and fold the audit into the final `.docx`. See Step 7 "Citation audit integration" for the exact wiring.
      - Step 9 itself does not emit a `.docx` file; the DOCX render remains Step 7's responsibility.
    - **Other formats (`.pdf`, `.pptx`, `.html`, `.txt`):** Currently unsupported by direct integration. Fall back to writing `output/citation-audit-{session_id}.json` **and** producing a sidecar `.md` appendix at `output/citation-audit-{session_id}.md` (append-mode render), and notify the user that the audit log is delivered alongside the primary artifact rather than folded in.
-4. Appendix shape (whatever the format path): table with columns `#`, `클레임 (Claim)`, `판정 (Verdict)`, `Verifier`, `근거 (Evidence)`, plus a one-line disclaimer noting that automated audit does not replace human review. The `docx_citation_appendix` helper and `citation_auditor render --mode=append` both emit this shape — do not hand-roll a different layout.
-5. Replace the Step 7 draft only for the `.md` path. For `.docx` and fallback paths, Step 7 produces the final artifact.
+5. Appendix shape (whatever the format path): table with columns `#`, `클레임 (Claim)`, `판정 (Verdict)`, `Verifier`, `근거 (Evidence)`, plus a status block and one-line disclaimer noting that automated audit does not replace human review. The `docx_citation_appendix` helper and `citation_auditor render --mode=append` both emit this shape — do not hand-roll a different layout.
+6. Replace the Step 7 draft only for the `.md` path. For `.docx` and fallback paths, Step 7 produces the final artifact.
 
 **Failure handling:**
 - If the `citation-auditor` skill cannot extract any claims from the draft (e.g., very short Mode A brief that slipped through the trigger), log a note and skip silently.
@@ -402,8 +405,9 @@ If failed:
 **Output artifacts:**
 - The saved deliverable includes the audit appendix (folded in for `.md`/`.docx`, sidecar for unsupported formats). Record the primary artifact path in `checkpoint.artifacts` as normal.
 - Always write the raw aggregated verdict JSON to `output/citation-audit-{session_id}.json` for traceability. For `.docx` this file is the hand-off between Step 9 and the Step 7 DOCX render; for `.md` it is informational but still written.
+- Always write the enriched registry to `output/claim-registry.json` and metadata to `output/citation-audit-{session_id}.metadata.json`. The metadata summary distinguishes `verified`, `contradicted`, `unsupported`, `source_unavailable`, `verifier_unavailable`, and `unknown`.
 
-On completion, update `output/checkpoint.json`. Record `citation_audit_fired: true` and summary counts `{verified, contradicted, unknown}` alongside `artifacts`.
+On completion, update `output/checkpoint.json`. Record `citation_audit_fired: true`, `citation_audit.status` (`complete`, `partial`, `skipped`, or `failed`), artifact paths, and the metadata `metrics` object alongside `artifacts`.
 
 **Progress banner:** Use `[Step 9/9 — Citation Audit]`.
 

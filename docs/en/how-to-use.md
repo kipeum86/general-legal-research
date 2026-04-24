@@ -70,9 +70,9 @@ Citation auditing runs in two ways:
   ```
   Returns annotated markdown with inline per-claim verdicts.
 
-Both paths use the same per-jurisdiction verifiers (`korean-law`, `us-law`, `eu-law`, `uk-law`, `scholarly`, `wikipedia`, `general-web`). Forecasts, opinions, and rumors are intentionally skipped — the auditor only checks verifiable factual and citation claims.
+Both paths use the same per-jurisdiction verifiers (`korean-law`, `us-law`, `eu-law`, `uk-law`, `scholarly`, `wikipedia`, `general-web`). Step 9 also writes `output/claim-registry.json` and `output/citation-audit-{session_id}.metadata.json` with verifier routing, detailed verdict status, coverage metrics, and source-degradation notes. Forecasts, opinions, and rumors are intentionally skipped — the auditor only checks verifiable factual and citation claims.
 
-For Korean-law citation auditing, `korean-law-mcp` is strongly recommended. Without it, Korean statute and case verifier results may remain `unknown`.
+For Korean-law citation auditing, `korean-law-mcp` is strongly recommended. Without it, Korean statute and case verifier results may be marked as degraded (`source_unavailable` / `verifier_unavailable`) in the audit metadata.
 
 ## Resuming Interrupted Sessions
 

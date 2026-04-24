@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "claim_registry.schema.json",
+  "title": "Claim Registry",
+  "type": "object",
+  "required": ["schema_version", "claims"],
+  "properties": {
+    "schema_version": {
+      "const": "claim-registry/v1"
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim_id", "text", "sentence_span", "routing", "verdict", "normalized_status"],
+        "properties": {
+          "claim_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{16}$"
+          },
+          "text": {
+            "type": "string"
+          },
+          "sentence_span": {
+            "type": "object",
+            "required": ["start", "end"],
+            "properties": {
+              "start": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "end": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": true
+          },
+          "claim_type": {
+            "type": ["string", "null"]
+          },
+          "routing": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["verifier", "authority", "reason", "matched_pattern"],
+              "properties": {
+                "verifier": {
+                  "type": "string"
+                },
+                "authority": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "matched_pattern": {
+                  "type": ["string", "null"]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "verdict": {
+            "type": "object"
+          },
+          "normalized_status": {
+            "enum": [
+              "verified",
+              "contradicted",
+              "unsupported",
+              "source_unavailable",
+              "verifier_unavailable",
+              "not_a_legal_claim",
+              "unknown"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -91,9 +91,22 @@ def test_appendix_includes_audit_status_and_provenance() -> None:
         artifact_path="output/citation-audit-session.json",
         resolution_message="No citation-audit JSON artifact found.",
         insertion_report={"inserted": 0, "relocated": 0, "skipped": [{"reason": "claim_text_not_found"}]},
+        audit_metadata={
+            "metrics": {
+                "total_claims": 2,
+                "verified": 1,
+                "contradicted": 0,
+                "unsupported": 1,
+                "tool_failures": 0,
+                "coverage_ratio": 1.0,
+            },
+            "source_degradation": [{"scope": "korean-law", "reason": "MCP unavailable"}],
+        },
     )
 
     text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
     assert "Audit status: skipped" in text
     assert "output/citation-audit-session.json" in text
     assert "inserted=0" in text
+    assert "Audit metrics: total=2" in text
+    assert "Source degradation: korean-law" in text

@@ -1,0 +1,37 @@
+{
+  "민법": {
+    "law_id": "001706",
+    "verified": true,
+    "source": "existing citation_auditor.LAW_ID_LOOKUP"
+  },
+  "개인정보 보호법": {
+    "law_id": "011357",
+    "verified": true,
+    "source": "existing citation_auditor.LAW_ID_LOOKUP"
+  },
+  "개인정보보호법": {
+    "law_id": "011357",
+    "verified": true,
+    "source": "spacing alias for 개인정보 보호법"
+  },
+  "형법": {
+    "law_id": null,
+    "verified": false,
+    "source": "requires MCP/Open Law confirmation"
+  },
+  "상법": {
+    "law_id": null,
+    "verified": false,
+    "source": "requires MCP/Open Law confirmation"
+  },
+  "민사소송법": {
+    "law_id": null,
+    "verified": false,
+    "source": "requires MCP/Open Law confirmation"
+  },
+  "형사소송법": {
+    "law_id": null,
+    "verified": false,
+    "source": "requires MCP/Open Law confirmation"
+  }
+}

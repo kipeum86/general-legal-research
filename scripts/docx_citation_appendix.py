@@ -228,6 +228,10 @@ def _label_display(label: str) -> str:
     return {
         "verified": "✓ verified",
         "contradicted": "⚠ contradicted",
+        "unsupported": "? unsupported",
+        "source_unavailable": "? source unavailable",
+        "verifier_unavailable": "? verifier unavailable",
+        "not_a_legal_claim": "— not a legal claim",
         "unknown": "? unknown",
     }.get(label, label or "—")
 
@@ -245,6 +249,7 @@ def append_citation_audit_log(
     artifact_path: str | Path | None = None,
     resolution_message: str | None = None,
     insertion_report: dict[str, Any] | None = None,
+    audit_metadata: dict[str, Any] | None = None,
 ) -> None:
     """Append the audit appendix (heading + table + disclaimer) to a Document.
 
@@ -265,6 +270,7 @@ def append_citation_audit_log(
         artifact_path=artifact_path,
         resolution_message=resolution_message,
         insertion_report=insertion_report,
+        audit_metadata=audit_metadata,
     )
 
     if not items:
@@ -333,12 +339,31 @@ def _append_status_block(
     artifact_path: str | Path | None,
     resolution_message: str | None,
     insertion_report: dict[str, Any] | None,
+    audit_metadata: dict[str, Any] | None,
 ) -> None:
     lines = [f"Audit status: {audit_status}"]
     if artifact_path is not None:
         lines.append(f"Audit artifact: {artifact_path}")
     if resolution_message:
         lines.append(f"Artifact resolution: {resolution_message}")
+    if audit_metadata:
+        metrics = audit_metadata.get("metrics") if isinstance(audit_metadata.get("metrics"), dict) else {}
+        if metrics:
+            lines.append(
+                "Audit metrics: "
+                f"total={metrics.get('total_claims', 0)}, "
+                f"verified={metrics.get('verified', 0)}, "
+                f"contradicted={metrics.get('contradicted', 0)}, "
+                f"unsupported={metrics.get('unsupported', 0)}, "
+                f"tool_failures={metrics.get('tool_failures', 0)}, "
+                f"coverage={metrics.get('coverage_ratio', 'n/a')}"
+            )
+        for degradation in audit_metadata.get("source_degradation", []) or []:
+            if not isinstance(degradation, dict):
+                continue
+            scope = degradation.get("scope", "unknown")
+            reason = degradation.get("reason", "source verification degraded")
+            lines.append(f"Source degradation: {scope} - {reason}")
     if insertion_report:
         inserted = insertion_report.get("inserted", 0)
         skipped = len(insertion_report.get("skipped", []) or [])

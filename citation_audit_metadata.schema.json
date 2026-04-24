@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "citation_audit_metadata.schema.json",
+  "title": "Citation Audit Metadata",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "backend_schema_version",
+    "audit_status",
+    "metrics",
+    "korean_law_mcp_available",
+    "source_degradation"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "citation-audit-metadata/v1"
+    },
+    "backend_schema_version": {
+      "type": "string"
+    },
+    "audit_status": {
+      "enum": ["complete", "partial", "skipped", "failed"]
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "total_claims",
+        "audited_claims",
+        "verified",
+        "contradicted",
+        "unsupported",
+        "source_unavailable",
+        "verifier_unavailable",
+        "unknown",
+        "tool_failures",
+        "coverage_ratio"
+      ],
+      "properties": {
+        "total_claims": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "audited_claims": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "verified": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "contradicted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unsupported": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_unavailable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "verifier_unavailable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknown": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tool_failures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "coverage_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "korean_law_mcp_available": {
+      "type": ["boolean", "null"]
+    },
+    "source_degradation": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["scope", "reason", "affected_claim_ids"],
+        "properties": {
+          "scope": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "affected_claim_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

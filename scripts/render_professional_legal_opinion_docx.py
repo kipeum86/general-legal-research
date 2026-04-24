@@ -36,6 +36,13 @@ try:
 except ImportError:
     resolve_audit_artifact = None
 
+try:
+    from citation_audit_backend import build_metadata as build_audit_metadata
+    from citation_audit_backend import detect_korean_law_mcp_availability
+except ImportError:
+    build_audit_metadata = None
+    detect_korean_law_mcp_availability = None
+
 
 FONT_NAME = "Batang"
 FONT_SIZE_PT = 10
@@ -438,6 +445,7 @@ def build_professional_docx(
     _aggregated = None
     _audit_resolution = None
     _insertion_report = None
+    _audit_metadata = None
     _audit_requested = audit_enabled and (audit_json is not None or session_id is not None or use_latest_audit)
     if output_dir is None:
         output_dir = _HERE.parent / "output"
@@ -455,6 +463,16 @@ def build_professional_docx(
         and (inject_unverified_tags_with_report is not None or inject_unverified_tags is not None)
     ):
         _aggregated = load_aggregated(_audit_resolution.path)
+        if build_audit_metadata is not None:
+            korean_law_mcp_available = (
+                detect_korean_law_mcp_availability(_HERE.parent)
+                if detect_korean_law_mcp_availability is not None
+                else None
+            )
+            _audit_metadata = build_audit_metadata(
+                _aggregated,
+                korean_law_mcp_available=korean_law_mcp_available,
+            )
         if inject_unverified_tags_with_report is not None:
             body_md, _insertion_report = inject_unverified_tags_with_report(body_md, _aggregated)
         elif inject_unverified_tags is not None:
@@ -476,10 +494,11 @@ def build_professional_docx(
         append_citation_audit_log(
             doc,
             _aggregated,
-            audit_status="complete",
+            audit_status=_audit_metadata.get("audit_status", "complete") if _audit_metadata else "complete",
             artifact_path=_audit_resolution.path if _audit_resolution is not None else None,
             resolution_message=_audit_resolution.message if _audit_resolution is not None else None,
             insertion_report=_insertion_report,
+            audit_metadata=_audit_metadata,
         )
     elif _audit_requested and append_citation_audit_log is not None:
         append_citation_audit_log(
