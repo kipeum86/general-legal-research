@@ -496,6 +496,7 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |   |   |-- ip-infringement-analysis.md # IP infringement frameworks and remedy tables
 |   |   |-- onboard.md                 # /onboard templates, interview, and initialization rules
 |   |   |-- output-generator.md        # Step 7 deliverable, citation, and save-flow rules
+|   |   |-- terms-of-service.md        # TOS clause selection, templates, and QC rules
 |   |   `-- web-researcher.md          # Step 3 source collection, fallback, and PDF/DOCX rules
 |   `-- source-payload-contract.md     # sanitized retrieval envelope
 |-- docs/

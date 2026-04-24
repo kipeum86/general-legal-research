@@ -7,107 +7,59 @@ description: Drafts enforceable U.S. Terms of Service agreements for websites, a
 
 Drafts an enforceable TOS tailored to the service model, data flows, and jurisdictional compliance needs.
 
-## Quick Start
+## Runtime Rule
+
+Use this file as the compact drafting checklist. Load `references/packs/terms-of-service.md` when drafting, tailoring, or QC'ing a Terms of Service agreement, or when clause-selection tables, sample clauses, privacy hooks, or pitfalls are needed.
+
+## Intake Checklist
 
 Gather before drafting:
 
-| Item | Required | Notes |
-|---|---|---|
-| Company legal name, address, contact email | Yes | Contracting entity |
-| Service name and URL/app identifiers | Yes | Defines "Service" |
-| Eligibility/age minimum | Yes | COPPA if under 13 [Unverified] |
-| Countries/states served | Yes | Triggers GDPR/CCPA/other |
-| Payment terms | If paid | Auto-renew, cancellation, refunds |
-| IP assets | Yes | Trademarks, content ownership |
-| UGC + moderation approach | If UGC | DMCA workflow |
-| APIs/integrations | If any | Third-party terms |
+- Company legal name, address, and contact email.
+- Service name plus URL/app identifiers.
+- Eligibility and age minimum.
+- Countries/states served.
+- Payment model, renewals, cancellation, and refund approach if paid.
+- IP assets, trademarks, and content ownership assumptions.
+- UGC and moderation approach if users can submit content.
+- APIs, integrations, or third-party services if any.
 
-## Core Workflow
+Ask before drafting if the contracting entity, service identity, eligibility, served jurisdictions, or payment/UGC facts are unclear.
 
-### 1. Clause Selection
+## Drafting Checklist
 
-| Clause | Include When | Key Points |
-|---|---|---|
-| Acceptance mechanism | Always | Clickwrap preferred; continued-use fallback |
-| Accounts & security | Accounts exist | Credentials, MFA, responsibility |
-| Acceptable use | Always | Prohibited conduct list |
-| UGC license | UGC exists | Scope, duration, takedown |
-| IP ownership | Always | Service IP, limited license |
-| Payments | Paid tiers | Billing, taxes, refunds |
-| Termination | Always | For cause/at will, effects |
-| Disclaimers | Always | AS IS / AS AVAILABLE |
-| Liability cap | Always | Cap amount, exclusions, carve-outs |
-| Indemnity | B2B or UGC | IP claims, violations |
-| Dispute resolution | Always | Governing law, venue/arbitration |
+1. Load the reference pack before drafting clauses or reviewing a TOS.
+2. Select clauses based on service model: acceptance, accounts, acceptable use, UGC/IP, payments, third-party services, termination, disclaimers, liability, indemnity, dispute resolution, and boilerplate.
+3. Prefer clickwrap or explicit assent mechanics; do not rely on browsewrap alone.
+4. Tailor privacy/data hooks to actual data flows and incorporated privacy policy terms.
+5. Add UGC license, moderation, and DMCA/takedown mechanics only when UGC exists.
+6. Add paid-service terms only when payment facts are known; cover auto-renewal, cancellation, refunds, taxes, and fees.
+7. Select dispute-resolution mechanics and consumer carve-outs based on audience and jurisdictions.
+8. Use jurisdiction-specific claims carefully; mark uncertain legal statements `[Unverified]`.
+9. Run the final QC checklist from the reference pack before delivering.
 
-### 2. Drafting Sequence
+## Output Sections
 
-1. **Definitions & acceptance** — clickwrap + versioning/effective date
-2. **Eligibility & authority** — age, entity authority
-3. **Account rules** — registration, security, accuracy
-4. **Acceptable use** — law compliance + prohibited conduct
-5. **UGC & IP** — ownership, license grant, feedback assignment
-6. **Third-party services** — links, integrations, no endorsement
-7. **Payment terms** — if applicable
-8. **Termination & suspension** — rights, effect, survival
-9. **Disclaimers & limitation of liability**
-10. **Indemnification** — if applicable
-11. **Dispute resolution** — law, venue, arbitration
-12. **Boilerplate** — severability, assignment, notices
+Draft in this order unless the user provides a different template:
 
-### 3. Prohibited Conduct (always include)
+1. Definitions, acceptance, versioning, and effective date.
+2. Eligibility and authority.
+3. Account registration, security, and accuracy.
+4. Acceptable use and prohibited conduct.
+5. UGC, IP ownership, feedback, and third-party services.
+6. Payment terms if applicable.
+7. Termination, suspension, and survival.
+8. Disclaimers, warranty exclusions, liability limits, and indemnity if applicable.
+9. Governing law, venue/arbitration, and consumer carve-outs.
+10. Notices, assignment, severability, and miscellaneous boilerplate.
 
-- Illegal activity, fraud, misrepresentation
-- Malware, phishing, security bypass
-- Unauthorized access, scraping, rate-limit evasion
-- IP infringement or circumvention of protections
-- Harassment, hate, abusive conduct
-- Interference with service availability
+## Blocking Rules
 
-### 4. Dispute Resolution Selection
+- Do not promise security, uptime, compliance, deletion, or support practices beyond actual controls.
+- Do not overstate waiver enforceability for consumers, EU/UK users, or California residents.
+- Do not include a liability cap, arbitration clause, or class waiver without preserving mandatory non-waivable rights where applicable.
+- Do not omit incorporated policy links, effective date, update method, notice method, or survival terms.
 
-| Option | Use When | Notes |
-|---|---|---|
-| Arbitration + class waiver | B2B or low-risk consumer | Include small-claims carve-out |
-| Court litigation | High consumer scrutiny | Specify venue + jury waiver |
-| EU consumer carve-out | Serving EU | Mandatory local rights preserved |
+## Reference Pack
 
-## Templates
-
-### UGC License (edit scope as needed)
-
-` ` `
-User Content License. You retain ownership of Your Content. You grant Company a worldwide, non-exclusive, royalty-free, sublicensable, transferable license to host, store, use, display, reproduce, modify for technical purposes, distribute, and create derivative works of Your Content solely to operate, improve, and promote the Service. License ends upon deletion except for content already shared or cached in ordinary operation.
-` ` `
-
-### Liability & Warranty (edit cap as needed)
-
-` ` `
-Disclaimer. THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING MERCHANTABILITY, FITNESS, AND NON-INFRINGEMENT, TO THE MAXIMUM EXTENT PERMITTED BY LAW.
-
-Limitation. TO THE MAXIMUM EXTENT PERMITTED BY LAW, COMPANY SHALL NOT BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR LOSS OF DATA, PROFITS, OR REVENUE. TOTAL LIABILITY SHALL NOT EXCEED THE AMOUNTS PAID BY YOU TO COMPANY IN THE 12 MONTHS BEFORE THE CLAIM (OR $100 IF NONE). EXCEPTIONS: LIABILITY FOR DEATH/PERSONAL INJURY, FRAUD, OR WILLFUL MISCONDUCT WHERE PROHIBITED.
-` ` `
-
-## Privacy & Data Hooks
-
-- Incorporate Privacy Policy by reference
-- Specify data processing roles (controller/processor)
-- Reference security measures at high level only — do not promise beyond actual controls
-- Address cross-border transfers if applicable (EU SCCs [Unverified])
-
-## Final QC Checklist
-
-- [ ] Definitions consistent, capitalization standardized
-- [ ] Effective date + version history included
-- [ ] Notice method and update mechanism defined
-- [ ] Survival clauses listed
-- [ ] Hyperlinks to all incorporated policies working
-
-## Pitfalls
-
-- **Browsewrap is weak** — prefer clickwrap acceptance; browsewrap risks unenforceability.
-- **EU/UK users** — include GDPR-consistent rights hooks and consumer protections; avoid overbroad waivers. [Unverified]
-- **California residents** — include CCPA/CPRA notice hooks and no-sale/share language. [Unverified]
-- **UGC services** — must include DMCA agent designation and takedown procedure. [Unverified]
-- **Unconscionability risk** — keep liability caps and waivers reasonable for consumer users.
-- **Regulated industries** (health, finance, telecom) — flag for additional statutory modules.
+- `references/packs/terms-of-service.md` - intake table, clause-selection matrix, drafting sequence, prohibited-conduct list, dispute-resolution options, sample clauses, privacy/data hooks, QC checklist, and pitfalls.

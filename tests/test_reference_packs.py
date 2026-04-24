@@ -141,3 +141,18 @@ def test_output_generator_uses_reference_pack() -> None:
     assert "## Mandatory Sections" in pack_text
     assert "## Citation Integrity Rules" in pack_text
     assert "## Format and Save Rules" in pack_text
+
+
+def test_terms_of_service_uses_reference_pack() -> None:
+    skill_path = ROOT / ".claude" / "skills" / "terms-of-service" / "SKILL.md"
+    pack_path = ROOT / "references" / "packs" / "terms-of-service.md"
+
+    skill_text = skill_path.read_text(encoding="utf-8")
+    pack_text = pack_path.read_text(encoding="utf-8")
+
+    assert "references/packs/terms-of-service.md" in skill_text
+    assert len(skill_text.splitlines()) <= 80
+    assert "## Intake Table" in pack_text
+    assert "## Clause Selection" in pack_text
+    assert "## Sample Clauses" in pack_text
+    assert "## Final QC Checklist" in pack_text
