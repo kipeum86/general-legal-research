@@ -449,6 +449,7 @@ All unresolved findings must remain explicit and traceable.
 ## 11) External Specialist Skills (AgentSkills Legal)
 
 Use `.claude/routing/skills.yaml` as the canonical routing table for core workflow skills, specialist skills, deep-researcher thresholds, and source payload contracts.
+After editing `.claude/routing/skills.yaml` or `.claude/routing/fixtures.yaml`, run `python3 scripts/validate_routing.py` before relying on the new routing.
 
 Hard overrides:
 - Legal opinion deliverables (`법률 의견서`, `opinion letter`, `legal opinion`, `formal opinion`, `opinion memo`) must invoke `legal-opinion-formatter` during Step 7.

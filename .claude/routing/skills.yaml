@@ -1,75 +1,78 @@
-version: 1
-purpose: "Compact routing table for project skills. CLAUDE.md should point here instead of restating every trigger."
-
-core_workflow:
-  - step: 0
-    skill: onboard
-    trigger: "user-config.json missing or user explicitly runs /onboard"
-  - step: 1
-    skill: query-interpreter
-    trigger: "all non-trivial research requests"
-  - step: 2
-    skill: jurisdiction-mapper
-    trigger: "standard workflow"
-  - step: 3
-    skill: web-researcher
-    trigger: "source collection"
-  - step: 4
-    skill: fact-checker
-    trigger: "standard workflow unless Quick Mode or KR-only direct primary-source lookup"
-  - step: 5
-    skill: source-scorer
-    trigger: "standard workflow"
-  - step: 6
-    skills: [conflict-detector, glossary-manager]
-    trigger: "standard workflow"
-  - step: 7
-    skill: output-generator
-    trigger: "deliverable generation"
-  - step: 8
-    skill: quality-checker
-    trigger: "before delivery"
-  - step: 9
-    skill: citation-auditor
-    trigger: "Mode B/C/D or memo/opinion deliverable after Step 8"
-    canonical_spec: docs/citation-audit.md
-
-specialists:
-  - skills: [legal-opinion-formatter]
-    trigger_terms: ["법률 의견서", "opinion letter", "legal opinion", "formal opinion", "opinion memo"]
-    required_references:
-      - references/legal-writing-formatting-guide.md
-  - skills: [legal-research]
-    trigger_terms: ["research methodology", "authority validation", "good law", "citation update", "filing"]
-  - skills: [legal-research-summary, client-memo]
-    trigger_terms: ["research digest", "client memo", "memo output", "summary memo"]
-  - skills: [regulatory-summary, compliance-summaries]
-    trigger_terms: ["market entry", "regulator obligations", "compliance summary", "licensing obligations"]
-  - skills: [gambling-law-summary]
-    trigger_terms: ["gambling", "betting", "loot box", "chance mechanics", "gaming licensing"]
-  - skills: [privacy-law-updates, cyber-law-compliance-summary]
-    trigger_terms: ["privacy", "data protection", "cybersecurity", "personal information", "breach"]
-  - skills: [antitrust-investigation-summary]
-    trigger_terms: ["antitrust", "competition", "cartel", "merger control", "dominance"]
-  - skills: [ip-infringement-analysis]
-    trigger_terms: ["IP", "copyright", "trademark", "patent", "infringement", "trade secret"]
-  - skills: [terms-of-service, api-acceptable-use-policy]
-    trigger_terms: ["terms of service", "platform policy", "user policy", "API acceptable use"]
-  - skills: [judgment-summary, case-briefs]
-    trigger_terms: ["case-law synthesis", "judgment summary", "case brief", "판례 요약"]
-  - skills: [ingest]
-    trigger_terms: ["/ingest", "소스 추가", "자료 넣었어", "inbox", "파일 올렸", "파일 넣었"]
-
-deep_researcher:
-  agent: .claude/agents/deep-researcher/AGENT.md
-  max_parallel_researchers: 3
-  auto_parallel_for_complexity:
-    min_jurisdictions: 3
-    min_estimated_sources: 8
-    min_total_source_words: 20000
-  require_user_confirmation: true
-  handoff:
-    input: output/research-plan.json
-    output: output/research-result.json
-
-source_payload_contract: references/source-payload-contract.md
+{
+  "version": 1,
+  "purpose": "Compact routing table for project skills. JSON-compatible YAML so scripts can validate it without a YAML dependency.",
+  "core_workflow": [
+    {"step": 0, "skill": "onboard", "trigger": "user-config.json missing or user explicitly runs /onboard"},
+    {"step": 1, "skill": "query-interpreter", "trigger": "all non-trivial research requests"},
+    {"step": 2, "skill": "jurisdiction-mapper", "trigger": "standard workflow"},
+    {"step": 3, "skill": "web-researcher", "trigger": "source collection"},
+    {"step": 4, "skill": "fact-checker", "trigger": "standard workflow unless Quick Mode or KR-only direct primary-source lookup"},
+    {"step": 5, "skill": "source-scorer", "trigger": "standard workflow"},
+    {"step": 6, "skills": ["conflict-detector", "glossary-manager"], "trigger": "standard workflow"},
+    {"step": 7, "skill": "output-generator", "trigger": "deliverable generation"},
+    {"step": 8, "skill": "quality-checker", "trigger": "before delivery"},
+    {"step": 9, "skill": "citation-auditor", "trigger": "Mode B/C/D or memo/opinion deliverable after Step 8", "canonical_spec": "docs/citation-audit.md"}
+  ],
+  "specialists": [
+    {
+      "skills": ["legal-opinion-formatter"],
+      "trigger_terms": ["법률 의견서", "opinion letter", "legal opinion", "formal opinion", "opinion memo"],
+      "required_references": ["references/legal-writing-formatting-guide.md"]
+    },
+    {
+      "skills": ["legal-research"],
+      "trigger_terms": ["research methodology", "authority validation", "good law", "citation update", "filing"]
+    },
+    {
+      "skills": ["legal-research-summary", "client-memo"],
+      "trigger_terms": ["research digest", "client memo", "memo output", "summary memo"]
+    },
+    {
+      "skills": ["regulatory-summary", "compliance-summaries"],
+      "trigger_terms": ["market entry", "regulator obligations", "compliance summary", "licensing obligations"]
+    },
+    {
+      "skills": ["gambling-law-summary"],
+      "trigger_terms": ["gambling", "betting", "loot box", "chance mechanics", "gaming licensing"]
+    },
+    {
+      "skills": ["privacy-law-updates", "cyber-law-compliance-summary"],
+      "trigger_terms": ["privacy", "data protection", "cybersecurity", "personal information", "breach"]
+    },
+    {
+      "skills": ["antitrust-investigation-summary"],
+      "trigger_terms": ["antitrust", "competition", "cartel", "merger control", "dominance"]
+    },
+    {
+      "skills": ["ip-infringement-analysis"],
+      "trigger_terms": ["IP", "copyright", "trademark", "patent", "infringement", "trade secret"]
+    },
+    {
+      "skills": ["terms-of-service", "api-acceptable-use-policy"],
+      "trigger_terms": ["terms of service", "platform policy", "user policy", "API acceptable use"]
+    },
+    {
+      "skills": ["judgment-summary", "case-briefs"],
+      "trigger_terms": ["case-law synthesis", "judgment summary", "case brief", "판례 요약"]
+    },
+    {
+      "skills": ["ingest"],
+      "trigger_terms": ["/ingest", "소스 추가", "자료 넣었어", "inbox", "파일 올렸", "파일 넣었"]
+    }
+  ],
+  "deep_researcher": {
+    "agent": ".claude/agents/deep-researcher/AGENT.md",
+    "max_parallel_researchers": 3,
+    "auto_parallel_for_complexity": {
+      "min_jurisdictions": 3,
+      "min_estimated_sources": 8,
+      "min_total_source_words": 20000
+    },
+    "require_user_confirmation": true,
+    "handoff": {
+      "input": "output/research-plan.json",
+      "output": "output/research-result.json"
+    }
+  },
+  "source_payload_contract": "references/source-payload-contract.md"
+}

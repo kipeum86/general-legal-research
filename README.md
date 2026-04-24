@@ -431,7 +431,9 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |-- .claude/
 |   |-- settings.json                  # auto-ingest hook
 |   |-- settings.local.json            # WebFetch domain allowlist
-|   |-- routing/skills.yaml            # compact skill routing table
+|   |-- routing/
+|   |   |-- skills.yaml                 # compact skill routing table
+|   |   `-- fixtures.yaml              # representative routing validation fixtures
 |   |-- commands/
 |   |   `-- audit.md                   # /audit slash command entry point
 |   |-- agents/
@@ -476,6 +478,7 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 |   |-- eurlex_api.py                    # EUR-Lex SOAP API CLI wrapper (on-demand)
 |   |-- legal_source_registry.py          # legal_sources.yaml validator/query helper
 |   |-- release.py                       # release note/tag/docs preflight helper
+|   |-- validate_routing.py              # routing table + fixture validator
 |   |-- citation_audit_backend.py        # Step 9 registry/metadata enrichment
 |   |-- install-agentskills-set.ps1
 |   |-- library-ingest.py                # inbox → grade classification + Markdown conversion
@@ -508,6 +511,12 @@ Additional practitioner/commentary sources are listed in `.claude/skills/web-res
 ```
 
 </details>
+
+Skill routing is centralized in `.claude/routing/skills.yaml` and covered by representative fixtures in `.claude/routing/fixtures.yaml`. After editing either file, run:
+
+```bash
+python3 scripts/validate_routing.py
+```
 
 ---
 

@@ -1,0 +1,60 @@
+{
+  "schema_version": "routing-fixtures/v1",
+  "fixtures": [
+    {
+      "id": "ko_legal_opinion",
+      "query": "브라질 LGPD 국외이전 요건에 관해 한국어 법률 의견서로 작성해줘.",
+      "expected_skills": ["legal-opinion-formatter"]
+    },
+    {
+      "id": "research_methodology",
+      "query": "Before filing, update citations and verify good law for this authority list.",
+      "expected_skills": ["legal-research"]
+    },
+    {
+      "id": "client_memo",
+      "query": "Prepare a client memo summarizing the research digest for management.",
+      "expected_skills": ["legal-research-summary", "client-memo"]
+    },
+    {
+      "id": "regulatory_compliance",
+      "query": "Summarize market entry regulator obligations and compliance requirements for fintech licensing.",
+      "expected_skills": ["regulatory-summary", "compliance-summaries"]
+    },
+    {
+      "id": "gambling_lootbox",
+      "query": "Compare loot box and betting licensing rules for a game with chance mechanics.",
+      "expected_skills": ["gambling-law-summary"]
+    },
+    {
+      "id": "privacy_cyber",
+      "query": "Analyze data protection, personal information breach, and cybersecurity notification duties.",
+      "expected_skills": ["privacy-law-updates", "cyber-law-compliance-summary"]
+    },
+    {
+      "id": "antitrust_merger",
+      "query": "Assess antitrust merger control and dominance risk for the acquisition.",
+      "expected_skills": ["antitrust-investigation-summary"]
+    },
+    {
+      "id": "ip_infringement",
+      "query": "Evaluate copyright and trademark infringement risk for this product launch.",
+      "expected_skills": ["ip-infringement-analysis"]
+    },
+    {
+      "id": "platform_terms",
+      "query": "Review our API acceptable use policy and terms of service for platform users.",
+      "expected_skills": ["terms-of-service", "api-acceptable-use-policy"]
+    },
+    {
+      "id": "case_brief",
+      "query": "Create a judgment summary and case brief for this 판례 요약 request.",
+      "expected_skills": ["judgment-summary", "case-briefs"]
+    },
+    {
+      "id": "ingest_sources",
+      "query": "자료 넣었어. inbox 파일 올렸으니 /ingest 실행해줘.",
+      "expected_skills": ["ingest"]
+    }
+  ]
+}
