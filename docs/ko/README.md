@@ -1,3 +1,14 @@
+> [!IMPORTANT]
+> **본 저장소는 [`legal-research-agent`](https://github.com/kipeum86/legal-research-agent)에 통합되었습니다.**
+>
+> `legal-agent-orchestrator`와의 정합성 강화 + 토큰 효율화(일반법·게임 양 경로에 걸치는
+> 매터의 중복 디스패치 제거)를 위해 `general-legal-research`와 `game-legal-research`가
+> 단일 에이전트로 통합되었습니다. 향후 모든 개발은 `legal-research-agent`에서 이루어지며,
+> 본 저장소는 historical reference 용도로만 유지됩니다.
+>
+> **마이그레이션**: 통합 에이전트에서 `research_mode = general` 사용.
+> [migration-notes.md](https://github.com/kipeum86/legal-research-agent/blob/main/docs/migration-notes.md) 참조.
+
 <div align="center">
 
 # General Legal Research Agent

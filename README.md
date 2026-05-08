@@ -1,3 +1,15 @@
+> [!IMPORTANT]
+> **This repository has been merged into [`legal-research-agent`](https://github.com/kipeum86/legal-research-agent).**
+>
+> For tighter alignment with `legal-agent-orchestrator` and improved token efficiency
+> (eliminating double dispatch on matters that hit both general-law and game-industry routes),
+> `general-legal-research` and `game-legal-research` have been consolidated into a single
+> agent. All future development happens in `legal-research-agent`; this repository is kept
+> for historical reference only.
+>
+> **Migration**: use `research_mode = general` in the merged agent. See
+> [migration-notes.md](https://github.com/kipeum86/legal-research-agent/blob/main/docs/migration-notes.md).
+
 <div align="center">
 
 # General Legal Research Agent
