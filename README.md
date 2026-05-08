@@ -678,11 +678,13 @@ This agent is part of the **KP Legal Orchestrator** series of specialist legal w
 
 | Agent | Role | Specialty |
 |-------|------|-----------|
-| [game-legal-research](https://github.com/kipeum86/game-legal-research) | Game Industry Specialist | Game industry law |
+| **[legal-research-agent](https://github.com/kipeum86/legal-research-agent)** | **Legal Research Specialist (v2)** | **General law (supersedes general + game)** |
+| ~~[general-legal-research](https://github.com/kipeum86/general-legal-research)~~ *(this repo)* | ~~Legal Research Specialist~~ | Superseded by `legal-research-agent` |
+| ~~[game-legal-research](https://github.com/kipeum86/game-legal-research)~~ | ~~Game Industry Specialist~~ | Superseded by `legal-research-agent` |
 | [legal-translation-agent](https://github.com/kipeum86/legal-translation-agent) | Legal Translation Specialist | Legal translation |
-| **[general-legal-research](https://github.com/kipeum86/general-legal-research)** | **Legal Research Specialist** | **Legal research** |
-| [PIPA-expert](https://github.com/kipeum86/PIPA-expert) | Privacy Specialist (Korea) | Data privacy law |
-| [GDPR-expert](https://github.com/kipeum86/GDPR-expert) | Privacy Specialist (EU) | Data protection law (GDPR) |
+| [data-protection-agent](https://github.com/kipeum86/data-protection-agent) | Privacy / Data Protection Specialist (v2) | Korean PIPA + EU GDPR + cross-border data transfer |
+| ~~[PIPA-expert](https://github.com/kipeum86/PIPA-expert)~~ | ~~Privacy Specialist (Korea)~~ | Superseded by `data-protection-agent` |
+| ~~[GDPR-expert](https://github.com/kipeum86/GDPR-expert)~~ | ~~Privacy Specialist (EU)~~ | Superseded by `data-protection-agent` |
 | [contract-review-agent](https://github.com/kipeum86/contract-review-agent) | Contract Specialist | Contract review |
 | [legal-writing-agent](https://github.com/kipeum86/legal-writing-agent) | Legal Drafting Specialist | Legal writing |
 | [second-review-agent](https://github.com/kipeum86/second-review-agent) | Senior Review Specialist | Quality review |

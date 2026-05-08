@@ -592,11 +592,13 @@ citation-auditor는 두 가지 맥락에서 실행됩니다:
 
 | 에이전트 | 역할 | 전문 분야 |
 |---------|------|----------|
-| [game-legal-research](https://github.com/kipeum86/game-legal-research) | 게임산업 스페셜리스트 | 게임 산업법 |
+| **[legal-research-agent](https://github.com/kipeum86/legal-research-agent)** | **리서치 스페셜리스트 (v2)** | **일반법 (general + game 통합)** |
+| ~~[general-legal-research](https://github.com/kipeum86/general-legal-research)~~ *(이 리포)* | ~~리서치 스페셜리스트~~ | `legal-research-agent`로 대체 |
+| ~~[game-legal-research](https://github.com/kipeum86/game-legal-research)~~ | ~~게임산업 스페셜리스트~~ | `legal-research-agent`로 대체 |
 | [legal-translation-agent](https://github.com/kipeum86/legal-translation-agent) | 법률 번역 스페셜리스트 | 법률 번역 |
-| **[general-legal-research](https://github.com/kipeum86/general-legal-research)** | **리서치 스페셜리스트** | **법률 리서치** |
-| [PIPA-expert](https://github.com/kipeum86/PIPA-expert) | 개인정보 스페셜리스트 (한국) | 개인정보보호법 |
-| [GDPR-expert](https://github.com/kipeum86/GDPR-expert) | 개인정보 스페셜리스트 (EU) | 데이터 보호법 (GDPR) |
+| [data-protection-agent](https://github.com/kipeum86/data-protection-agent) | 프라이버시 / 데이터 보호 스페셜리스트 (v2) | 한국 PIPA + EU GDPR + 국경 간 데이터 이전 |
+| ~~[PIPA-expert](https://github.com/kipeum86/PIPA-expert)~~ | ~~개인정보 스페셜리스트 (한국)~~ | `data-protection-agent`로 대체 |
+| ~~[GDPR-expert](https://github.com/kipeum86/GDPR-expert)~~ | ~~개인정보 스페셜리스트 (EU)~~ | `data-protection-agent`로 대체 |
 | [contract-review-agent](https://github.com/kipeum86/contract-review-agent) | 계약 스페셜리스트 | 계약서 검토 |
 | [legal-writing-agent](https://github.com/kipeum86/legal-writing-agent) | 법률 드래프팅 스페셜리스트 | 법률 문서 작성 |
 | [second-review-agent](https://github.com/kipeum86/second-review-agent) | 시니어 리뷰 스페셜리스트 | 품질 리뷰 |
